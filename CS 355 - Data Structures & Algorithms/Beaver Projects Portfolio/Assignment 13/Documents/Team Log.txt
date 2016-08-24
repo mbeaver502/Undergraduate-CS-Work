@@ -1,0 +1,109 @@
+11/27/2012:
+
+
+	12:45-1:45: Proposal verified by teacher; Created Project; Created h and cpp files and wrote basic functions.
+	
+	4:00-4:30: Filled out remaining basic functions; Successfully tested adjacency list; Began new graph class
+
+	4:30-5:00: Graph class written and some functions tested.
+
+	5:00-5:30: Graph display tested and completed. Started working on queue.
+
+	5:30-6:00: Added functions to node class to return and change its data members; began working on Dijkstra function
+
+	6:00-7:00: Coded and tested Dijkstra; Works as long as a path from first node to last exists.
+
+	10:00-12:00: Michael fixed the errors in Dijkstra, added to graph class
+
+
+
+11/28.2012:
+
+
+	9:00-10:00: Andrew H started on binary heaps
+
+	4:00-5:00: Group worked on binary heap. Smaller functions working properly, insert is getting close
+	
+	5:00-5:30: Drew and Andrew work out errors with insert, works for ints
+
+	5:30-6:00: Group almost have remove figured out, almost ready for testing
+
+	6:00-6:15: Remove completed and successfully tested for ints. Heap fully functional for ints.
+
+	6:15-6:30: Saved the int version as a new file, began reworking using vertices.
+
+	6:30-6:45: All of heap class reworked for our nodes instead of ints. Simple tests successful.
+	
+	10:00-12:00: Michael puts new heap into shortest path algorithm, fixes some errors
+
+
+
+11/29/12:
+
+
+	1:15-1:45: Started test cases; Error found in old queue method,ignored since we dont use it anymore
+
+	1:45-2:15: Drew and Andrew work on more test cases, find some errors to be fixed.
+
+	4:00-4:30: Group fixed the newfound errors; continued testing, found new error.
+
+	4:30-5:00: Error still persists, morale is low
+
+	5:30-6:oo: Error finally resolved and tested, faith in ourselves restored
+
+	6:00-8:30: Drew and Michael code, fix, and test file io until our brains almost melt, but finally get it working
+
+
+
+11/30/12:
+
+	12:30-1:00: Michael straightens up code and finds an error
+	
+	1:00-1:30: Michael and Andrew fix error, find new error
+
+	1:30-2:00: Group fixes new error, starts on manual node adding
+
+	2:00-2:30: Group finishes manual node adding and adjacency adding, program complete, starts more intense testing
+
+	2:30-3:00: Thought we found an error, but it was just a blank line at the end of the txt file. Otherwise Successful testing.
+
+
+
+12/01/12:
+
+
+	1:00-3:30: Andrew finds error in shortest path, group fixes it. Group adds and tests file output.
+
+	3:30-4:00: Michael updates driver, added clear graph function, and fixed blank line file input annoyance.
+	
+
+
+12/02/12:
+
+	4:00-6:00: Michael and Drew added copy constructors and assignment operators.
+
+
+
+12/03/12:
+	
+	1:15-2:30: Drew adds some of the final documentation.
+
+	4:00-4:30: Group finishes final documentation and begin final testing and transferring testing plan from paper to computer.
+
+	4:30-6:30: Group performs and documents final testing, begins ideas on presentation.
+
+	8:00-8:30: Group starts working on presentation.
+
+	8:30-9:00: Group creates their individual parts of presentations, and compile them together.
+
+	9:00-9:30: Group practices presentation together. 
+
+	~30 minutes for each: All practice individually at home after meeting and the next morning before class. 
+
+
+
+Total time count: 30 hours 30 minutes
+	Group: 16 hours 15 minutes
+	Drew: 22 hours 30 minutes
+	Michael: 26 hours 15 minutes
+	Andrew: 19 hours 15 minutes

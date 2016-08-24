@@ -1,0 +1,21 @@
+Minutes 10012012
+-----------------
+
+Members: Drew, Michael, Andrew, and Elizabeth
+
+Time: 8:00pm - 10:30pm
+
+* Incorporating Drew's large tree input test case
+	-- 25 item input
+
+* Drew, Michael, and Elizabeth developed test cases
+	-- Insert, Print In Order, Print Pre-Order, Print Post-Order, Empty, ClearList, GoToPrev, GoToNext, GoToBeginning, GoToEnd, Copy Constructor, and Assignment Operator
+
+* Drew, Andrew, and Elizabeth worked on Remove and helper routine
+
+* Michael incorporated test cases into assignment document
+	-- 5 thorough test cases
+
+* Drew wrote a findParent method
+	-- Group helped him debug it
+		-- Because it didn't work so good

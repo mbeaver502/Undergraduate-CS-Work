@@ -1,0 +1,20 @@
+Minutes 09272012
+---------------------
+
+Members: Michael, Andrew, and Drew (Skype)
+
+Time: 4:00pm - 5:00pm
+
+* Michael finished GoToPrev and respective helper routine
+	-- Recursive In Order search for previous Node
+
+* Discussed different ways to implement CopyList
+	-- Recursive with call to Insert
+		-- Loops inside loops => inefficient
+	-- Recursive Pre Order insertion copy
+		-- Gets root(s), left subtree(s), and right subtree(s)
+		-- Works for BSTs
+		-- Forgot to implement check for source list's cursor location
+			-- Fixed => now functions properly
+
+	

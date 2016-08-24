@@ -1,0 +1,21 @@
+Minutes 09242012
+-------------------
+
+Members: Drew, Andrew, Michael, Elizabeth
+Time: 4:00pm - 5:15pm
+
+* Discussing how to print a binary search tree
+	-- Line by line down the tree
+		1) Push Node data from each line into a dynamic buffer
+		2) Output the buffer
+		3) Go to 1, start from previous line+1
+		4) Repeat until left and right pointers are NULL
+	-- By order (up left, Root, down right)
+		1) Recurse left sub-tree
+		2) Output Root
+		3) Recurse right sub-tree
+
+* Big O presentation
+	-- Developed example graphs
+	-- Discussed ways to illustrate examples
+	-- Explained how Big O works as a loose upper bound

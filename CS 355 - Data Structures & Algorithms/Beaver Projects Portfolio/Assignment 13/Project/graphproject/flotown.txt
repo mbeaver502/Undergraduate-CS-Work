@@ -1,0 +1,59 @@
+16
+Power line segments
+Power stations
+Miles
+Seven Points
+Cox Creek Pkwy
+Cloverdale
+Darby Dr
+Downtown Florence
+East Florence
+Florence Blvd
+Huntsville Rd
+Mall
+McFarland Park
+Northwest Florence
+Random Park
+Savannah Hwy
+UNA Campus
+Wilson Dam
+Wal-Mart
+Seven Points->UNA Campus(3)
+Cox Creek Pkwy->Cloverdale(10)
+Cox Creek Pkwy->Northwest Florence(10)
+Cox Creek Pkwy->Seven Points(10)
+Cloverdale->Northwest Florence(10)
+Darby Dr->Cox Creek Pkwy(8)
+Darby Dr->Northwest Florence(15)
+Darby Dr->Seven Points(6)
+Downtown Florence->UNA Campus(3)
+Downtown Florence->McFarland Park(6)
+Downtown Florence->Savannah Hwy(12)
+Downtown Florence->Florence Blvd(8)
+East Florence->Huntsville Rd(15)
+East Florence->Wal-Mart(5)
+Florence Blvd->UNA Campus(2)
+Florence Blvd->Cox Creek Pkwy(11)
+Florence Blvd->Seven Points(6)
+Huntsville Rd->Darby Dr(7)
+Huntsville Rd->Mall(7)
+Huntsville Rd->Florence Blvd(6)
+Mall->Wal-Mart(2)
+Mall->Florence Blvd(12)
+Mall->Darby Dr(7)
+Mall->Cox Creek Pkwy(12)
+McFarland Park->Savannah Hwy(15)
+Northwest Florence->Random Park(8)
+Northwest Florence->Seven Points(8)
+Random Park->Savannah Hwy(2)
+Random Park->Seven Points(10)
+Savannah Hwy->Seven Points(11)
+Savannah Hwy->UNA Campus(12)
+Wilson Dam->East Florence(12)
+Wilson Dam->Wal-Mart(10)
+Wilson Dam->Mall(8)
+Wilson Dam->Huntsville Rd(6)
+Wilson Dam->Florence Blvd(10)
+Wilson Dam->Downtown Florence(15)
+Wilson Dam->McFarland Park(20)
+Wal-Mart->Cox Creek Pkwy(15)

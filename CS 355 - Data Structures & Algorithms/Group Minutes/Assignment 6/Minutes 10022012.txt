@@ -1,0 +1,15 @@
+Minutes 10022012
+-----------------
+
+Members: Drew, Michael, Andrew, and Elizabeth
+
+Time: 6:00pm - 8:00pm
+
+* Michael implemented Behemoth test case into driver program
+
+* Drew and Elizabeth finished iterative Remove method
+	-- Drew explained his Remove method
+
+* Michael incorporated the rest of the Behemoth test case into the project document
+
+* Michael added additional test cases

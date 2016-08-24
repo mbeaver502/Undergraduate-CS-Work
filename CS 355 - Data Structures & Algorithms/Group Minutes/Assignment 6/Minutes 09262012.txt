@@ -1,0 +1,19 @@
+Minutes 09262012
+-------------------
+
+Group Members: Andrew, Drew, Michael, and Elizabeth (Skype)
+Time: 4:00pm - 6:30pm
+
+* Michael implemented recursive ClearList method and helper routine
+
+* Andrew implemented iterative Find method
+
+* Discussing different ways to implement GoToNext
+	-- Iterative x
+	-- Different versions of recursion
+		-- Using tripped flags
+		-- Some work for specific cases, not all cases
+	-- Load tree in order into a dynamic array, the next value is the one directly after the one at the cursor
+		-- Can be incredibly inefficient with large trees
+		-- Includes potentially wasteful amount of memory for potentially have the tree that is unnecessary (e.g., left sub-tree if cursor is in right sub-tree)
+	-- Got very close to working

@@ -1,0 +1,33 @@
+﻿Build started 12/11/2012 3:52:23 PM.
+     1>Project "C:\Users\Michael\Desktop\Papers\Computer Science\CS 355\Projects Portfolio\Assignment 11\Project\SortSystem\SortSystem.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\SortSystem.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt BubbleSort.cpp driver.cpp InsertionSort.cpp MergeSort.cpp QuickSort.cpp RadixSort.cpp SelectionSort.cpp
+         SelectionSort.cpp
+         RadixSort.cpp
+         QuickSort.cpp
+         MergeSort.cpp
+         InsertionSort.cpp
+         driver.cpp
+         BubbleSort.cpp
+         Generating Code...
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 355\Projects Portfolio\Assignment 11\Project\Debug\SortSystem.exe" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\SortSystem.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 355\Projects Portfolio\Assignment 11\Project\Debug\SortSystem.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 355\Projects Portfolio\Assignment 11\Project\Debug\SortSystem.lib" /MACHINE:X86 Debug\BubbleSort.obj
+         Debug\driver.obj
+         Debug\InsertionSort.obj
+         Debug\MergeSort.obj
+         Debug\QuickSort.obj
+         Debug\RadixSort.obj
+         Debug\SelectionSort.obj
+         SortSystem.vcxproj -> C:\Users\Michael\Desktop\Papers\Computer Science\CS 355\Projects Portfolio\Assignment 11\Project\Debug\SortSystem.exe
+       Manifest:
+         c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 355\Projects Portfolio\Assignment 11\Project\Debug\SortSystem.exe;#1" /manifest Debug\SortSystem.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "Debug\SortSystem.unsuccessfulbuild".
+         Touching "Debug\SortSystem.lastbuildstate".
+     1>Done Building Project "C:\Users\Michael\Desktop\Papers\Computer Science\CS 355\Projects Portfolio\Assignment 11\Project\SortSystem\SortSystem.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:10.75

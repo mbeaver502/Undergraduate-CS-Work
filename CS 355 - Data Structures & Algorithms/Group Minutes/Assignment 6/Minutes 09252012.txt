@@ -1,0 +1,32 @@
+Minutes 09252012
+-------------------
+
+Members: Drew, Andrew, Michael, Elizabeth
+Time: 4:00pm - 6:00pm
+
+* Discussed ways to implemented a Print routine for Binary Search Tree
+	-- How to traverse the sub-trees while outputting each value
+
+* Worked out the logic to Print In Order
+	-- Andrew Hamilton figured out the logic to perform an In Order print
+	-- Tried different implementations of code
+	-- Tried different code logic to traverse left sub-tree of BST
+	-- Had difficulty figuring out how to go down the right side of the left sub-tree of the BST
+	-- After numerous failures, looked online for help
+	-- Our efforts were somewhat more complex than necessary
+	-- Adapted a solution from David Eck (http://math.hws.edu/eck/cs225/s03/binary_trees/)
+		-- Eck's solution is a basic recursive implementation of our logic, whereas our efforts were overtly complex and difficult to trace (not to mention wrong)
+
+* Worked out the logic for Preorder Print and Postorder Print
+	-- Copied and adjusted the code from PrintInOrder as necessary
+
+* Andrew Hamilton implemented GoToBeginning and GoToEnd
+
+* Used Michael's iterative implementation of Insert rather than recursive implementation
+	-- Already implemented ahead of time, so kept it
+
+* Drew and Andrew implemented AtCursor
+
+* Everyone implemented BNode's GetData and BST's Empty methods
+
+* Everyone implemented BNode's constructors and BST's constructor

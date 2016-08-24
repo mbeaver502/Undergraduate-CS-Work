@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Sort Headers">
+      <UniqueIdentifier>{b51a0c39-c3a8-4b8f-9919-3142d0704ae3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sort Headers\NLogNSorts">
+      <UniqueIdentifier>{13dfc877-419d-4d26-9d9c-59f512e903a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sort Headers\NSquaredSorts">
+      <UniqueIdentifier>{a626dace-ad66-48f8-b062-c8c0dcb3c19e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sort Sources">
+      <UniqueIdentifier>{6c906082-28d3-44a3-bd2d-0d2bce8c49e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sort Sources\NSquaredSorts">
+      <UniqueIdentifier>{00c77919-bb78-4570-addc-c327aa622e5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sort Sources\NLogNSorts">
+      <UniqueIdentifier>{746f8c3e-1099-480b-a143-b6dea273eb56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sort Sources\LinearSorts">
+      <UniqueIdentifier>{3bad93ae-15f0-4901-b7be-eddcb4afffc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sort Headers\LinearSorts">
+      <UniqueIdentifier>{ac19c65f-8e5b-4130-a049-920ab79769c0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="driver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BubbleSort.cpp">
+      <Filter>Source Files\Sort Sources\NSquaredSorts</Filter>
+    </ClCompile>
+    <ClCompile Include="InsertionSort.cpp">
+      <Filter>Source Files\Sort Sources\NSquaredSorts</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectionSort.cpp">
+      <Filter>Source Files\Sort Sources\NSquaredSorts</Filter>
+    </ClCompile>
+    <ClCompile Include="RadixSort.cpp">
+      <Filter>Source Files\Sort Sources\LinearSorts</Filter>
+    </ClCompile>
+    <ClCompile Include="MergeSort.cpp">
+      <Filter>Source Files\Sort Sources\NLogNSorts</Filter>
+    </ClCompile>
+    <ClCompile Include="QuickSort.cpp">
+      <Filter>Source Files\Sort Sources\NLogNSorts</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NSquaredSorts.h">
+      <Filter>Header Files\Sort Headers\NSquaredSorts</Filter>
+    </ClInclude>
+    <ClInclude Include="BubbleSort.h">
+      <Filter>Header Files\Sort Headers\NSquaredSorts</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectionSort.h">
+      <Filter>Header Files\Sort Headers\NSquaredSorts</Filter>
+    </ClInclude>
+    <ClInclude Include="InsertionSort.h">
+      <Filter>Header Files\Sort Headers\NSquaredSorts</Filter>
+    </ClInclude>
+    <ClInclude Include="NLogNSorts.h">
+      <Filter>Header Files\Sort Headers\NLogNSorts</Filter>
+    </ClInclude>
+    <ClInclude Include="MergeSort.h">
+      <Filter>Header Files\Sort Headers\NLogNSorts</Filter>
+    </ClInclude>
+    <ClInclude Include="QuickSort.h">
+      <Filter>Header Files\Sort Headers\NLogNSorts</Filter>
+    </ClInclude>
+    <ClInclude Include="RadixSort.h">
+      <Filter>Header Files\Sort Headers\LinearSorts</Filter>
+    </ClInclude>
+    <ClInclude Include="SortingSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractSort.h">
+      <Filter>Header Files\Sort Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="LinearSorts.h">
+      <Filter>Header Files\Sort Headers\LinearSorts</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
