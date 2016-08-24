@@ -1,0 +1,307 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR: QQ 
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+                           1 ************************************
+                           2 * TRAVIS HUNT  *
+                           3 * 04/17/13  *
+                           4 * PROGRAM 5  *
+                           5 ************************************
+                           6 * DESCRIPTION  *
+                           7 * THIS PROGRAM ACCEPTS AS INPUT A  *
+                           8 * FILE
+                           9 ************************************
+                          10 * REGISTER KEY  *
+                          11 * REG 2 - POINTER TO INPUT LINE   *
+                          12 * REG 11 - USED TO CALL SUBPROGRAM *
+                          13 ************************************
+000000                    14 THPROG5  START
+
+DRIVER CODE
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 2
+
+000000 90EC D00C          16          STM   14,12,12(13) BEGINNING HOUSEKEEPING
+000004 05C0               17          BALR  12,0 .
+000006                    18          USING HERE,12 .
+000006 50D0 C17E          19 HERE     ST    13,SAVEAREA+4 .
+00000A 41D0 C17A          20          LA    13,SAVEAREA .
+
+                          22 *
+00000E E020 C352 0027     23          XPRNT =C'               SAVINGS  ACCOUNT  REPORT',39
+000014 E020 C379 0018     24          XPRNT =C' TRAN.CODE        AMOUNT',24
+00001A E020 C391 001F     25          XPRNT =C'+      RATE     CURRENT BALANCE',31
+                          26 *
+000020 F820 C1F9 C3B0     27          ZAP   DEPNUM(3),=P'0'
+000026 F820 C1FC C3B0     28          ZAP   WITHNUM(3),=P'0'
+00002C F840 C1FF C3B0     29          ZAP   DEPTOTAL(5),=P'0'
+000032 F840 C204 C3B0     30          ZAP   WITHTOTA(5),=P'0'
+                          31 *
+
+000038 E000 C1C3 000A     33 READIN   XREAD INLINE,10 WILL READ IN UNTIL END OF FILE
+00003E 4740 C094          34          BC    B'0100',ENDREAD
+000042 E020 C3B1 0005     35          XPRNT =C'     ',5
+000048 E020 C1C2 0002     36          XPRNT CC,2
+                          37 *
+00004E 95F0 C1C3          38          CLI   INLINE,C'0' CHECKS FOR INITIAL BALANCE
+000052 4770 C058          39          BC    B'0111',SKIP0
+000056 45B0 C24E          40          BAL   11,INITBAL
+00005A 47F0 C090          41          BC    B'1111',BOTTOM
+                          42 *
+00005E 95F1 C1C3          43 SKIP0    CLI   INLINE,C'1' CHECKS FOR DEPOSIT
+000062 4770 C06E          44          BC    B'0111',SKIP1
+000066 FA20 C1F9 C3B6     45          AP    DEPNUM(3),=P'1'
+00006C 45B0 C276          46          BAL   11,DEPOSIT
+000070 47F0 C090          47          BC    B'1111',BOTTOM
+                          48 *
+000074 95F2 C1C3          49 SKIP1    CLI   INLINE,C'2' CHECKS FOR WITHDRAWAL
+000078 4770 C084          50          BC    B'0111',SKIP2
+00007C FA20 C1FC C3B6     51          AP    WITHNUM(3),=P'1'
+000082 45B0 C2A6          52          BAL   11,WITHDRAW
+000086 47F0 C090          53          BC    B'1111',BOTTOM
+                          54 *
+00008A 95F3 C1C3          55 SKIP2    CLI   INLINE,C'3' CHECKS FOR INTEREST
+00008E 4770 C090          56          BC    B'0111',BOTTOM
+000092 45B0 C2E6          57          BAL   11,INTEREST
+000096 47F0 C032          58 BOTTOM   BC    B'1111',READIN
+                          59 *
+00009A E020 C3B7 000E     60 ENDREAD  XPRNT =C'0# DEPOSITS  =',14
+0000A0 DE05 C20A C1F9     61          ED    DEPPAT(6),DEPNUM GENERATES PRINTABLE NUM OF DEP.
+0000A6 E020 C209 0007     62          XPRNT DEPNUMCC,7
+0000AC E020 C3C5 001B     63          XPRNT =C' TOTAL AMOUNT OF DEPOSITS =',27
+0000B2 4130 C1FF          64          LA    3,DEPTOTAL
+0000B6 45A0 C230          65          BAL   10,PRINT PRINTS DEPOSIT TOTAL
+0000BA F864 C223 C1FF     66          ZAP   TEMPINTR(7),DEPTOTAL(5)
+0000C0 E020 C3E0 001B     67          XPRNT =C' AVG. AMOUNT/DEPOSIT      =',27
+0000C6 F920 C1F9 C3B0     68          CP    DEPNUM(3),=P'0' CHECKS AGAINST 0 DEPOSITS
+0000CC 4780 C0F4          69          BC    B'1000',NODEPO
+0000D0 FD62 C223 C1F9     70          DP    TEMPINTR(7),DEPNUM(3) FINDS THE AVG DEPOSIT AMOUNT
+0000D6 FA22 C227 C227     71          AP    REMAIN(3),REMAIN(3)
+0000DC F922 C227 C1F9     72          CP    REMAIN(3),DEPNUM(3)
+0000E2 4740 C0E6          73          BC    B'0100',NOROUNDD
+0000E6 FA30 C223 C3B6     74          AP    QUOTIENT(4),=P'1'
+0000EC F843 C1FF C223     75 NOROUNDD ZAP   DEPTOTAL(5),QUOTIENT(4)   SAVES AVERAGE DEPOSIT
+0000F2 45A0 C230          76          BAL   10,PRINT
+0000F6 47F0 C0FA          77          BC    B'1111',NEXT
+0000FA E020 C3FB 000E     78 NODEPO   XPRNT =C'+        $0.00',14 IF NO DEP. PRINTS 0
+                          79 *
+000100 E020 C409 0011     80 NEXT     XPRNT =C'0# WITHDRAWALS  =',17
+000106 DE05 C211 C1FC     81          ED    WITHPAT(6),WITHNUM   GENERATES PRINTABLE NUM OF WITH.
+00010C E020 C210 0007     82          XPRNT WITNUMCC,7
+000112 E020 C41A 001E     83          XPRNT =C' TOTAL AMOUNT OF WITHDRAWALS =',30
+000118 4130 C204          84          LA    3,WITHTOTA
+00011C 45A0 C230          85          BAL   10,PRINT PRINTS DEPOSIT TOTAL
+000120 F864 C223 C204     86          ZAP   TEMPINTR(7),WITHTOTA(5)
+000126 E020 C438 001E     87          XPRNT =C' AVG. AMOUNT/WITHDRAWAL      =',30
+00012C F920 C1FC C3B0     88          CP    WITHNUM(3),=P'0' CHECKS AGAINST 0 WITHDRAWALS
+000132 4780 C15A          89          BC    B'1000',NOWITH
+000136 FD62 C223 C1FC     90          DP    TEMPINTR(7),WITHNUM(3) FINDS AVG WITHDRAWAL AMOUNT
+00013C FA22 C227 C227     91          AP    REMAIN(3),REMAIN(3)
+000142 F922 C227 C1FC     92          CP    REMAIN(3),WITHNUM(3)
+000148 4740 C14C          93          BC    B'0100',NOROUNDW
+00014C FA30 C223 C3B6     94          AP    QUOTIENT(4),=P'1'
+000152 F843 C204 C223     95 NOROUNDW ZAP   WITHTOTA(5),QUOTIENT(4)   SAVES AVERAGE WITHDRAWAL
+000158 45A0 C230          96          BAL   10,PRINT
+00015C 47F0 C160          97          BC    B'1111',FINAL
+000160 E020 C3FB 000E     98 NOWITH   XPRNT =C'+        $0.00',14 IF NO WITH. PRINTS 0
+                          99 *
+000166 E020 C456 001F    100 FINAL    XPRNT =C'0            CURRENT BALANCE  =',31
+00016C 4130 C1CD         101          LA    3,CURRBAL
+000170 45A0 C230         102          BAL   10,PRINT PRINTS FINAL CURRENT BALANCE
+                         103 *
+000174 58D0 C17E         104          L     13,SAVEAREA+4 END HOUSEKEEPING
+000178 98EC D00C         105          LM    14,12,12(13) .
+00017C 07FE              106          BR    14 .
+000180                   107 SAVEAREA DS    18F
+0001C8 4E                108 CC       DC    C'+'
+0001C9                   109 INLINE   DS    CL10 STORAGE FOR LINE READ IN FROM FILE
+0001D3                   110 CURRBAL  DS    PL5 CURRENT BALANCE
+0001D8 40206B2020206B20  111 PATTERN  DC    X'40206B2020206B2021204B202060'
+0001E6 4E                112 MONCC    DC    C'+'
+0001E7                   113 MONPAT   DS    CL14
+0001F5                   114 DEPOVALU DS    PL5 DEPOSIT AMOUNT
+0001FA                   115 WITHVALU DS    PL5 WITHDRAWAL AMOUNT
+0001FF                   116 DEPNUM   DS    PL3 NUMBER OF DEPOSITS
+000202                   117 WITHNUM  DS    PL3 NUMBER OF WITHDRAWALS
+000205                   118 DEPTOTAL DS    PL5 TOTAL AMOUNT OF DEPOSITS
+00020A                   119 WITHTOTA DS    PL5 TOTAL AMOUNT OF WITHDRAWALS
+00020F 4E                120 DEPNUMCC DC    C'+'
+000210 402020202120      121 DEPPAT   DC    X'402020202120' PATTERN FOR DEPOSIT NUM
+000216 4E                122 WITNUMCC DC    C'+'
+000217 402020202120      123 WITHPAT  DC    X'402020202120' PATTERN FOR WITHDRAWAL NUM
+00021D                   124 MINBAL   DS    PL5 MINIMUM BALANCE
+000222                   125 INTRRATE DS    PL2 INTEREST RATE
+000224 40214B2020        126 INTERPAT DC    X'40214B2020' INTEREST PATTERN
+000229                   127 TEMPINTR DS    0PL7 TEMP LOCATION FOR INTEREST AMOUNT
+000229                   128 QUOTIENT DS    PL4
+00022D                   129 REMAIN   DS    PL3 REMAINDER
+000230 4E                130 INTERCC  DC    C'+'
+000231                   131 INTPRINT DS    CL5 USED TO PRINT INTEREST
+                         132 *
+
+SUBPROGRAM CODE
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 3
+
+
+                         135 ******************************
+                         136 * EDITS/PRINTS MONEY AMOUNTS *
+                         137 ***********************************
+                         138 * REGISTER KEY *
+                         139 *---------------------------------*
+                         140 * REG  3 - POINTER TO PRINTED NUM *
+                         141 * REG 10 - BRANCH BACK TO CALLER *
+                         142 ***********************************
+000236 D20D C1E1 C1D2    143 PRINT    MVC   MONPAT(14),PATTERN
+00023C 4110 C1EA         144          LA    1,MONPAT+9 SETS REG 1 TO THE 21 SIGN. DIGIT
+000240 DF0D C1E1 3000    145          EDMK  MONPAT(14),0(3)
+000246 0610              146          BCTR  1,0
+000248 925B 1000         147          MVI   0(1),C'$' ADDS $ TO BEGINNING OF MONEY
+00024C E020 C1E0 000F    148          XPRNT MONCC,15
+000252 07FA              149          BR    10
+                         150 *
+
+                         152 ************************
+                         153 * SETS INITIAL BALANCE *
+                         154 ***********************************
+                         155 *  REGISTER KEY *
+                         156 *---------------------------------*
+                         157 * REG  2 - POINTER TO 2ND NUMBER  *
+                         158 * REG 11 - BRANCH BACK TO CALLER *
+                         159 ***********************************
+000254 F248 C1CD C1C4    160 INITBAL  PACK  CURRBAL(5),INLINE+1(9)
+00025A E020 C475 0006    161          XPRNT =C'+     ',6
+000260 4130 C1CD         162          LA    3,CURRBAL
+000264 45A0 C230         163          BAL   10,PRINT PRINTS THE CURRENT BALANCE
+000268 E020 C47B 0010    164          XPRNT =C'+               ',16
+00026E E020 C1E0 000F    165          XPRNT MONCC,15
+000274 F844 C217 C1CD    166          ZAP   MINBAL(5),CURRBAL(5) MAKES CURRENT BALANCE MIN BAL
+00027A 07FB              167          BR    11
+                         168 *
+
+                         170 ***********************
+                         171 * PROCESSES A DEPOSIT *
+                         172 ***********************************
+                         173 * REGISTER KEY *
+                         174 *---------------------------------*
+                         175 * REG  3 - POINTER TO PRINT MONEY *
+                         176 * REG 10 - CALL PRINT ROUTINE *
+                         177 * REG 11 - BRANCH BACK TO CALLER *
+                         178 ***********************************
+00027C F248 C1EF C1C4    179 DEPOSIT  PACK  DEPOVALU(5),INLINE+1(9)
+000282 FA44 C1CD C1EF    180          AP    CURRBAL(5),DEPOVALU(5) ADDS DEP TO CURRENT BAL
+000288 FA44 C1FF C1EF    181          AP    DEPTOTAL(5),DEPOVALU(5) ADDS DEP TO DEP TOTAL
+00028E E020 C475 0006    182          XPRNT =C'+     ',6
+000294 4130 C1EF         183          LA    3,DEPOVALU
+000298 45A0 C230         184          BAL   10,PRINT PRINTS THE DEPOSIT AMOUNT
+00029C E020 C47B 0010    185          XPRNT =C'+               ',16
+0002A2 4130 C1CD         186          LA    3,CURRBAL
+0002A6 45A0 C230         187          BAL   10,PRINT PRINTS THE CURRENT BALANCE
+0002AA 07FB              188          BR    11
+                         189 *
+
+                         191 **************************
+                         192 * PROCESSES A WITHDRAWAL *
+                         193 ***********************************
+                         194 * REGISTER KEY *
+                         195 *---------------------------------*
+                         196 * REG  3 - POINTER TO PRINT MONEY *
+                         197 * REG 10 - CALL PRINT ROUTINE *
+                         198 * REG 11 - BRANCH BACK TO CALLER *
+                         199 ***********************************
+0002AC F248 C1F4 C1C4    200 WITHDRAW PACK  WITHVALU(5),INLINE+1(9)
+0002B2 FB44 C1CD C1F4    201          SP    CURRBAL(5),WITHVALU(5) SUBTRACTS WITHDRAWAL FROM BAL
+0002B8 FA44 C204 C1F4    202          AP    WITHTOTA(5),WITHVALU(5) ADDS WITH. AMOUNT TO TOTAL
+0002BE E020 C475 0006    203          XPRNT =C'+     ',6
+0002C4 4130 C1F4         204          LA    3,WITHVALU
+0002C8 45A0 C230         205          BAL   10,PRINT PRINTS THE WITHDRAWAL AMOUNT
+0002CC E020 C47B 0010    206          XPRNT =C'+               ',16
+0002D2 4130 C1CD         207          LA    3,CURRBAL
+0002D6 45A0 C230         208          BAL   10,PRINT PRINTS THE CURRENT BAL
+0002DA F944 C217 C1CD    209          CP    MINBAL(5),CURRBAL(5)
+0002E0 47C0 C2E4         210          BC    B'1100',WITHBOTT IF MINBAL IS STILL MIN, SKIP NEXT
+0002E4 F844 C217 C1CD    211          ZAP   MINBAL(5),CURRBAL(5)
+0002EA 07FB              212 WITHBOTT BR    11
+                         213 *
+
+                         215 *************************************
+                         216 * PROCESSES AN INTEREST TRANSACTION *
+                         217 *************************************
+                         218 * REGISTE      R KEY *
+                         219 *---------------------------------*
+                         220 * REG  3 - POINTER TO PRINT MONEY *
+                         221 * REG 10 - CALL PRINT ROUTINE *
+                         222 * REG 11 - BRANCH BACK TO CALLER *
+                         223 ***********************************
+0002EC F212 C21C C1C4    224 INTEREST PACK  INTRRATE(2),INLINE+1(3)
+0002F2 E020 C48B 0018    225          XPRNT =C'+                       ',24
+0002F8 D204 C22B C21E    226          MVC   INTPRINT(5),INTERPAT
+0002FE DE04 C22B C21C    227          ED    INTPRINT(5),INTRRATE GENERATES PRINTABLE INT. RATE
+000304 E020 C22A 0006    228          XPRNT INTERCC,6
+00030A F940 C217 C3B0    229          CP    MINBAL(5),=P'0' CHECKS AGAINST INTEREST RATE OF 0
+000310 47D0 C33C         230          BC    B'1101',NOINT IF 0, NO INTEREST IS CALCULATED
+000314 F864 C223 C217    231          ZAP   TEMPINTR(7),MINBAL(5)
+00031A FC61 C223 C21C    232          MP    TEMPINTR(7),INTRRATE(2) FINDS AMOUNT TO BE ADDED
+000320 FD62 C223 C4A3    233          DP    TEMPINTR(7),=P'10000'
+000326 F922 C227 C4A6    234          CP    REMAIN(3),=P'5000'
+00032C 4740 C330         235          BC    B'0100',NOROUND
+000330 FA30 C223 C3B6    236          AP    QUOTIENT(4),=P'1' ROUNDS UP IF NECESSARY
+000336 F843 C217 C223    237 NOROUND  ZAP   MINBAL(5),QUOTIENT(4)
+00033C FA44 C1CD C217    238          AP    CURRBAL(5),MINBAL(5) ADDS INT AMOUNT TO BAL
+000342 E020 C4A9 0007    239 NOINT    XPRNT =C'+      ',7
+000348 4130 C1CD         240          LA    3,CURRBAL
+00034C 45A0 C230         241          BAL   10,PRINT PRINTS CURRENT BALANCE
+000350 F844 C217 C1CD    242          ZAP   MINBAL(5),CURRBAL(5) MAKES CURRENT BALANCE MINBAL
+000356 07FB              243          BR    11
+                         244 *
+                         245          END   THPROG5
+000358 4040404040404040               =C'               SAVINGS  ACCOUNT  REPORT'
+00037F 40E3D9C1D54BC3D6               =C' TRAN.CODE        AMOUNT'
+000397 4E404040404040D9               =C'+      RATE     CURRENT BALANCE'
+0003B6 0C40                           =P'0'
+0003B7 4040404040                     =C'     '
+0003BC 1CF0                           =P'1'
+0003BD F07B40C4C5D7D6E2               =C'0# DEPOSITS  ='
+0003CB 40E3D6E3C1D340C1               =C' TOTAL AMOUNT OF DEPOSITS ='
+0003E6 40C1E5C74B40C1D4               =C' AVG. AMOUNT/DEPOSIT      ='
+000401 4E40404040404040               =C'+        $0.00'
+00040F F07B40E6C9E3C8C4               =C'0# WITHDRAWALS  ='
+000420 40E3D6E3C1D340C1               =C' TOTAL AMOUNT OF WITHDRAWALS ='
+00043E 40C1E5C74B40C1D4               =C' AVG. AMOUNT/WITHDRAWAL      ='
+00045C F040404040404040               =C'0            CURRENT BALANCE  ='
+00047B 4E4040404040                   =C'+     '
+000481 4E40404040404040               =C'+               '
+000491 4E40404040404040               =C'+                       '
+0004A9 10000C05000C                   =P'10000'
+0004AC 05000C4E4040                   =P'5000'
+0004AF 4E404040404040                 =C'+      '
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+              SAVINGS  ACCOUNT  REPORT
+TRAN.CODE        AMOUNT      RATE     CURRENT BALANCE
+    0           $212.14                      $212.14 
+    1           $110.00                      $322.14 
+    1            $90.00                      $412.14 
+    1            $31.00                      $443.14 
+    2            $35.00                      $408.14 
+    2             $2.00                      $406.14 
+    1             $4.59                      $410.73 
+    3                        4.00            $419.22 
+
+# DEPOSITS  =     4
+TOTAL AMOUNT OF DEPOSITS =      $235.59 
+AVG. AMOUNT/DEPOSIT      =       $58.90 
+
+# WITHDRAWALS  =     2
+TOTAL AMOUNT OF WITHDRAWALS =       $37.00 
+AVG. AMOUNT/WITHDRAWAL      =       $18.50 
+
+            CURRENT BALANCE  =      $419.22 
+
+*** EXECUTION COMPLETED ***

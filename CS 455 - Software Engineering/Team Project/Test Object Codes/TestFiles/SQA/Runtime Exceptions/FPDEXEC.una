@@ -1,0 +1,31 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Test Object Codes\TestFiles\SQA\AEEXEC.PRT
+#
+*
+* THIS PROGRAM WILL ILLUSTRATE THE FOLLOWING EXCEPTION:
+*        FIXED-POINT DIVIDE EXCEPTION
+* CHAD FARLEY
+* MICHAEL BEAVER
+*
+FPDEXEC  START  
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+*
+         L     3,=F'3'
+         D     2,=F'45'
+*
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+CARD     DS    CL80
+VALUE    DC    X'80000000'
+         END   FPDEXEC
+$ENTRY

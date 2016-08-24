@@ -1,0 +1,79 @@
+#
+#9999
+#9999
+#9999
+#9999
+#C:\Users\Andrew\Documents\CS 455\TestCases\Classes\Assembler\HUNT\THPROG1.PRT
+#
+***********************************
+* TRAVIS HUNT *
+* 02/20/2013 *
+* PROGRAM 1 *
+***********************************
+* DESCRIPTION *
+* THIS PROGRAM WILL TAKE IN AS    *
+* INPUT AN UNKNOWN NUMBER OF DATA *
+* LINES WHICH EACH CONTAIN 3  *
+* INTEGER VALUES SEPARATED BY AT  *
+* LEAST 1 BLANK. *
+* THE PROGRAM WILL THEN PRINT THE *
+* LARGEST VALUE ON EACH LINE AS *
+* WELL AS THE SUM OF THE LARGEST  *
+* VALUES. THE LARGEST VALUE FOR  *
+* EACH LINE WILL BE STORED IN *
+* REGISTER 7. IF THE VALUE IN  *
+* REGISTER 8 IS GREATER, THE *
+* VALUE IS COPIED INTO REGISTER 8 *
+***********************************
+* REGISTER KEY *
+* REG 7 - 1ST/LARGE NUMBER *
+* REG 8 - SECOND NUMBER *
+* REG 9 - SUM OF LARGEST *
+***********************************
+PROG1    START
+BEGINHK  STM   14,12,12(13)   BEGINNING HOUSEKEEPING
+         BALR  12,0   .
+         USING HERE,12   .
+HERE     ST    13,SAVEAREA+4   .
+         LA    13,SAVEAREA   .
+*
+         SR    9,9   SETS REG 9 TO 0 FOR SUM
+*
+****************************************
+*      READ TILL END OF FILE LOOP  *
+****************************************
+TOPREAD  XREAD LINE,80
+         BC    B'0100',ENDREAD   EOF REACHED, GO TO END
+GETFIRST XDECI 7,LINE   GETS THE FIRST INTEGER
+GETNEXT  XDECI 8,0(1)   GETS THE NEXT INTEGER
+         CR    7,8
+         BC    B'1010',GETTHIRD   SKIPS NEXT IF REG7 > REG8
+         LR    7,8    
+GETTHIRD XDECI 8,0(1)   GETS THE THIRD INTEGER
+         CR    7,8
+         BC    B'1010',PRINT   SKIPS NEXT IF REG7 > REG8
+         LR    7,8
+PRINT    XDECO 7,OUTLINE   
+         XPRNT CC,38   PRINTS LARGEST IN LINE
+SUMNUMS  AR    9,7   ADDS NUMBER TO SUM REG
+BOTTOM   BC    B'1111',TOPREAD   LOOPS BACK TO READ NEXT
+*
+ENDREAD  XDECO 9,SUMOUT
+         XPRNT FINAL,38   PRINTS SUM OF LARGEST
+         XPRNT =C'0CORRECT',8
+*
+ENDHK    L     13,SAVEAREA+4   END HOUSEKEEPING
+         LM    14,12,12(13)   .
+         BR    14   .
+SAVEAREA DS    18F   .
+****************************************
+*               STORAGE                *
+****************************************
+LINE     DS    CL80   STORAGE FOR INPUT LINE
+CC       DC    C'0LARGEST NUMBER IN ROW:   '
+OUTLINE  DS    CL12   STORAGE FOR NUMBER OUTPUT
+FINAL    DC    C'0SUM OF LARGEST INTEGERS: '
+SUMOUT   DS    CL12   STORAGE FOR SUM OF LARGEST
+*
+         END   PROG1 
+$ENTRY PROG1.DAT

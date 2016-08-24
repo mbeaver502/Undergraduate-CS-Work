@@ -1,0 +1,144 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR:  
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+                           1 *ANDREW AARON
+                           2 *ASSIGNMENT:PROGRAM 3
+                           3 *DUE: 3/21/2013
+                           4 *
+                           5 *DESCRIPTION:
+                           6 *    THIS PROGRAM WILL READ IN INTEGERS, VERIFY THAT THEY ARE VALID
+                           7 *  GRADES, INSERT UP TO 30 INTO A TABLE, AND PRINT THEM OUT.
+                           8 *    THE PROGRAM WILL THEN SORT THE GRADES IN THE TABLE, AND PRINT
+                           9 *  OUT THE SORTED TABLE.
+                          10 *
+                          11 *INPUT: UNKNOWN NUMBER OF INTEGERS, ONLY READS UP TO 30 VALID ONES
+                          12 *OUTPUT: FIRST PRINTS THE TABLE AS ENTERED, THEN THE SORTED TABLE
+                          13 *
+                          14 *
+                          15 *REGISTER KEY:
+                          16 *  REGISTER 2 - HOLDS THE CONTROL REGISTER IN THE READ LOOP. HOLDS
+                          17 *    THE TOP OF SEARCH POINTER IN THE SORT LOOP.
+                          18 *  REGISTER 3 - TEMPORARILY HOLDS EACH INTEGER IN THE READ LOOP
+                          19 *  REGISTER 4 - HOLDS THE STEP COUNT OF THE LOOPS
+                          20 *  REGISTER 5 - HOLDS THE TERMINAL VALUE FOR THE LOOPS
+                          21 *  REGISTER 6 - POINTER TO THE GREATEST VALUE IN THE SORT LOOP
+                          22 *  REGISTER 7 - HOLDS THE SEARCH POINTER IN THE SORT LOOP
+                          23 *  REGISTER 8 - HOLDS THE GREATEST VALUE FOUND PER LOOP
+                          24 *  REGISTER 9 - USED AS A TEMP VARIABLE TO SWAP GRADES
+                          25 *  REGISTER 11 - HOLDS THE ADDRESS OF NEXT INSTRUCTION AFTER A SUB
+                          26 *
+                          27 *VARIABLE KEY:
+                          28 *  CARD - HOLDS ONE DATA LINE AT A TIME
+                          29 *  TABLE - WHERE THE ARRAY OF INTEGERS IS STORED
+                          30 *  CC - FOR CARRIAGE CONTROL
+                          31 *  OUT - HOLDS OUTPUT LINE
+                          32 *  MAXGRADE - GREATEST INTEGER THAT IS A VALID GRADE
+                          33 *  MINGRADE - SMALLEST INTEGER THAT IS A VALID GRADE
+                          34 *  HEADER1 - HEADER FOR SUBREAD SUBROUTINE
+                          35 *  HEADER2 - HEADER FOR SUBSORT SUBROUTINE
+                          36 *  HEADER3 - HEADER FOR SUBPRNT SUBROUTINE
+                          37 *
+                          38 **********************************************************************
+                          39 *                            BEGINNING HK
+000000                    40 PROJECT3 START
+000000 90EC D00C          41          STM   14,12,12(13)
+000004 05C0               42          BALR  12,0
+000006                    43          USING HERE,12
+000006 50D0 C026          44 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C022          45          LA    13,SAVEAREA
+
+                          47 **********************************************************************
+                          48 *                                BODY
+
+00000E 45B0 C186          50          BAL   11,SUBREAD
+000012 45B0 C204          51          BAL   11,SUBPRNT
+000016 45B0 C1C4          52          BAL   11,SUBSORT
+00001A 45B0 C204          53          BAL   11,SUBPRNT
+
+                          55 **********************************************************************
+                          56 *                               END HK
+00001E 58D0 C026          57          L     13,SAVEAREA+4
+000022 98EC D00C          58          LM    14,12,12(13)
+000026 07FE               59          BR    14
+000028                    60 SAVEAREA DS    18F
+                          61 **********************************************************************
+                          62 *                              VARIABLES
+
+000070                    64 CARD     DS    CL80            SEE VARIABLE KEY
+0000C0                    65 TABLE    DS    30F
+000138 40                 66 CC       DC    C' '
+000139                    67 OUT      DS    CL12
+000148 00000064           68 MAXGRADE DC    F'100'
+00014C 00000000           69 MINGRADE DC    F'0'
+00014D 000000F0D9C5C1C4   70 HEADER1  DC    C'0READING IN VALID INPUT...'
+000167 4B4B4BF0E2D6D9E3   71 HEADER2  DC    C'0SORTING GRADES...'
+000179 4B4B4BF1C9D5E3C5   72 HEADER3  DC    C'1INTEGERS IN TABLE:'
+
+                          74 **********************************************************************
+                          75 *                             SUBROUTINES
+                          76 *
+                          77 *THIS SUBROUTINE FIRST READS IN AND VARIFIES ONE INTEGER AT A TIME.
+                          78 *IF THE INTEGER IS A VALID GRADE, IT STORES IT IN TABLE AND LOOPS BACK
+
+00018C D3C5 7AE0 20C1     80 SUBREAD  XPRNT HEADER1,26
+000192 4700 1A41          81          LA    2,TABLE
+000196 20C0 BA41          82          LA    4,4
+00019A 4000 0441          83          LA    5,TABLE+116       STORES UP TO 30 GRADES
+00019E 50C1 2EE0 00C0     84 TOPREAD  XREAD CARD,80
+0001A4 6A00 5047          85          BC    B'0100',ENDREAD   IF EOF, STOP READING
+0001A8 40C1 BE53          86          XDECI 3,CARD
+0001AC 30C0 6A59          87          C     3,MAXGRADE        IF INT READ IS >100
+0001B0 30C1 4247          88          BC    B'0010',TOPREAD   THEN ITS NOT A VALID GRADE
+0001B4 20C1 9859          89          C     3,MINGRADE        ALSO INVALID IF ITS <0
+0001B8 30C1 4647          90          BC    B'0100',TOPREAD
+0001BC 40C1 9850          91          ST    3,0(2)            STORES ONLY IF A VALID GRADE
+0001C0 3200 0087          92          BXLE  2,4,TOPREAD
+0001C4 24C1               93 ENDREAD  LR    5,2              SET NEW TERMINAL VALUE
+0001C6 9818               94          SR    5,4
+0001C8 521B               95          BR    11
+                          96 *
+
+                          98 *THIS SUBROUTINE WILL SORT THE INTEGERS IN THE TABLE.
+
+0001CA 5407 FBE0 20C1    100 SUBSORT  XPRNT HEADER2,18
+0001D0 6100 1241         101          LA    2,TABLE
+0001D4 20C0 BA41         102          LA    4,4
+0001D8 4000 0458         103 OUTLOOP  L     8,0(2)            SET LARGEST FOUND TO TOPOFSEARCH
+0001DC 8200              104          LR    7,2               RESET SEARCH POINTER TO CURRENT TOP
+0001DE 0018              105          LR    6,7
+0001E0 7218 6759         106 INLOOP   C     8,0(7)            IS VALUE AT SEARCH POINTER>GREATEST
+0001E4 8700 0047         107          BC    B'1010',TRYNEXT   IF NOT, SKIP IT FOR NOW
+0001E8 A0C1 E858         108          L     8,0(7)            IF SO, SET IT AS NEW GREATEST
+0001EC 8700              109          LR    6,7               AND SET LARGEST FOUND POINTER
+0001EE 0018 6787         110 TRYNEXT  BXLE  7,4,INLOOP
+0001F2 74C1 DA58         111          L     9,0(2)            SWAP TOPOFSEARCH WITH GREATEST
+0001F6 9200 0050         112          ST    9,0(6)
+0001FA 9600 0050         113          ST    8,0(2)
+0001FE 8200 0087         114          BXLE  2,4,OUTLOOP
+000202 24C1 D2E0 20C1    115          XPRNT CC,1
+000208 3200              116          BR    11
+                         117 *
+
+                         119 *THIS SUBROUTINE WILL PRINT THE INTEGERS IN THE TABLE.
+
+00020A 0107 FBE0 20C1    121 SUBPRNT  XPRNT HEADER3,19
+000210 7300 1341         122          LA    2,TABLE
+000214 20C0 BA41         123          LA    4,4
+000218 4000 0458         124 TOPPRNT  L     3,0(2)          LOAD EACH INTEGER FROM TABLE TO REG3
+00021C 3200 0052         125          XDECO 3,OUT           CONVERT & PRINT EACH INT FROM REG 3
+000220 30C1 33E0 20C1    126          XPRNT CC,13
+000226 3200 0D87         127          BXLE  2,4,TOPPRNT
+00022A 24C2              128          BR    11
+                         129 **********************************************************************
+                         130 *                            END OF PROGRAM
+                         131          END   PROJECT3
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+

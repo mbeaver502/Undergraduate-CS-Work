@@ -1,0 +1,159 @@
+#
+#5000
+#500
+#100
+#2700
+#
+#
+*ANDREW HAMILTON
+*PROGRAM #6
+*4/21/13
+*THIS PROGRAM WILL READ IN UP TO 30 LINES OF DATA CONTAINING ONE
+*INTEGER BETWEEN 0 AND 100 PER LINE. IT WILL THEN SORT THE NUMBERS
+*IN DESCENDING ORDER AND PRINT THEM OUT.
+AHPROG6  START
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+*
+         LA    1,TABLE
+         L     15,=V(INPUT)   CALL TO THE EXTERNAL SUBROUTINES
+         BALR  14,15
+         LA    1,TABLE
+         L     15,=V(SORT)
+         BALR  14,15
+         LA    1,TABLE
+         L     15,=V(PRINT)
+         BALR  14,15
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+*
+SAVEAREA DS    18F
+TABLE    DS    30F
+         LTORG
+*
+*THE INPUT ROUTINE READS IN UP TO 30 LINES OF DATA AND INSERTS
+*THEM INTO A TABLE. IT WILL ONLY ACCEPT NUMBERS BETWEEN 0 AND 100
+*
+INPUT    CSECT
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HEREINPT,12
+HEREINPT ST    13,SAVEINPT+4
+         LA    13,SAVEINPT
+*
+         LA    2,0(1)       INITIALIZE REGISTERS FOR THE
+         LA    4,4          BXLE LOOP
+         LA    5,120(2)
+         LA    6,0         REG 6 AND 7 ARE USED TO CHECK FOR
+         LA    7,100       VALID INPUT
+INPTLOOP XREAD LINE,80
+         BC    B'0100',ENDREAD
+         XDECI 3,LINE
+         CR    3,6           COMPARE EACH INPUT VALUE WITH 0 AND
+         BC    B'1011',NEXT  100, IF < 0 OR > 100, REG 2 IS 
+         SR    2,4           DECREMENTED AND THE VALUE IS NOT INPUT
+         BC    B'1111',BOTTOM
+NEXT     CR    3,7
+         BC    B'1101',NEXT2
+         SR    2,4
+         BC    B'1111',BOTTOM
+NEXT2    ST    3,0(2)
+BOTTOM   BXLE  2,4,INPTLOOP
+ENDREAD  LR    5,2         SET REG 5 TO POINT TO THE BOTTOM
+         LA    4,4         TABLE
+         SR    5,4
+         L     13,SAVEINPT+4
+         LM    14,12,12(13)
+         BR    14
+LINE     DS    CL80
+SAVEINPT DS    18F
+         LTORG
+*
+*THE PRINT ROUTINE PRINTS THE VALUES IN THE TABLE FROM TOP TO
+*BOTTOM
+*
+PRINT    CSECT
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HEREPRNT,12
+HEREPRNT ST    13,SAVEPRNT+4
+         LA    13,SAVEPRNT
+         LA    4,4
+         LA    2,0(1)
+         LA    5,120(2)
+PRNT     L     3,0(2)
+         XDECO 3,OUT
+         XPRNT CC,13
+         BXLE  2,4,PRNT
+         L     13,SAVEPRNT+4
+         LM    14,12,12(13)
+         BR    14
+SAVEPRNT DS    18F
+CC       DC    C'0'
+OUT      DS    CL12
+         LTORG
+*
+*THE SORT ROUTINE USES THE SELECTION SORT ALGORITHM TO SORT THE
+*TABLE IN DESCENDING ORDER
+*
+SORT     CSECT
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERESORT,12
+HERESORT ST    13,SAVESORT+4
+         LA    13,SAVESORT
+         LA    2,0(1)           
+         LA    5,120(2)        THE OUTER BXLE LOOP USES 2 AS THE
+         LA    4,4             CONDITION REG AND 5 AS THE TERMINAL
+OUTER    LA    6,0(2)          VALUE
+         LA    7,0(2)          REG 7 HOLDS THE LARGEST VALUE FOUND
+INNER    L     8,0(6)
+         C     8,0(7)           COMPARE 7 WITH ALL THE VALUES IN THE
+         BC    B'1101',ENDINNER  TABLE AND IF THE ARE > REG 7, SET 7
+         LA    7,0(6)           TO POINT TO THE LARGER VALUE
+ENDINNER BXLE  6,4,INNER
+         L     9,0(2)        USE REG 9 AND 10 TO SWAP THE LARGEST
+         L     10,0(7)       VALUE FOUND WITH THE TOP OF THE LIST-
+         ST    9,0(7)        SWAP REG 2 AND REG 7
+         ST    10,0(2)
+         BXLE  2,4,OUTER
+         L     13,SAVESORT+4
+         LM    14,12,12(13)
+         BR    14
+SAVESORT DS    18F
+         END   AHPROG6
+$ENTRY
+15
+1
+4
+8
+6
+20
+44
+67
+5
+19
+66
+45
+32
+78
+34
+55
+64
+33
+66
+7
+53
+11
+25
+09
+88
+76
+99
+33
+22
+44

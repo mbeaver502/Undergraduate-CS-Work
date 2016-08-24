@@ -1,0 +1,86 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR: SF 
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+                           1 *
+                           2 * THIS PROGRAM WILL ILLUSTRATE THE FOLLOWING EXCEPTION:
+                           3 *        DATA EXCEPTION
+                           4 * CHAD FARLEY
+                           5 * MICHAEL BEAVER
+                           6 *
+000000                     7 DATAEXEC START
+000000 90EC D00C           8          STM   14,12,12(13)
+000004 05C0                9          BALR  12,0
+000006                    10          USING HERE,12
+000006 50D0 C02A          11 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C026          12          LA    13,SAVEAREA
+                          13 *
+00000E E000 C06E 0050     14          XREAD CARD,80
+000014 F234 C0BE C06E     15          PACK  LOCATION(4),CARD(5)
+00001A FA33 C0BE C0BE     16          AP    LOCATION,LOCATION(4)
+                          17 *
+000020 58D0 C02A          18          L     13,SAVEAREA+4
+000024 98EC D00C          19          LM    14,12,12(13)
+000028 07FE               20          BR    14
+00002C                    21 SAVEAREA DS    18F
+000074                    22 CARD     DS    CL80
+0000C4                    23 LOCATION DS    PL4
+                          24          END   DATAEXEC
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+*** EXECUTION COMPLETED ***PSW AT ABEND:  XXXXXXXX 00X000020      COMPLETION CODE: 0C7 DATA
+
+** TRACE OF INSTRUCTIONS JUST BEFORE TERMINATION **
+
+           LOCATION    INSTRUCTION
+           ========    ===============
+            000000     90EC D00C
+            000004     05C0
+            000006     50D0 C02A
+            00000A     41D0 C026
+            00000E     E000 C06E 0050
+            000014     F234 C0BE C06E
+            00001A     FA33 C0BE C0BE    <-- Last instruction executed.
+
+
+
+** TRACE OF LAST 10 BRANCH INSTRUCTIONS EXECUTED **
+
+           LOCATION    INSTRUCTION
+           ========    ===============
+            000004     05C0    <-- Last branch executed.
+
+
+
+R0-7 :F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 
+R8-15:F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 00000006 0000002C 00000110 00000000 
+
+
+USER STORAGE:   CORE ADDRESSES SPECIFIED - 000000 to 000A8C
+
+000000      90ECD00C   05C050D0   C02A41D0   C026E000      *..}..{.}{..}{.\.*
+000010      C06E0050   F234C0BE   C06EFA33   C0BEC0BE      *{>..2.{.{>..{.{.*
+000020      58D0C02A   98ECD00C   07FEF5F5   F5F5F5F5      *.}{.q.}...555555*
+000030      000000C8   F5F5F5F5   F5F5F5F5   F5F5F5F5      *...H555555555555*
+000040      F5F5F5F5   F5F5F5F5   F5F5F5F5   F5F5F5F5      *5555555555555555*
+            LINES:   000040 - 000060    ARE IDENTICAL
+000070      F5F5F5F5   F0F15CF2   F3404040   40404040      *555501*23       *
+000080      40404040   40404040   40404040   40404040      *                *
+            LINES:   000080 - 0000B0    ARE IDENTICAL
+0000C0      40404040   0001C23F   F5F5F5F5   F5F5F5F5      *    ..B.55555555*
+0000D0      F5F5F5F5   00000110   00000000   F4F4F4F4      *5555........4444*
+0000E0      F4F4F4F4   F4F4F4F4   F4F4F4F4   F4F4F4F4      *4444444444444444*
+            LINES:   0000E0 - 000100    ARE IDENTICAL
+000110      F5F5F5F5   F5F5F5F5   F5F5F5F5   F5F5F5F5      *5555555555555555*
+            LINES:   000110 - 000A70    ARE IDENTICAL
+000A80      F5F5F5F5   F5F5F5F5   F5F5F5F5                 *555555555555*
+
+                 ***  END OF USER MEMORY  ***

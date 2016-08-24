@@ -1,0 +1,93 @@
+#
+#9999
+#9999
+#9999
+#9999
+#C:\Users\Travis\Documents\Courses\Spring 2014\Software Engineering\Team Project\Test Files\Assembler\THPROG4.PRT
+#
+************************************
+* TRAVIS HUNT  *
+* 03/11/13  *
+* PROGRAM 2  *
+************************************
+* DESCRIPTION  *
+* THIS PROGRAM ACCEPTS AS INPUT A  *
+* DATA FILE CONTAINING EXACLTY 20  *
+* LINES OF INTEGERS, ONE INTEGER   *
+* PER LINE. THE DATA ARE STORED    *
+* IN A TABLE. THE PROGRAM WILL   *
+* THEN PRINT THE VALUES IN THE   *
+* ORDER IN WHICH THEY WERE STORED. *
+* FINALLY, THE VALUES WILL BE   *
+* PRINTED AGAIN IN THE REVERSE  *
+* ORDER.    *
+************************************
+* REGISTER KEY  *
+* REG 2 - POINTER TO THE TABLE  *
+* REG 5 - USED FOR OUTPUT  *
+* REG 8 - STEP SIZE FOR LOOPS   *
+* REG 9 - TERMINAL VALUE FOR LOOPS *
+* REG 11 - USED TO CALL SUBPROGRAM *
+************************************
+THPROG2  START
+         TITLE 'DRIVER CODE'
+         STM   14,12,12(13) BEGINNING HOUSEKEEPING
+         BALR  12,0 .
+         USING HERE,12 .
+HERE     ST    13,SAVEAREA+4 .
+         LA    13,SAVEAREA .
+         SPACE
+         BAL   11,READSUB CALLS SUBPROGRAM TO READ IN VALUES
+*
+         XPRNT =C'1THE TABLE IN ORDER:',20
+         BAL   11,PRINTREG CALLS SUBPROGRAM TO PRINT REGULAR
+* 
+         XPRNT =C'1THE TABLE IN REVERSE ORDER:',28
+         BAL   11,PRINTREV CALLS SUBPROGRAM TO PRINT REVERSE
+         SPACE
+         L     13,SAVEAREA+4 END HOUSEKEEPING
+         LM    14,12,12(13) .
+         BR    14 .
+SAVEAREA DS    18F .
+         TITLE 'SUBPROGRAM CODE'
+         SPACE
+***************************
+* WILL READ IN DATA FILE  *
+*************************** 
+READSUB  LA    2,TABLE BEGIN READ SUBROUTINE
+         LA    8,4
+         LA    9,TABLE+76 POINTER TO LAST ITEM IN TABLE
+READTOP  XREAD LINE,80
+         XDECI 5,LINE
+         ST    5,0(2)
+         BXLE  2,8,READTOP
+         BR    11 END READSUB, RETURN TO DRIVER
+LINE     DS    CL80
+         SPACE
+****************************
+* WILL PRINT TABLE REGULAR *
+**************************** 
+PRINTREG LA    2,TABLE BEGIN PRINT REGULAR SUBROUTINE
+REGTOP   L     5,0(2)
+         XDECO 5,OUTLINE
+         XPRNT CC,13
+         BXLE  2,8,REGTOP
+         BR    11 END PRINTREG, RETURN TO DRIVER
+         SPACE
+****************************
+* WILL PRINT TABLE REVERSE *
+****************************
+PRINTREV LA    2,TABLE+76 BEGIN PRINT REVERSE SUBROUTINE
+         L     8,=F'-4'
+         LA    9,TABLE-4
+REVTOP   L     5,0(2)
+         XDECO 5,OUTLINE
+         XPRNT CC,13
+         BXH   2,8,REVTOP
+         BR    11 END PRINTREV, RETURN TO DRIVER
+CC       DC    C' '
+OUTLINE  DS    CL12 STORAGE FOR OUTPUT
+TABLE    DS    20F    STORAGE FOR NUMBERS
+*
+         END   THPROG2
+$ENTRY DATA2.TXT

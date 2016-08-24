@@ -1,0 +1,61 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Test Object Codes\TestFiles\EXTTEST.PRT
+#
+HOUSE    START
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+         L     15,=V(TEST1)
+         BALR  14,15
+         L     15,=V(TEST2)
+         BALR  14,15
+         L     15,=V(TEST3)
+         BALR  14,15
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+         LTORG
+TEST1    CSECT
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE2,12
+HERE2    ST    13,SAVE2+4
+         LA    13,SAVE2
+         XPRNT =C'0TEST SUB 1',11
+         L     13,SAVE2+4
+         LM    14,12,12(13)
+         BR    14
+SAVE2    DS    18F  
+         LTORG
+TEST2    CSECT
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE3,12
+HERE3    ST    13,SAVE3+4
+         LA    13,SAVE3
+         XPRNT =C'0TEST SUB 2',11
+         L     13,SAVE3+4
+         LM    14,12,12(13)
+         BR    14
+SAVE3    DS    18F    
+         LTORG
+TEST3    CSECT
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE4,12
+HERE4    ST    13,SAVE4+4
+         LA    13,SAVE4
+         XPRNT =C'0TEST SUB 3',11
+         L     13,SAVE4+4
+         LM    14,12,12(13)
+         BR    14
+SAVE4    DS    18F          
+         END   HOUSE 
+$ENTRY

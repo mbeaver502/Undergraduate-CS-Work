@@ -1,0 +1,238 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR: WW 
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+                           1 ************************************
+                           2 * TRAVIS HUNT  *
+                           3 * 04/22/13  *
+                           4 * PROGRAM 6  *
+                           5 ************************************
+                           6 * DESCRIPTION  *
+                           7 * THIS PROGRAM ACCEPT AS INPUT A  *
+                           8 * NUMBER OF LINES EQUAL TO UP TO  *
+                           9 * 30 LINES. EACH LINE MUST CONTAIN *
+                          10 * ONE TEST SCORE IN THE RANGE 0 TO *
+                          11 * 100. THE SCORES WILL THEN BE   *
+                          12 * DISPLAYED IN THE ORDER THEY WERE *
+                          13 * READ IN. NEXT, THE SCORES WILL   *
+                          14 * BE SORTED IN DESCENDING ORDER    *
+                          15 * AND DISPLAYED AGAIN IN THAT  *
+                          16 * ORDER. THIS ULTILIZES EXTERNAL  *
+                          17 * SUBROUTINES.   *
+                          18 ************************************
+                          19 * REGISTER KEY  *
+                          20 * REG 2 - STEPSIZE FOR LOOPS  *
+                          21 * REG 3 - TERMINAL VALUE FOR LOOPS *
+                          22 * REG 4 - POINTER FOR TABLE   *
+                          23 * REG 5 - USED FOR OUTPUT/SEARCH  *
+                          24 * REG 6 - POINTER TO LAST ITEM  *
+                          25 * REG 7 - HOLDS LARGEST VALUE  *
+                          26 * REG 8 - USED FOR TEMP FOR SWAP  *
+                          27 * REG 11 - USED TO CALL SUBPROGRAM *
+                          28 ************************************
+000000                    29 THPROG6  START
+
+DRIVER CODE
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 2
+
+000000 90EC D00C          31          STM   14,12,12(13) BEGINNING HOUSEKEEPING
+000004 05C0               32          BALR  12,0 .
+000006                    33          USING HERE,12 .
+000006 50D0 C04A          34 HERE     ST    13,SAVEAREA+4 .
+00000A 41D0 C046          35          LA    13,SAVEAREA .
+
+00000E 4110 C132          37          LA    1,PARMLIST
+000012 58F0 C13A          38          L     15,=V(READIN)
+000016 05EF               39          BALR  14,15 CALLS SUBPROGRAM TO READ IN VALUES
+                          40 *
+000018 4110 C132          41          LA    1,PARMLIST
+00001C E020 C106 0014     42          XPRNT LINE1,20
+000022 58F0 C13E          43          L     15,=V(PRINT)
+000026 05EF               44          BALR  14,15 CALLS SUBPROGRAM TO PRINT TABLE
+
+                          46 *
+000028 4110 C132          47          LA    1,PARMLIST
+00002C 58F0 C142          48          L     15,=V(SORT)
+000030 05EF               49          BALR  14,15 CALLS SUBPROGRAM TO SORT VALUES
+                          50 *
+000032 4110 C132          51          LA    1,PARMLIST
+000036 E020 C11A 0012     52          XPRNT LINE2,18
+00003C 58F0 C13E          53          L     15,=V(PRINT)
+000040 05EF               54          BALR  14,15 CALLS SUBPROGRAM TO PRINT TABLE
+
+                          56 *
+000042 58D0 C04A          57          L     13,SAVEAREA+4 END HOUSEKEEPING
+000046 98EC D00C          58          LM    14,12,12(13) .
+00004A 07FE               59          BR    14 .
+00004C                    60 SAVEAREA DS    18F .
+000094                    61 TABLE    DS    30F STORAGE FOR NUMBERS
+00010C F1E3C8C540D6D9C9   62 LINE1    DC    C'1THE ORIGINAL TABLE:'
+000120 F0E3C8C540E2D6D9   63 LINE2    DC    C'0THE SORTED TABLE:'
+000134                    64 BOTPOINT DS    F
+000138 00000094           65 PARMLIST DC    A(TABLE)
+00013C 00000134           66          DC    A(BOTPOINT)
+                          67          LTORG
+000140 00000000                       =V(READIN)
+000144 00000000                       =V(PRINT)
+000148 00000000                       =V(SORT)
+
+SUBPROGRAM CODE
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 3
+
+
+                          70 ***************************
+                          71 * WILL READ IN DATA FILE  *
+                          72 *********************************************
+                          73 *   REGISTER KEY   *
+                          74 *-------------------------------------------*
+                          75 * REG 2 - STEP SIZE    *
+                          76 * REG 3 - TERMINAL VALUE   *
+                          77 * REG 4 - TOP OF TABLE   *
+                          78 * REG 5 - USED FOR OUTPUT   *
+                          79 * REG 6 - USED AS TEMP TO SAVE END OF TABLE *
+                          80 * REG 11 - USED TO BRANCH BACK TO DRIVER *
+                          81 *********************************************
+00014C                    82 READIN   CSECT
+00014C 90EC D00C          83          STM   14,12,12(13)
+000150 05C0               84          BALR  12,0
+000152                    85          USING READHERE,12
+000152 50D0 C0A2          86 READHERE ST    13,READSAVE+4
+000156 41D0 C09E          87          LA    13,READSAVE
+                          88 *
+00015A 5841 0000          89          L     4,0(1) MAKES REG 4 POINT TO TABLE
+00015E 5871 0004          90          L     7,4(1)
+000162 4120 0004          91          LA    2,4
+000166 4134 0074          92          LA    3,116(4) POINTER TO LAST ITEM IN TABLE
+00016A E000 C04E 0050     93 READTOP  XREAD LINE,80
+000170 4740 C03A          94          BC    B'0100',READDONE NO MORE LINES TO READ
+000174 5350 C04E          95          XDECI 5,LINE
+000178 4740 C018          96          BC    B'0100',READTOP NEGATIVE,BRANCH TOP W/O INCREMENTING
+00017C 5950 C0E6          97          C     5,=F'100'
+000180 4720 C018          98          BC    B'0010',READTOP TOO BIG,BRANCH TOP W/O INCREMENTING
+000184 5054 0000          99          ST    5,0(4)
+000188 8742 C018         100 BOTTOMRE BXLE  4,2,READTOP
+00018C 1864              101 READDONE LR    6,4 SAVES ADDRESS OF LAST ITEM STORED
+00018E 5B60 C0EA         102          S     6,=F'4'
+000192 5067 0000         103          ST    6,0(7)
+                         104 *
+000196 58D0 C0A2         105          L     13,READSAVE+4
+00019A 98EC D00C         106          LM    14,12,12(13)
+00019E 07FE              107          BR    14 END READSUB, RETURN TO DRIVER
+                         108 *
+0001A0                   109 LINE     DS    CL80
+0001F0                   110 READSAVE DS    18F
+                         111          LTORG
+000238 00000064                       =F'100'
+00023C 00000004                       =F'4'
+
+SUBPROGRAM CODE
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 4
+
+                         113 ****************************
+                         114 *     WILL PRINT TABLE     *
+                         115 **********************************************
+                         116 *   REGISTER KEY     *
+                         117 *--------------------------------------------*
+                         118 * REG 2 - STEP SIZE    *
+                         119 * REG 3 - TERMINAL VALUE (LAST ITEM IN LIST) *
+                         120 * REG 4 - TOP OF TABLE    *
+                         121 * REG 5 - USED AS OUTPUT    *
+                         122 * REG 11 - USED TO BRANCH BACK TO DRIVER  *
+                         123 **********************************************
+000240                   124 PRINT    CSECT  BEGIN PRINT HOUSEKEEPING
+000240 90EC D00C         125          STM   14,12,12(13)
+000244 05C0              126          BALR  12,0
+000246                   127          USING PRINHERE,12
+000246 50D0 C046         128 PRINHERE ST    13,PRINSAVE+4
+00024A 41D0 C042         129          LA    13,PRINSAVE
+                         130 *
+00024E 4120 0004         131          LA    2,4
+000252 5841 0000         132          L     4,0(1) BEGIN PRINT REGULAR SUBROUTINE
+000256 5831 0004         133          L     3,4(1)
+00025A 5833 0000         134          L     3,0(3)
+00025E 5854 0000         135 PRINTTOP L     5,0(4)
+000262 5250 C035         136          XDECO 5,OUTLINE
+000266 E020 C034 000D    137          XPRNT CC,13
+00026C 8742 C018         138          BXLE  4,2,PRINTTOP
+                         139 *
+000270 58D0 C046         140          L     13,PRINSAVE+4
+000274 98EC D00C         141          LM    14,12,12(13)
+000278 07FE              142          BR    14 END PRINTREG, RETURN TO DRIVER
+00027A 40                143 CC       DC    C' '
+00027B                   144 OUTLINE  DS    CL12 STORAGE FOR OUTPUT
+000288                   145 PRINSAVE DS    18F
+                         146          LTORG
+
+SUBPROGRAM CODE
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 5
+
+                         148 ****************************
+                         149 *   WILL SORT THE TABLE    *
+                         150 **********************************************
+                         151 *   REGISTER KEY     *
+                         152 *--------------------------------------------*
+                         153 * REG 2 - STEP SIZE    *
+                         154 * REG 3 - TERMINAL VALUE (LAST ITEM IN LIST) *
+                         155 * REG 4 - TOP OF SEARCH    *
+                         156 * REG 5 - SEARCH POINTER    *
+                         157 * REG 6 - POINTER TO LARGEST VALUE   *
+                         158 * REG 7 - HOLDS LARGEST VALUE    *
+                         159 * REG 8 - TEMP TO HOLD TOP FOR SWAP   *
+                         160 * REG 11 - USED TO BRANCH TO DRIVER   *
+                         161 **********************************************
+0002D0                   162 SORT     CSECT  SORT BEGIN HOUSEKEEPING
+0002D0 90EC D00C         163          STM   14,12,12(13) .
+0002D4 05C0              164          BALR  12,0 .
+0002D6                   165          USING SORTHERE,12 .
+0002D6 50D0 C052         166 SORTHERE ST    13,SORTSAVE+4 .
+0002DA 41D0 C04E         167          LA    13,SORTSAVE .
+                         168 *
+0002DE 4120 0004         169          LA    2,4
+0002E2 5841 0000         170          L     4,0(1)
+0002E6 5831 0004         171          L     3,4(1)
+0002EA 5833 0000         172          L     3,0(3)
+0002EE 1864              173 OUTTER   LR    6,4 SETS LARGEST TO TOP ITEM
+0002F0 4154 0004         174          LA    5,4(4) SETS SEARCH TO NEXT ITEM
+0002F4 5876 0000         175          L     7,0(6)
+0002F8 5975 0000         176 INNER    C     7,0(5) COMPARES CURRENT LARGEST W/ SEARCH
+0002FC 4720 C030         177          BC    B'0010',INBOTTOM
+000300 1865              178          LR    6,5 MAKES LARGEST POINT TO SEARCH
+000302 5876 0000         179          L     7,0(6) SAVES LARGEST VALUE
+000306 8752 C022         180 INBOTTOM BXLE  5,2,INNER
+00030A 5884 0000         181          L     8,0(4) SAVES TOP VALUE IN TEMP
+00030E 5074 0000         182          ST    7,0(4) STORES LARGEST TO TOP
+000312 5086 0000         183          ST    8,0(6) STORES TEMP VALUE IN SEARCH
+000316 8742 C018         184 OUTBOTT  BXLE  4,2,OUTTER
+                         185 *
+00031A 58D0 C052         186          L     13,SORTSAVE+4 SORT END HOUSEKEEPING
+00031E 98EC D00C         187          LM    14,12,12(13) .
+000322 07FE              188          BR    14 DONE, BRANCH BACK TO DRIVER
+000324                   189 SORTSAVE DS    18F .
+                         190          LTORG
+                         191 *
+                         192          END   THPROG6
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+THE ORIGINAL TABLE:
+          15
+           1
+         100
+           0
+
+THE SORTED TABLE:
+         100
+          15
+           1
+           0
+
+*** EXECUTION COMPLETED ***

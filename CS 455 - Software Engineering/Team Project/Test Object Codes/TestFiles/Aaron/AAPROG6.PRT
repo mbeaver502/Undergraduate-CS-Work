@@ -1,0 +1,265 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR: SAGFA 
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+                           1 *ANDREW AARON
+                           2 *ASSIGNMENT:PROGRAM 6
+                           3 *DUE: 4/22/2013
+                           4 *
+                           5 *DESCRIPTION:
+                           6 *    THIS PROGRAM WILL READ IN INTEGERS, VERIFY THAT THEY ARE VALID
+                           7 *  GRADES, INSERT UP TO 30 INTO A TABLE, AND PRINT THEM OUT.
+                           8 *    THE PROGRAM WILL THEN SORT THE GRADES IN THE TABLE, AND PRINT
+                           9 *  OUT THE SORTED TABLE.
+                          10 *
+                          11 *INPUT: UNKNOWN NUMBER OF INTEGERS, ONLY READS UP TO 30 VALID ONES
+                          12 *OUTPUT: FIRST PRINTS THE TABLE AS ENTERED, THEN THE SORTED TABLE
+                          13 *
+                          14 *
+                          15 *REGISTER KEY:
+                          16 *  REGISTER 2 - HOLDS THE CONTROL REGISTER IN THE READ LOOP. HOLDS
+                          17 *    THE TOP OF SEARCH POINTER IN THE SORT LOOP.
+                          18 *  REGISTER 3 - TEMPORARILY HOLDS EACH INTEGER IN THE READ LOOP
+                          19 *  REGISTER 4 - HOLDS THE STEP COUNT OF THE LOOPS
+                          20 *  REGISTER 5 - HOLDS THE TERMINAL VALUE FOR THE LOOPS
+                          21 *  REGISTER 6 - POINTER TO THE GREATEST VALUE IN THE SORT LOOP
+                          22 *               ALSO HOLDS POINTER TO TABLLAST IN READ
+                          23 *  REGISTER 7 - HOLDS THE SEARCH POINTER IN THE SORT LOOP
+                          24 *  REGISTER 8 - HOLDS THE GREATEST VALUE FOUND PER LOOP
+                          25 *  REGISTER 9 - USED AS A TEMP VARIABLE TO SWAP GRADES
+                          26 *
+                          27 *VARIABLE KEY:
+                          28 *  TABLE - WHERE THE ARRAY OF INTEGERS IS STORED
+                          29 *  TABLLAST � POINTER TO THE LAST NUMBER ENTERED
+                          30 *  CARD - HOLDS ONE DATA LINE AT A TIME
+                          31 *  CC - FOR CARRIAGE CONTROL
+                          32 *  OUT - HOLDS OUTPUT LINE
+                          33 *  MAXGRADE - GREATEST INTEGER THAT IS A VALID GRADE
+                          34 *  MINGRADE - SMALLEST INTEGER THAT IS A VALID GRADE
+                          35 *  HEADER1 - HEADER FOR SUBREAD SUBROUTINE
+                          36 *  HEADER2 - HEADER FOR SUBSORT SUBROUTINE
+                          37 *  HEADER3 - HEADER FOR SUBPRNT SUBROUTINE
+                          38 **********************************************************************
+                          39 *                            BEGINNING HK
+000000                    40 PROJECT3 START
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 2
+
+000000 90EC D00C          41          STM   14,12,12(13)
+000004 05C0               42          BALR  12,0
+000006                    43          USING HERE,12
+000006 50D0 C03E          44 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C03A          45          LA    13,SAVEAREA
+
+                          47 **********************************************************************
+                          48 *                                BODY
+
+00000E 4110 C0FE          50          LA    1,READPARM
+000012 58F0 C106          51          L     15,=V(SUBREAD)    READ IN RANDOM INTEGERS
+000016 05EF               52          BALR  14,15
+
+000018 4110 C0FE          54          LA    1,READPARM
+00001C 58F0 C10A          55          L     15,=V(SUBPRNT)    PRINT INTEGERS AS ENTERED
+000020 05EF               56          BALR  14,15
+
+000022 4110 C0FE          58          LA    1,READPARM
+000026 58F0 C10E          59          L     15,=V(SUBSORT)    SORT INTEGERS
+00002A 05EF               60          BALR  14,15
+
+00002C 4110 C0FE          62          LA    1,READPARM
+000030 58F0 C10A          63          L     15,=V(SUBPRNT)    PRINT SORTED INTEGERS
+000034 05EF               64          BALR  14,15
+
+                          66 **********************************************************************
+                          67 *                               END HK
+000036 58D0 C03E          68          L     13,SAVEAREA+4
+00003A 98EC D00C          69          LM    14,12,12(13)
+00003E 07FE               70          BR    14
+000040                    71 SAVEAREA DS    18F
+                          72 **********************************************************************
+                          73 *                              VARIABLES
+
+000088                    75 TABLE    DS    30F            SEE VARIABLE KEY
+000100                    76 TABLLAST DS    1F
+000104 00000088           77 READPARM DC    A(TABLE)
+000108 00000100           78          DC    A(TABLLAST)
+                          79          LTORG
+00010C 00000000                       =V(SUBREAD)
+000110 00000000                       =V(SUBPRNT)
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 3
+
+000114 00000000                       =V(SUBSORT)
+
+                          81 **********************************************************************
+                          82 *                             SUBROUTINES
+                          83 *
+                          84 *THIS SUBROUTINE FIRST READS IN AND VARIFIES ONE INTEGER AT A TIME.
+                          85 *IF THE INTEGER IS A VALID GRADE, IT STORES IT IN TABLE AND LOOPS BACK
+
+000118                    87 SUBREAD  CSECT                BEGINNING HOUSEKEEPING
+000118 90EC D00C          88          STM   14,12,12(13)
+00011C 05C0               89          BALR  12,0
+00011E                    90          USING HERE1,12
+00011E 50D0 C05A          91 HERE1    ST    13,SAVEREAD+4
+000122 41D0 C056          92          LA    13,SAVEREAD
+                          93 *
+                          94 ****READ BODY
+                          95 *
+000126 5821 0000          96          L     2,0(1)            LOAD TABLE FROM PARAM
+00012A 4140 0004          97          LA    4,4
+00012E 5851 0004          98          L     5,4(1)            LOAD END OF TABL FROM PARAM
+000132 1865               99          LR    6,5               PUT TABLLAST IN REG 6
+000134 1B54              100          SR    5,4               SUBTRACT 4 FROM REG5 TO GET END
+000136 E020 C0F6 001A    101          XPRNT HEADER1,26
+00013C E000 C09E 0050    102 TOPREAD  XREAD CARD,80
+000142 4740 C044         103          BC    B'0100',ENDREAD   IF EOF, STOP READING
+000146 5330 C09E         104          XDECI 3,CARD
+00014A 5930 C0EE         105          C     3,MAXGRADE        IF INT READ IS >100
+00014E 4720 C01E         106          BC    B'0010',TOPREAD   THEN ITS NOT A VALID GRADE
+000152 5930 C0F2         107          C     3,MINGRADE        ALSO INVALID IF ITS <0
+000156 4740 C01E         108          BC    B'0100',TOPREAD
+00015A 5032 0000         109          ST    3,0(2)            STORES ONLY IF A VALID GRADE
+00015E 8724 C01E         110          BXLE  2,4,TOPREAD
+000162 1852              111 ENDREAD  LR    5,2              SET NEW TERMINAL VALUE
+000164 1B54              112          SR    5,4
+000166 5056 0000         113          ST    5,0(6)           STORE LAST ENTERED VALUE
+                         114 *        BR    11
+                         115 *
+                         116 ****END HOUSEKEEPING
+                         117 *
+00016A 58D0 C05A         118          L     13,SAVEREAD+4
+00016E 98EC D00C         119          LM    14,12,12(13)
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 4
+
+000172 07FE              120          BR    14
+000174                   121 SAVEREAD DS    18F
+                         122 *
+                         123 ****LOCAL VARIABLES
+                         124 *
+0001BC                   125 CARD     DS    CL80
+00020C 00000064          126 MAXGRADE DC    F'100'
+000210 00000000          127 MINGRADE DC    F'0'
+000214 F0D9C5C1C4C9D5C7  128 HEADER1  DC    C'0READING IN VALID INPUT...'
+                         129          LTORG
+                         130 *
+                         131 *
+                         132 *THIS SUBROUTINE WILL SORT THE INTEGERS IN THE TABLE.
+                         133 *
+
+00022E                   135 SUBSORT  CSECT                BEGINNING HOUSEKEEPING
+00022E 90EC D00C         136          STM   14,12,12(13)
+000232 05C0              137          BALR  12,0
+000234                   138          USING HERE2,12
+000234 50D0 C058         139 HERE2    ST    13,SAVESORT+4
+000238 41D0 C054         140          LA    13,SAVESORT
+                         141 *
+                         142 ****SORT BODY
+                         143 *
+00023C 5821 0000         144          L     2,0(1)            LOAD TABLE FROM PARAM
+000240 4140 0004         145          LA    4,4
+000244 5851 0004         146          L     5,4(1)            LOAD END OF TABL FROM PARAM
+000248 5855 0000         147          L     5,0(5)
+00024C E020 C09C 0012    148          XPRNT HEADER2,18
+000252 5882 0000         149 OUTLOOP  L     8,0(2)            SET LARGEST FOUND TO TOPOFSEARCH
+000256 1872              150          LR    7,2               RESET SEARCH POINTER TO CURRENT TOP
+000258 1867              151          LR    6,7
+00025A 5987 0000         152 INLOOP   C     8,0(7)            IS VALUE AT SEARCH POINTER>GREATEST
+00025E 47A0 C034         153          BC    B'1010',TRYNEXT   IF NOT, SKIP IT FOR NOW
+000262 5887 0000         154          L     8,0(7)            IF SO, SET IT AS NEW GREATEST
+000266 1867              155          LR    6,7               AND SET LARGEST FOUND POINTER
+000268 8774 C026         156 TRYNEXT  BXLE  7,4,INLOOP
+00026C 5892 0000         157          L     9,0(2)            SWAP TOPOFSEARCH WITH GREATEST
+000270 5096 0000         158          ST    9,0(6)
+000274 5082 0000         159          ST    8,0(2)
+000278 8724 C01E         160          BXLE  2,4,OUTLOOP
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 5
+
+                         161 *
+                         162 ****END HOUSEKEEPING
+                         163 *
+00027C 58D0 C058         164          L     13,SAVESORT+4
+000280 98EC D00C         165          LM    14,12,12(13)
+000284 07FE              166          BR    14
+000288                   167 SAVESORT DS    18F
+                         168 *
+                         169 ****LOCAL VARIABLES
+                         170 *
+0002D0 F0E2D6D9E3C9D5C7  171 HEADER2  DC    C'0SORTING GRADES...'
+                         172          LTORG
+                         173 *
+                         174 *
+                         175 *THIS SUBROUTINE WILL PRINT THE INTEGERS IN THE TABLE.
+                         176 *
+
+0002E2                   178 SUBPRNT  CSECT                BEGINNING HOUSEKEEPING
+0002E2 90EC D00C         179          STM   14,12,12(13)
+0002E6 05C0              180          BALR  12,0
+0002E8                   181          USING HERE3,12
+0002E8 50D0 C040         182 HERE3    ST    13,SAVEPRNT+4
+0002EC 41D0 C03C         183          LA    13,SAVEPRNT
+                         184 *
+                         185 ****PRNT BODY
+                         186 *
+0002F0 5821 0000         187          L     2,0(1)          LOAD TABLE FROM PARAM
+0002F4 4140 0004         188          LA    4,4
+0002F8 5851 0004         189          L     5,4(1)          LOAD END OF TABL FROM PARAM
+0002FC 5855 0000         190          L     5,0(5)
+000300 E020 C084 0013    191          XPRNT HEADER3,19
+000306 5832 0000         192 TOPPRNT  L     3,0(2)          LOAD EACH INTEGER FROM TABLE TO REG3
+00030A 5230 C098         193          XDECO 3,OUT           CONVERT & PRINT EACH INT FROM REG 3
+00030E E020 C097 000D    194          XPRNT CC,13
+000314 8724 C01E         195          BXLE  2,4,TOPPRNT
+                         196 *
+                         197 ****END HOUSEKEEPING
+                         198 *
+000318 58D0 C040         199          L     13,SAVEPRNT+4
+00031C 98EC D00C         200          LM    14,12,12(13)
+000320 07FE              201          BR    14
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 6
+
+000324                   202 SAVEPRNT DS    18F
+                         203 *
+                         204 ****LOCAL VARIABLES
+                         205 *
+00036C F1C9D5E3C5C7C5D9  206 HEADER3  DC    C'1INTEGERS IN TABLE:'
+00037F 40                207 CC       DC    C' '
+000380                   208 OUT      DS    CL12
+                         209          LTORG
+                         210 *
+                         211 **********************************************************************
+                         212 *                            END OF PROGRAM
+                         213          END   PROJECT3
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+READING IN VALID INPUT...
+INTEGERS IN TABLE:
+           1
+           2
+         100
+          25
+
+SORTING GRADES...
+INTEGERS IN TABLE:
+         100
+          25
+           2
+           1
+
+*** EXECUTION COMPLETED ***

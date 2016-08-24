@@ -1,0 +1,199 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Travis\Documents\Courses\Spring 2014\Software Engineering\Team Project\Test Files\Assembler\THPROG3.PRT
+#
+************************************
+* TRAVIS HUNT  *
+* 04/03/13  *
+* PROGRAM 4  *
+************************************
+* DESCRIPTION  *
+* THIS PROGRAM ACCEPTS AS INPUT A  *
+* FILE WITH AN UNKNOWN NUMBER OF  *
+* SETS OF 5 DATA LINES. EACH DATA  *
+* SET IS FORMATTED IN THIS WAY:  *
+*   1) FIRST MIDDLE LAST NAMES   *
+*   2) STREET ADDRESS  *
+*   3) CITY   *
+*   4) ST   *
+*   5) ZIP CODE  *
+* THE PROGRAM THEN CHANGES EACH   *
+* SET TO THE FOLLOWING FORM:  *
+*   1) LAST, FIRST MIDDLE INITIAL  *
+*   2) STREET ADDRESS  *
+*   3) CITY, STATE  ZIP  *
+************************************
+* REGISTER KEY  *
+* REG 2 - POINTER TO INPUT LINE   *
+* REG 3 - POINTER TO OUTPUT LINE  *
+* REG 4 - STEPSIZE   *
+* REG 5 - TERMINAL VALUE  *
+* REG 10 - USED TO CALL SUBPROGRAM *
+* REG 11 - USED TO CALL SUBPROGRAM *
+************************************
+THPROG4  START
+         TITLE 'DRIVER CODE'
+         STM   14,12,12(13) BEGINNING HOUSEKEEPING
+         BALR  12,0 .
+         USING HERE,12 .
+HERE     ST    13,SAVEAREA+4 .
+         LA    13,SAVEAREA .
+         SPACE
+*
+READIN   XREAD INLINE,50 WILL READ IN UNTIL END OF FILE
+         BC    B'0100',ENDREAD
+         CLI   INLINE,C' ' IF LINE BEGINS WITH BLANK, SKIP IT
+         BC    B'1000',READBOTT
+*
+         BAL   11,ERASE ERASES OUTLINE WITH BLANKS
+         BAL   11,LINE1 PROCESSES NAME LINE
+         XPRNT CC,51
+*
+         XREAD INLINE,50 READS IN STREET LINE
+         BAL   11,ERASE
+         MVC   OUTLINE(50),INLINE   COPIES IN STREET ADDRESS
+         XPRNT CC,51
+*
+         BAL   11,ERASE
+         BAL   11,LINE3 PROCESSES THE CITY, ST, AND ZIP 
+         XPRNT CC,51
+*
+         XPRNT =C'0',1
+         XPRNT =C' ',1
+READBOTT BC    B'1111',READIN
+*
+ENDREAD  L     13,SAVEAREA+4 END HOUSEKEEPING
+         LM    14,12,12(13) .
+         BR    14 
+SAVEAREA DS    18F
+INLINE   DS    CL50 STORAGE FOR LINE READ IN FROM FILE
+CC       DC    C' '
+OUTLINE  DS    CL50 STORAGE FOR OUTPUT LINE  .
+         TITLE 'SUBPROGRAM CODE'
+         SPACE
+****************************
+*      ERASES OUTLINE      *
+***********************************
+* REGISTER KEY *
+*---------------------------------*
+* REG 11 - BRANCHES BACK TO MAIN *
+***********************************
+ERASE    MVI   OUTLINE,C' '
+         MVC   OUTLINE+1(49),OUTLINE
+         BR    11
+*
+****************************
+*   WILL PROCESS LINE 1    *
+**********************************************
+*   REGISTER KEY     *
+*--------------------------------------------*
+* REG 2 - POINTER TO INPUT LINE    *
+* REG 3 - POINTER TO OUTPUT LINE    *
+* REG 11 - BRANCH BACK TO DRIVER    *
+**********************************************
+LINE1    LA    2,INLINE
+         LA    3,OUTLINE
+*
+         BAL   10,SEARCH SKIPS TO LAST NAME
+         LA    2,1(2)
+         BAL   10,SEARCH
+         LA    2,1(2)
+* 
+         BAL   10,COPY COPIES LAST/FIRST NAME
+         MVI   0(3),C','
+         MVI   1(3),C' '
+         LA    3,2(3)
+         LA    2,INLINE
+         BAL   10,COPY
+         MVI   0(3),C' '
+*
+FINAL    LA    2,1(2) COPIES MIDDLE INITIAL
+         LA    3,1(3)
+         MVC   0(1,3),0(2)
+         MVI   1(3),C'.'
+         BR    11
+*
+***************************
+* SEARCHES FOR NEXT BLANK *
+*************************************
+*  REGISTER KEY    *
+*-----------------------------------*
+* REG 2  - POINTER TO INPUT LINE   *
+* REG 10 - USED TO BRANCH TO CALLER *
+*************************************
+SEARCH   CLI   0(2),C' '
+         BC    B'1000',SEARDONE
+         LA    2,1(2)
+         BC    B'1111',SEARCH
+SEARDONE BR    10
+*
+****************************
+* COPIES WORD INTO OUTLINE *
+*************************************
+* REGISTER KEY   *
+*-----------------------------------*
+* REG 2 - POINTER TO INPUT LINE   *
+* REG 3 - POINTER TO OUTPUT LINE   *
+* REG 10 - BRANCH BACK TO CALLER   * 
+*************************************
+COPY     CLI   0(2),C' '
+         BC    B'1000',COPYDONE
+         MVC   0(1,3),0(2)
+         LA    2,1(2)
+         LA    3,1(3)
+         BC    B'1111',COPY
+COPYDONE BR    10
+*
+********************
+* PROCESSES LINE 3 *
+********************************
+* REGISTER KEY          *
+* REG 2 - POINTER TO INLINE    *
+* REG 3 - POINTER TO OUTLINE   *
+* REG 11 - BRANCH TO DRIVER    *
+********************************
+LINE3    XREAD INLINE,50 READS IN CITY LINE
+         LA    2,INLINE
+         LA    3,OUTLINE
+         BAL   10,FINDCITY FINDS AND COPIES CITY NAME
+         MVI   0(3),C','
+         MVI   1(3),C' '
+         LA    3,2(3) PREPARES FOR STATE
+*
+         XREAD INLINE,50 READS IN STATE LINE
+         MVC   0(2,3),INLINE
+         MVI   2(3),C' '
+         MVI   3(3),C' '
+         LA    3,4(3) PREPARES FOR ZIP CODE
+* 
+         XREAD INLINE,50 READS IN ZIP CODE LINE
+         MVC   0(5,3),INLINE
+         BR    11
+*
+****************************
+*    FINDS THE CITY NAME   *
+******************************************
+* REGISTER KEY    *
+*----------------------------------------*
+* REG 2 - POINTER TO INLINE    *
+* REG 3 - POINTER TO OUTLINE    *
+* REG 4 - STEPSIZE    *
+* REG 5 - POINTER TO LAST LETTER IN NAME *
+* REG 10 - BRANCH BACK TO CALLER    *
+******************************************
+FINDCITY LA    4,1
+         LA    5,INLINE+49 
+FIND     CLI   0(5),C' ' FINDS LOCATION OF LAST CITY LETTER
+         BC    B'0111',CITYDONE
+         BCTR  5,0
+         BC    B'1111',FIND
+CITYDONE MVC   0(1,3),0(2) COPIES CITY ALLOWING MULTIPLE WORDS
+         LA    3,1(3)
+         BXLE  2,4,CITYDONE
+         BR    10
+*
+         END   THPROG4
+$ENTRY DATA4.TXT

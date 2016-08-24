@@ -1,0 +1,128 @@
+#
+#5000
+#500
+#100
+#600
+#C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Test Object Codes\TestFiles\Aaron\AAPROG2.PRT
+#
+*ANDREW AARON
+*ASSIGNMENT:PROGRAM 2
+*DUE: 3/13/2013
+*
+*DESCRIPTION:
+*    THIS PROGRAM WILL ACCEPT EXACTLY 20 DATA LINES, EACH
+*      CONTAINING ONE INTEGER VALUE. ALL VALUES WILL BE PLACED INTO
+*      A TABLE. THEN THE TABLE WILL BE PRINTED IN ORDER, AND THEN
+*      PRINTED AGAIN IN REVERSE ORDER.
+*
+*INPUT: DATA FILE 20 LINES LONG WITH ONE INTEGER VALUE ON EACH LINE
+*OUTPUT: DATA FILE PRINTED FROM A TABLE, FIRST NORMAL THEN REVERSED
+*    
+*
+*REGISTER KEY:
+*    REGISTER 2 - USED AS A CONTROL REGISTER IN EACH LOOP
+*    REGISTER 3 - TEMPORARILY HOLDS EACH INTEGER IN THE LOOPS
+*    REGISTER 4 - HOLDS THE STEP COUNT OF EACH LOOP
+*    REGISTER 5 - HOLDS THE TERMINAL VALUE FOR EACH LOOP
+*    REGISTER 6 - HOLDS THE ADDRESS OF NEXT INSTRUCTION AFTER A SUB
+*
+*VARIABLE KEY:
+*    CARD - HOLDS ONE DATA LINE AT A TIME
+*    TABLE - WHERE THE ARRAY OF INTEGERS IS STORED
+*    CC - FOR CARRIAGE CONTROL
+*    OUT - HOLDS OUTPUT LINE
+*    HEADER1 - DESCRIPTION FOR SUBREAD PRINTOUT
+*    HEADER2 - DESCRIPTION FOR SUBPRNT PRINTOUT
+*    HEADER3 - DESCRIPTION FOR SUBRPRNT PRINTOUT
+*
+**********************************************************************
+*                            BEGINNING HK
+PROJECT2 START         
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+         SPACE
+**********************************************************************
+*                                BODY
+         SPACE
+         BAL   6,SUBREAD      SUBROUTINES DO ALL THE WORK
+         BAL   6,SUBPRNT
+         BAL   6,SUBRPRNT
+         SPACE
+**********************************************************************
+*                               END HK
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+**********************************************************************
+*                              VARIABLES
+         SPACE
+CARD     DS    CL80            SEE VARIABLE KEY
+TABLE    DS    20F
+CC       DC    C' '
+OUT      DS    CL12
+HEADER1  DC    C'0READING INPUT...'
+HEADER2  DC    C'1INPUT FROM TABLE IN ORDER'
+HEADER3  DC    C'1INPUT FROM TABLE REVERSED'
+         SPACE
+**********************************************************************
+*                             SUBROUTINES
+         SPACE
+SUBREAD  XPRNT HEADER1,17
+         LA    2,TABLE
+         L     4,4095(4)
+         LA    5,TABLE+76      END OF TABLE IS 4*19=76 SPACES AWAY
+TOPREAD  XREAD CARD,80
+         XDECI 3,CARD          READ IN AND CONVERT EACH INTEGER
+         ST    3,0(2)          INTO REG 3 AND STORE IT IN TABLE
+         BXLE  2,4,TOPREAD
+         BR    6
+*
+         SPACE
+SUBPRNT  XPRNT HEADER2,26
+         LA    2,TABLE
+         LA    4,4
+         LA    5,TABLE+76
+TOPPRNT  L     3,0(2)          LOAD EACH INTEGER FROM TABLE TO REG3
+         XDECO 3,OUT           CONVERT & PRINT EACH INT FROM REG 3
+         XPRNT CC,13
+         BXLE  2,4,TOPPRNT
+         BR    6
+*
+         SPACE
+SUBRPRNT XPRNT HEADER3,26
+         LA    2,TABLE+76      START AT THE END AND GO BACKWARDS
+         L     4,=F'-4'
+         LA    5,TABLE-4
+TOPRPRNT L     3,0(2)          SAME AS SUBPRNT, BUT BACKWARDS
+         XDECO 3,OUT
+         XPRNT CC,13
+         BXH   2,4,TOPRPRNT
+         BR    6
+**********************************************************************
+*                            END OF PROGRAM
+         END   PROJECT2
+$ENTRY
+5
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0

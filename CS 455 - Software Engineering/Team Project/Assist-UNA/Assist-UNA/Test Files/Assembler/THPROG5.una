@@ -1,0 +1,253 @@
+#
+#9999
+#9999
+#9999
+#9999
+#C:\Users\Travis\Documents\Courses\Spring 2014\Software Engineering\Team Project\Test Files\Assembler\THPROG4.PRT
+#
+************************************
+* TRAVIS HUNT  *
+* 04/17/13  *
+* PROGRAM 5  *
+************************************
+* DESCRIPTION  *
+* THIS PROGRAM ACCEPTS AS INPUT A  *
+* FILE 
+************************************
+* REGISTER KEY  *
+* REG 2 - POINTER TO INPUT LINE   *
+* REG 11 - USED TO CALL SUBPROGRAM *
+************************************
+THPROG5  START
+         TITLE 'DRIVER CODE'
+         STM   14,12,12(13) BEGINNING HOUSEKEEPING
+         BALR  12,0 .
+         USING HERE,12 .
+HERE     ST    13,SAVEAREA+4 .
+         LA    13,SAVEAREA .
+         SPACE
+*
+         XPRNT =C'               SAVINGS  ACCOUNT  REPORT',39
+         XPRNT =C' TRAN.CODE        AMOUNT',24
+         XPRNT =C'+      RATE     CURRENT BALANCE',31
+*
+         ZAP   DEPNUM(3),=P'0'
+         ZAP   WITHNUM(3),=P'0'
+         ZAP   DEPTOTAL(5),=P'0'
+         ZAP   WITHTOTA(5),=P'0'
+*
+         SPACE
+READIN   XREAD INLINE,10 WILL READ IN UNTIL END OF FILE
+         BC    B'0100',ENDREAD
+         XPRNT =C'     ',5
+         XPRNT CC,2
+*
+         CLI   INLINE,C'0' CHECKS FOR INITIAL BALANCE
+         BC    B'0111',SKIP0
+         BAL   11,INITBAL
+         BC    B'1111',BOTTOM
+*
+SKIP0    CLI   INLINE,C'1' CHECKS FOR DEPOSIT
+         BC    B'0111',SKIP1
+         AP    DEPNUM(3),=P'1'
+         BAL   11,DEPOSIT
+         BC    B'1111',BOTTOM
+*
+SKIP1    CLI   INLINE,C'2' CHECKS FOR WITHDRAWAL
+         BC    B'0111',SKIP2
+         AP    WITHNUM(3),=P'19'
+         BAL   11,WITHDRAW
+         BC    B'1111',BOTTOM
+*
+SKIP2    CLI   INLINE,C'3' CHECKS FOR INTEREST
+         BC    B'0111',BOTTOM
+         BAL   11,INTEREST
+BOTTOM   BC    B'1111',READIN
+*
+ENDREAD  XPRNT =C'0# DEPOSITS  =',14
+         ED    DEPPAT(6),DEPNUM GENERATES PRINTABLE NUM OF DEP.
+         XPRNT DEPNUMCC,7 
+         XPRNT =C' TOTAL AMOUNT OF DEPOSITS =',27
+         LA    3,DEPTOTAL
+         BAL   10,PRINT PRINTS DEPOSIT TOTAL
+         ZAP   TEMPINTR(7),DEPTOTAL(5)
+         XPRNT =C' AVG. AMOUNT/DEPOSIT      =',27
+         CP    DEPNUM(3),=P'0' CHECKS AGAINST 0 DEPOSITS
+         BC    B'1000',NODEPO
+         DP    TEMPINTR(7),DEPNUM(3) FINDS THE AVG DEPOSIT AMOUNT
+         AP    REMAIN(3),REMAIN(3)
+         CP    REMAIN(3),DEPNUM(3)
+         BC    B'0100',NOROUNDD
+         AP    QUOTIENT(4),=P'1'
+NOROUNDD ZAP   DEPTOTAL(5),QUOTIENT(4)   SAVES AVERAGE DEPOSIT
+         BAL   10,PRINT
+         BC    B'1111',NEXT
+NODEPO   XPRNT =C'+        $0.00',14 IF NO DEP. PRINTS 0
+*
+NEXT     XPRNT =C'0# WITHDRAWALS  =',17
+         ED    WITHPAT(6),WITHNUM   GENERATES PRINTABLE NUM OF WITH.
+         XPRNT WITNUMCC,7
+         XPRNT =C' TOTAL AMOUNT OF WITHDRAWALS =',30
+         LA    3,WITHTOTA
+         BAL   10,PRINT PRINTS DEPOSIT TOTAL
+         ZAP   TEMPINTR(7),WITHTOTA(5)
+         XPRNT =C' AVG. AMOUNT/WITHDRAWAL      =',30
+         CP    WITHNUM(3),=P'0' CHECKS AGAINST 0 WITHDRAWALS
+         BC    B'1000',NOWITH 
+         DP    TEMPINTR(7),WITHNUM(3) FINDS AVG WITHDRAWAL AMOUNT
+         AP    REMAIN(3),REMAIN(3)
+         CP    REMAIN(3),WITHNUM(3)
+         BC    B'0100',NOROUNDW
+         AP    QUOTIENT(4),=P'1'
+NOROUNDW ZAP   WITHTOTA(5),QUOTIENT(4)   SAVES AVERAGE WITHDRAWAL
+         BAL   10,PRINT
+         BC    B'1111',FINAL
+NOWITH   XPRNT =C'+        $0.00',14 IF NO WITH. PRINTS 0
+*
+FINAL    XPRNT =C'0            CURRENT BALANCE  =',31
+         LA    3,CURRBAL
+         BAL   10,PRINT PRINTS FINAL CURRENT BALANCE
+*
+         L     13,SAVEAREA+4 END HOUSEKEEPING
+         LM    14,12,12(13) .
+         BR    14 .
+SAVEAREA DS    18F
+CC       DC    C'+'
+INLINE   DS    CL10 STORAGE FOR LINE READ IN FROM FILE
+CURRBAL  DS    PL5 CURRENT BALANCE
+PATTERN  DC    X'40206B2020206B2021204B202060'
+MONCC    DC    C'+'
+MONPAT   DS    CL14 
+DEPOVALU DS    PL5 DEPOSIT AMOUNT
+WITHVALU DS    PL5 WITHDRAWAL AMOUNT
+DEPNUM   DS    PL3 NUMBER OF DEPOSITS
+WITHNUM  DS    PL3 NUMBER OF WITHDRAWALS
+DEPTOTAL DS    PL5 TOTAL AMOUNT OF DEPOSITS
+WITHTOTA DS    PL5 TOTAL AMOUNT OF WITHDRAWALS
+DEPNUMCC DC    C'+'
+DEPPAT   DC    X'402020202120' PATTERN FOR DEPOSIT NUM
+WITNUMCC DC    C'+'
+WITHPAT  DC    X'402020202120' PATTERN FOR WITHDRAWAL NUM
+MINBAL   DS    PL5 MINIMUM BALANCE
+INTRRATE DS    PL2 INTEREST RATE
+INTERPAT DC    X'40214B2020' INTEREST PATTERN
+TEMPINTR DS    0PL7 TEMP LOCATION FOR INTEREST AMOUNT
+QUOTIENT DS    PL4 
+REMAIN   DS    PL3 REMAINDER
+INTERCC  DC    C'+'
+INTPRINT DS    CL5 USED TO PRINT INTEREST
+* 
+         TITLE 'SUBPROGRAM CODE'
+         SPACE
+******************************
+* EDITS/PRINTS MONEY AMOUNTS *
+***********************************
+* REGISTER KEY *
+*---------------------------------*
+* REG  3 - POINTER TO PRINTED NUM *
+* REG 10 - BRANCH BACK TO CALLER *
+***********************************
+PRINT    MVC   MONPAT(14),PATTERN
+         LA    1,MONPAT+9 SETS REG 1 TO THE 21 SIGN. DIGIT
+         EDMK  MONPAT(14),0(3)
+         BCTR  1,0
+         MVI   0(1),C'$' ADDS $ TO BEGINNING OF MONEY
+         XPRNT MONCC,15
+         BR    10
+*
+         SPACE
+************************
+* SETS INITIAL BALANCE *
+***********************************
+*  REGISTER KEY *
+*---------------------------------*
+* REG  2 - POINTER TO 2ND NUMBER  *
+* REG 11 - BRANCH BACK TO CALLER *
+***********************************
+INITBAL  PACK  CURRBAL(5),INLINE+1(9)
+         XPRNT =C'+     ',6
+         LA    3,CURRBAL
+         BAL   10,PRINT PRINTS THE CURRENT BALANCE
+         XPRNT =C'+               ',16
+         XPRNT MONCC,15
+         ZAP   MINBAL(5),CURRBAL(5) MAKES CURRENT BALANCE MIN BAL
+         BR    11
+*
+         SPACE
+***********************
+* PROCESSES A DEPOSIT *
+***********************************
+* REGISTER KEY *
+*---------------------------------*
+* REG  3 - POINTER TO PRINT MONEY *
+* REG 10 - CALL PRINT ROUTINE *
+* REG 11 - BRANCH BACK TO CALLER *
+***********************************
+DEPOSIT  PACK  DEPOVALU(5),INLINE+1(9)
+         AP    CURRBAL(5),DEPOVALU(5) ADDS DEP TO CURRENT BAL
+         AP    DEPTOTAL(5),DEPOVALU(5) ADDS DEP TO DEP TOTAL
+         XPRNT =C'+     ',6
+         LA    3,DEPOVALU
+         BAL   10,PRINT PRINTS THE DEPOSIT AMOUNT
+         XPRNT =C'+               ',16
+         LA    3,CURRBAL
+         BAL   10,PRINT PRINTS THE CURRENT BALANCE
+         BR    11
+*
+         SPACE
+**************************
+* PROCESSES A WITHDRAWAL *
+***********************************
+* REGISTER KEY *
+*---------------------------------*
+* REG  3 - POINTER TO PRINT MONEY *
+* REG 10 - CALL PRINT ROUTINE *
+* REG 11 - BRANCH BACK TO CALLER *
+***********************************
+WITHDRAW PACK  WITHVALU(5),INLINE+1(9)
+         SP    CURRBAL(5),WITHVALU(5) SUBTRACTS WITHDRAWAL FROM BAL
+         AP    WITHTOTA(5),WITHVALU(5) ADDS WITH. AMOUNT TO TOTAL
+         XPRNT =C'+     ',6
+         LA    3,WITHVALU
+         BAL   10,PRINT PRINTS THE WITHDRAWAL AMOUNT
+         XPRNT =C'+               ',16
+         LA    3,CURRBAL
+         BAL   10,PRINT PRINTS THE CURRENT BAL
+         CP    MINBAL(5),CURRBAL(5)
+         BC    B'1100',WITHBOTT IF MINBAL IS STILL MIN, SKIP NEXT
+         ZAP   MINBAL(5),CURRBAL(5)
+WITHBOTT BR    11
+*
+         SPACE
+*************************************
+* PROCESSES AN INTEREST TRANSACTION *
+*************************************
+* REGISTE      R KEY *
+*---------------------------------*
+* REG  3 - POINTER TO PRINT MONEY *
+* REG 10 - CALL PRINT ROUTINE *
+* REG 11 - BRANCH BACK TO CALLER *
+***********************************
+INTEREST PACK  INTRRATE(2),INLINE+1(3)
+         XPRNT =C'+                       ',24
+         MVC   INTPRINT(5),INTERPAT 
+         ED    INTPRINT(5),INTRRATE GENERATES PRINTABLE INT. RATE
+         XPRNT INTERCC,6
+         CP    MINBAL(5),=P'0' CHECKS AGAINST INTEREST RATE OF 0
+         BC    B'1101',NOINT IF 0, NO INTEREST IS CALCULATED
+         ZAP   TEMPINTR(7),MINBAL(5)
+         MP    TEMPINTR(7),INTRRATE(2) FINDS AMOUNT TO BE ADDED
+         DP    TEMPINTR(7),=P'10000' 
+         CP    REMAIN(3),=P'5000'
+         BC    B'0100',NOROUND
+         AP    QUOTIENT(4),=P'1' ROUNDS UP IF NECESSARY
+NOROUND  ZAP   MINBAL(5),QUOTIENT(4)
+         AP    CURRBAL(5),MINBAL(5) ADDS INT AMOUNT TO BAL
+NOINT    XPRNT =C'+      ',7
+         LA    3,CURRBAL
+         BAL   10,PRINT PRINTS CURRENT BALANCE
+         ZAP   MINBAL(5),CURRBAL(5) MAKES CURRENT BALANCE MINBAL
+         BR    11
+*
+         END   THPROG5
+$ENTRY DATA5.TXT

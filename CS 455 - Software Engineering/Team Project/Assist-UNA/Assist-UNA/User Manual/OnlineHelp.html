@@ -1,0 +1,304 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" href="image/AssistIcon.ico">
+    <link rel="stylesheet" type="text/css" href="./Style/stylesheet.css">
+    <title>Assist/UNA - Online User Manual</title>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <img src="image/AssistLogo.jpg" alt="Assist/UNA" 
+                 style="float:left;padding-left:110px;" height="80px"/>
+            <div class="shadow">
+                <h1 style="float:left;padding-left:50px;">
+                    Quick Reference
+                </h1>
+            </div>
+        </div>
+        <div id="sidebar">
+            <h3 class="shadow"> Navigation </h3>
+            <h4>
+                <a href="#GettingStarted">
+                    Getting Started
+                </a>
+            </h4>
+            <h4>
+                <a href="#Assemble">
+                    Assembling
+                </a>
+            </h4>
+            <h4>
+                <a href="#Printing">
+                    Printing
+                </a>
+            </h4>
+            <h4>
+                <a href="#Editing">
+                    Editing
+                </a>
+            </h4>
+            <h4>
+                <a href="#Options">
+                    Options
+                </a>
+            </h4>
+        </div>
+        <div id="content">
+            <a id="GettingStarted">
+                <h2> 1.0 Getting Started </h2>
+            </a>
+            <p>
+                The ASSIST/UNA software is a Windows-based emulator of the
+                ASSIST/I assembler for the IBM/360 machine. This software provides 
+                a graphical environment in which to write
+                assembly language programs. The ASSIST/UNA software is meant to
+                be used primarily by students enrolled in assembly language courses.
+                <br />
+                <br />
+                If you have concerns that require more detailed explanations, please
+                consult the PDF user manual, which accompanied the distribution of
+                ASSIST/UNA.
+            </p>
+            <h3> - 1.1 Starting a New Project </h3>
+            <p>
+                <ol>
+                    <li>Click the <b>New</b> button on the toolbar or select <b>File &#8594 New</b>. (Ctrl + N)</li>
+                    <li>This creates a new .una project file.</li>
+                </ol>
+            </p>
+            <h3> - 1.2 Saving Your Project </h3>
+            <p>
+                Your project <i>must</i> be saved before assembly can occur.<br />
+                To save your project:<br />
+                <ol>
+                    <li>Click the <b>Save</b> button on toolbar or select <b>File &#8594 Save</b>. (Ctrl + S)</li>
+                    <li>Choose a location for your saved project files.</li>
+                    <li>Choose a name for your project.</li>
+                </ol>
+            </p>
+            <h3> - 1.3 Opening Your Project </h3>
+            <p>
+                To open a previously saved project:
+                <ol>
+                    <li>Click the <b>Open</b> button on the toolbar or select <b>File &#8594 Open</b>. (Ctrl + O)</li>
+                    <li>In the Open File Dialog Window, choose which .una file you would like to open.</li>
+                </ol>
+                Opening a project will reset the ASSIST/UNA environment to its default state.
+            </p>
+            <a id="Assemble">
+                <h2> 2.0 Assembling a Program </h2>
+            </a>
+            <p>
+                When assembling a program in ASSIST/UNA, it is vital that you understand the differences 
+                between each assembly option. This section covers how to most efficiently utilize each assembly 
+                option. It also covers how to view both the .PRT and the output window.
+            </p>
+            <h3> - 2.1 Assemble and Generate a .PRT File </h3>
+            <p>
+                The main purpose of this option is to allow you to quickly assemble your source 
+                code and check the .PRT file for any errors that may be present within your code.<br /> 
+                <b>Warning: </b>Assembly does not generate any program output.<br />
+                To begin Assembly:
+                <ol>
+                    <li>Click the <b>Assemble</b> button on toolbar or select <b>Assemble &#8594 
+                        Assemble</b>. (F2)</li>
+                    <li>The source code is assembled and a .PRT file is generated.</li>
+                    <li>The generated .PRT file will have the same name as your project file.</li>
+                    <li>Any errors found in the source code will be reported in the .PRT file.</li>
+                </ol>
+            </p>
+            <h3> - 2.2 Assemble and Debug </h3>
+            <p>
+                This option allows you to step through your program as it is simulated. This option generates 
+                program output.<br />
+                <b>Warning: </b>This option temporarily generates a .PRT file before deleting it.<br />
+                To begin Debugging:
+                <ol>
+                    <li>Click the arrow next to the <b>Assembly</b> button on the toolbar and select
+                    <b>Assemble and Debug</b> from the drop-down menu. Alternatively, you can select <b>
+                        Assemble &#8594 Assemble and Debug</b> in the top menu. (F3)</li>
+                    <li>After assembly has begun, use the <b>Next</b> button to step through each line. (F5)</li>
+                    <li>If you want to stop debugging, click the <b>Stop</b> button. (F8)</li>
+                    <li>If you would like to completely run through your program in debug mode, click 
+                    <b>Run To End</b>. (F7)</li>
+                    <li>If you would like to run to a specific location, without executing the instruction,
+                        you may select the <b>Run To Location</b> option. (F6)</li>
+                    <li>As each statement is executed, both the Registers Display and the Memory 
+                        Display will be updated.</li>
+                    <li>After assembly is completed, the Symbol Table Display will update and show the 
+                    symbol table contents.</li>
+                    <li>All output generated by the program will be displayed in the Output Dialog Window. Any 
+                    runtime exceptions will be reported in the temporary .PRT file and in the Output Dialog Window.</li>
+                </ol> 
+            </p>
+            <h3> - 2.3 Assemble/Final Run </h3>
+            <p>
+                This option allows you to assemble and execute your source code. This option generates output
+                and a .PRT file.<br />
+                To begin a Final Run:
+                <ol>
+                    <li>
+                        Click the arrow next to the <b>Assembly</b> button on the toolbar and select
+                        <b>Assemble/Final Run</b> from the drop-down menu. Alternatively, you can select <b>
+                            Assemble &#8594 Assemble/Final Run</b> in the top menu. (F4)</li>
+                    <li>A text box will appear prompting you for an identifier. This identifier will appear
+                    at the top of your .PRT file.</li>
+                    <li>Once assembly completes, the symbol table contents will be updated.</li>
+                    <li>The program will completely assemble without interruption, regardless of whether or not
+                         the source program has errors.</li>
+                    <li>Once execution concludes, both the Registers Display and the Memory Display will be updated.</li>
+                    <li>Any output generated by the program will be displayed in the .PRT file and the Output 
+                    Dialog Window. All errors will be reported in the both windows.</li>
+                </ol>
+            </p>
+            <h3><b>Important Note:</b></h3>
+            <p>
+                <ul>
+                    <li>The maximum number of errors supported in the assembler is 300.</li>
+                    <li>The maximum number of symbols in one program is 100.</li>
+                    <li>The maximum number of literals: 50 + (50 * number of LTORGs).</li>
+                </ul>
+            </p>
+            <h3> - 2.4 View .PRT File </h3>
+            <p>
+                The .PRT file associated with your project will share the same name as your project file.<br />
+                <b>Reminder:</b> Only the <b>Assemble</b> and <b>Assemble/Final Run</b> options will generate 
+                a permanent .PRT file.
+                To view the .PRT file:<br />
+                <ol>
+                    <li>Click the <b>View .PRT</b> button on the toolbar, or select <b>Tools &#8594 View 
+                        .PRT</b>. (F9)</li>
+                    <li>If a .PRT has been generated, then a window will open containing it.</li>
+                </ol>
+                <b>Important Note:</b> An automatic TITLE is generated in the .PRT every 45 lines.
+            </p>
+            <h3> - 2.5 View Output Dialog Window </h3>
+            <p>
+                This displays all errors and output generated by the simulator.<br />
+                <b>Reminder:</b> Only the <b>Assemble and Debug</b> and <b>Assemble/Final Run</b> options will 
+                produce program output.
+                To view output:<br />
+                <ol>
+                    <li>After using either <b>Assemble and Debug</b> or <b>Assemble/Final Run</b>, the output
+                    window will automatically be displayed.</li>
+                    <li>If you would like to manually view the output window, select <b>Tools &#8594 Output</b>
+                    . (F10)</li>
+                </ol>
+            </p>
+            <a id="Printing">
+                <h2> 3.0 Printing </h2>
+            </a>
+            <p>
+                This section covers printing both the source code and the .PRT file.
+            </p>
+            <h3> - 3.1 Print Source Code </h3>
+            <p>
+                By default, the source code will print in portrait mode.<br />
+                To print the source code:<br />
+                <ol>
+                    <li>Click the <b>Print</b> button on the toolbar, or select <b>File &#8594 Print</b>. (Ctrl + P)</li>
+                    <li>A Print Dialog box is displayed, allowing you to alter any print settings.</li>
+                </ol>
+            </p>
+            <h3> - 3.2 Print .PRT File </h3>
+            <p>
+                By default, the .PRT will print in Landscape mode.<br />
+                To print the .PRT:<br />
+                <ol>
+                    <li>First select the <b>View .PRT</b> option (see Section 2.4).</li>
+                    <li>Then, in the View .PRT Window, selet the <b>Print</b> button.</li>
+                    <li>If the .PRT file exists, then a Print Dialog box is displayed, allowing you to alter any 
+                    print settings.</li>
+                </ol> 
+            </p>
+            <a id="Editing">
+                <h2> 4.0 Editing Your Program </h2>
+            </a>
+            <p>
+                The most basic way to edit your program is to simply type some text into the source code editor.
+                This section covers some of the different ways that ASSIST/UNA allows you to edit and navigate 
+                your source code.
+            </p>
+            <h3> - 4.1 Pasting Text into the Source Code Editor </h3>
+            <p>
+                To paste text into your program:<br />
+                <ol>
+                    <li>After copying some text, then use either <b>Ctrl + V</b> or <b>right-click &#8594 Paste</b> 
+                    to paste your copied text into the source code editor.</li>
+                    <li>Any text that is pasted into the source code editor will automatically be correctly 
+                    formatted.</li>
+                </ol>
+            </p>
+            <h3> - 4.2 Search for Text in Source Code </h3>
+            <p>
+                This tool allows you to quickly search through your source code to find all occurences of some 
+                search term.
+                To use <b>Search</b>:<br />
+                <ol>
+                    <li>Select <b>Edit &#8594 Search</b>. (Ctrl + F)</li>
+                    <li>A text box will appear prompting you to enter a search term.</li>
+                    <li>After entering a search term, click <b>Find</b> to jump to its first occurrence 
+                    within your source code.</li>
+                    <li>Continue clicking <b>Find</b> to cycle through all occurrences.</li>
+                </ol> 
+            </p>
+            <h3> - 4.3 Replace Words in Source Code </h3>
+            <p>
+                This tool allows you to find all occurences of some search term and replace it with some 
+                alternative term.
+                To use <b>Search and Replace</b>:<br />
+                <ol>
+                    <li>Select <b>Edit &#8594 Search and Replace</b>. (Ctrl + H)</li>
+                    <li>A text box will appear prompting you to enter a search term and a replacement term.</li>
+                    <li>After entering both search and replacement terms, click <b>Find</b> to jump to its first 
+                    occurrence within your source code.</li>
+                    <li>Click <b>Replace</b> to replace the highlighted search term.</li>
+                    <li>Continue clicking <b>Find</b> and <b>Replace</b> to cycle through and replace all instances 
+                    of the search term.</li>
+                </ol>
+            </p>
+            <h3> - 4.4 Importing </h3>
+            <p>
+                This tool allows you to import text files.<br />
+                To import a text file:<br />
+                <ol>
+                    <li>Select <b>File &#8594 Import</b>.</li>
+                    <li>Choose which .txt or .rtf file you would like to import.</li>
+                </ol>
+            </p>
+            <h3> - 4.5 Exporting </h3>
+            <p>
+                This tool allows you to export source code to a text file or a rich text format file.
+                <ol>
+                    <li>Select <b>File &#8594 Export</b>.</li>
+                    <li>Choose a location for your exported file.</li>
+                </ol>
+            </p>
+            <a id="Options">
+                <h2> 5.0 Options </h2>
+            </a>
+            <p>
+                ASSIST/UNA gives you the ability to change several options to better suit your needs.
+                To access the options menu:<br />
+                <ol>
+                    <li>Select <b>Tools &#8594 Options</b>.</li>
+                    <li>The Options Dialog Window appears displaying all ASSIST/I and ASSIST/UNA 
+                    options.</li>
+                </ol>
+            </p>
+        </div>
+        <div id="footer">
+            <hr style="border:0px;color:purple;background-color:purple;padding-top:10px;"/>
+            <hr style="border:0px;color:black;background-color:black;width:900px;"/>
+            <div style="font-size:90%">
+                This online user manual is brought to you by the members of Team Tunnel Snakes. <br />
+                The ASSIST/UNA software was completed for CS 455: Software Engineering at the 
+                University of North Alabama. <br />
+                Team Members:<br /> Travis Hunt, Andrew Hamilton, Michael Beaver, Chad Farley, 
+                Andrew Aaron, and Clay Boren.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

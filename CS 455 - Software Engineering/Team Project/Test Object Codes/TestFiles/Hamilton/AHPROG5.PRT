@@ -1,0 +1,223 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR:  
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+                           1 *ANDREW HAMILTON
+                           2 *PROGRAMMING ASSIGNMENT #5
+                           3 *4/17/13
+                           4 *THIS PROGRAM WILL MAINTAIN A BALANCE FOR A SAVINGS ACCOUNT.
+                           5 *IT WILL ACCEPT AS INPUT LINES OF DATA WITH THE FIRST CHARACTER
+                           6 *OF EACH LINE BEING A CODE (0-3) TO SIGNAL A DEPOSIT, WITHDRAWAL,
+                           7 *OR INTEREST CALCULATION, FOLLOWED BY THE AMOUNT. THE PROGRAM
+                           8 *WILL CREATE A REPORT BASED ON THE INPUT.
+000000                     9 AHPROG5  START
+000000 90EC D00C          10          STM   14,12,12(13)
+000004 05C0               11          BALR  12,0
+000006                    12          USING HERE,12
+000006 50D0 C0BE          13 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C0BA          14          LA    13,SAVEAREA
+                          15 *
+                          16 *
+                          17 *    PRINT THE TOP OF THE REPORT STATEMENT
+                          18 *
+00000E E020 C318 002A     19          XPRNT =C' TRANS.    SAVINGS     ACCOUNT    CURRENT',42
+000014 E020 C341 0029     20          XPRNT =C' CODE      AMOUNT      RATE       BALANCE',41
+00001A 45B0 C264          21          BAL   11,CLROUT
+                          22 * INITIALIZE COUNTERS TO ZERO AND A PACKED LOCATION
+                          23 * TO ONE TO BE USED TO INCREMENT
+                          24 *
+00001E F870 C189 C36A     25          ZAP   TOTDEP(8),=P'0'
+000024 F820 C199 C36A     26          ZAP   NUMDEP(3),=P'0'
+00002A F870 C191 C36A     27          ZAP   TOTWTH(8),=P'0'
+000030 F820 C19C C36A     28          ZAP   NUMWTH(3),=P'0'
+000036 F800 C19F C36B     29          ZAP   ONE(1),=P'1'
+                          30 *
+                          31 * READ UNTIL END OF FILE LOOP
+00003C E000 C102 000A     32 TOPREAD  XREAD LINE,10
+000042 4740 C082          33          BC    B'0100',ENDREAD
+                          34 *
+                          35 * A SERIES OF BRANCH ON CONDITIONS ARE USED TO DETERMINE
+                          36 * WHAT THE FIRST CHARACTER IS. A CALL IS MADE TO AN
+                          37 * INTERNAL SUBROUTINE BASED ON THE FIRST CHARACTER.
+000046 95F0 C102          38          CLI   LINE,C'0'
+00004A 4770 C050          39          BC    B'0111',DEP
+00004E 45B0 C1A0          40          BAL   11,INITIAL
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 2
+
+000052 47F0 C074          41          BC    B'1111',BOTTOM
+                          42 *
+                          43 * READ UNTIL END OF FILE LOOP
+000056 95F1 C102          44 DEP      CLI   LINE,C'1'
+00005A 4770 C060          45          BC    B'0111',WITHDRW
+00005E 45B0 C1CA          46          BAL   11,DEPOSIT
+000062 47F0 C074          47          BC    B'1111',BOTTOM
+                          48 *
+000066 95F2 C102          49 WITHDRW  CLI   LINE,C'2'
+00006A 4770 C070          50          BC    B'0111',INTR
+00006E 45B0 C200          51          BAL   11,WITHDRAW
+000072 47F0 C074          52          BC    B'1111',BOTTOM
+                          53 *
+000076 45B0 C246          54 INTR     BAL   11,INTEREST
+00007A D20C C15C C36C     55 BOTTOM   MVC   TEMP(13),=X'40206B2020206B2021204B2020'
+000080 45B0 C270          56          BAL   11,PRNTCRRN
+000084 47F0 C036          57          BC    B'1111',TOPREAD
+                          58 *
+000088 45B0 C264          59 ENDREAD  BAL   11,CLROUT
+00008C E020 C379 0001     60          XPRNT =C' ',1
+000092 E020 C37A 0012     61          XPRNT =C' CURRENT BALANCE: ',18
+000098 45B0 C270          62          BAL   11,PRNTCRRN
+00009C E020 C379 0001     63          XPRNT =C' ',1
+0000A2 45B0 C290          64          BAL   11,PRNTDEP
+0000A6 45B0 C264          65          BAL   11,CLROUT
+0000AA E020 C379 0001     66          XPRNT =C' ',1
+0000B0 45B0 C2D4          67          BAL   11,PRNTWITH
+0000B4 58D0 C0BE          68          L     13,SAVEAREA+4
+0000B8 98EC D00C          69          LM    14,12,12(13)
+0000BC 07FE               70          BR    14
+0000C0                    71 SAVEAREA DS    18F
+000108                    72 LINE     DS    ZL10
+                          73 CC       DS    C'0'
+                                        $
+                             Error, Invalid delimiter
+000112                    74 OUT      DS    CL80
+000162                    75 TEMP     DS    CL17
+000173                    76 TEMP2    DS    CL6
+000179                    77 CURRENT  DS    PL5
+00017E                    78 LOWEST   DS    PL5
+000183                    79 DEPOS    DS    PL5
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 3
+
+000188                    80 WITH     DS    PL5
+00018D                    81 INTER    DS    PL2
+00018F                    82 TOTDEP   DS    PL8
+000197                    83 TOTWTH   DS    PL8
+00019F                    84 NUMDEP   DS    PL3
+0001A2                    85 NUMWTH   DS    PL3
+0001A5                    86 ONE      DS    PL1
+                          87 *
+                          88 *
+0001A6 F248 C173 C103     89 INITIAL  PACK  CURRENT(5),LINE+1(9)
+0001AC F844 C178 C173     90          ZAP   LOWEST(5),CURRENT(5) INITIALIZE LOWEST VAL
+0001B2 92F0 C10D          91          MVI   OUT+1,C'0'  MOVE IN A ZERO FOR OUTPUT
+                          92 *
+0001B6 D20C C15C C36C     93          MVC   TEMP(13),=X'40206B2020206B2021204B2020'
+0001BC DF0C C15C C173     94          EDMK  TEMP(13),CURRENT
+0001C2 0610               95          BCTR  1,0
+0001C4 925B 1000          96          MVI   0(1),C'$' SEND THE INITIAL VALUE AND DOLLAR
+0001C8 D20C C112 C15C     97          MVC   OUT+6(13),TEMP SIGN TO THE OUTPUT LIN
+0001CE 07FB               98          BR    11
+                          99 *
+                         100 *
+0001D0 F248 C17D C103    101 DEPOSIT  PACK  DEPOS(5),LINE+1(9)
+0001D6 FA44 C173 C17D    102          AP    CURRENT(5),DEPOS(5) ADD DEPOSIT TO CURRENT AMT AND
+0001DC 92F1 C10D         103          MVI   OUT+1,C'1'  SEND EACH VALUE TO THE OUT LIN
+                         104 *
+0001E0 D20C C15C C36C    105          MVC   TEMP(13),=X'40206B2020206B2021204B2020'
+0001E6 DF0C C15C C17D    106          EDMK  TEMP(13),DEPOS
+0001EC 0610              107          BCTR  1,0
+0001EE 925B 1000         108          MVI   0(1),C'$'
+0001F2 D20C C112 C15C    109          MVC   OUT+6(13),TEMP
+0001F8 FA74 C189 C17D    110          AP    TOTDEP(8),DEPOS(5)  ACCUMULATE TOTAL DEPOSITS
+0001FE FA20 C199 C19F    111          AP    NUMDEP(3),ONE(1) AND TOTAL AMOUNT
+000204 07FB              112          BR    11
+                         113 *
+                         114 *
+000206 F248 C182 C103    115 WITHDRAW PACK  WITH(5),LINE+1(9)
+00020C FB44 C173 C182    116          SP    CURRENT(5),WITH(5)
+000212 92F2 C10D         117          MVI   OUT+1,C'2'  WORKS THE SAME AS DEPOSIT BUT
+                         118 *        SUBTRACTS FROM TOTAL AMOUNT
+000216 D20C C15C C36C    119          MVC   TEMP(13),=X'40206B2020206B2021204B2020'
+00021C DF0C C15C C182    120          EDMK  TEMP(13),WITH
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 4
+
+000222 0610              121          BCTR  1,0
+000224 925B 1000         122          MVI   0(1),C'$'
+000228 D20C C112 C15C    123          MVC   OUT+6(13),TEMP
+00022E FA74 C191 C182    124          AP    TOTWTH(8),WITH(5) ACCUMULATE NUM WITHDRAWALS
+000234 FA20 C19C C19F    125          AP    NUMWTH(3),ONE(1) AND TOTAL AMOUNT
+00023A F944 C173 C178    126          CP    CURRENT(5),LOWEST(5)
+000240 47B0 C244         127          BC    B'1011',WITHBOT  CHECK FOR NEW LOWEST VAL
+000244 F844 C178 C173    128          ZAP   LOWEST(5),CURRENT(5) TO BE USED WITH INTEREST
+00024A 07FB              129 WITHBOT  BR    11  CALCULATIONS
+                         130 *
+                         131 *
+00024C 92F3 C10D         132 INTEREST MVI   OUT+1,C'3'
+000250 F212 C187 C103    133          PACK  INTER(2),LINE+1(3)
+000256 D204 C15C C38C    134          MVC   TEMP(5),=X'40214B2020'
+00025C DE04 C15C C187    135          ED    TEMP(5),INTER
+000262 D204 C123 C15C    136          MVC   OUT+23(5),TEMP
+000268 07FB              137          BR    11
+                         138 *
+                         139 *
+00026A 9240 C10C         140 CLROUT   MVI   OUT,C' '
+00026E D24E C10D C10C    141          MVC   OUT+1(79),OUT
+000274 07FB              142          BR    11
+                         143 *
+                         144 *
+                         145 *PRINTS THE CURRENT AMOUNT IN THE BANK ACCOUNT
+000276 D20C C15C C36C    146 PRNTCRRN MVC   TEMP(13),=X'40206B2020206B2021204B2020'
+00027C DF0C C15C C173    147          EDMK  TEMP(13),CURRENT
+000282 0610              148          BCTR  1,0
+000284 925B 1000         149          MVI   0(1),C'$'
+000288 D20C C12C C15C    150          MVC   OUT+32(13),TEMP
+00028E E020 C10C 002E    151          XPRNT CC,46
+000294 07FB              152          BR    11
+                         153 *
+                         154 *
+                         155 *PRINTS NUMBER OF DEPOSITS AND TOTAL AMOUNT
+000296 D205 C16D C391    156 PRNTDEP  MVC   TEMP2(6),=X'402020202020'
+00029C DE05 C16D C199    157          ED    TEMP2(6),NUMDEP
+0002A2 D205 C119 C16D    158          MVC   OUT+13(6),TEMP2
+0002A8 D20C C10C C397    159          MVC   OUT(13),=C'# DEPOSITS = '
+0002AE E020 C10C 0017    160          XPRNT CC,23
+0002B4 E020 C379 0001    161          XPRNT =C' ',1
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 5
+
+0002BA D20F C15C C3A4    162          MVC   TEMP(16),=X'40202020202020202020202020202020'
+0002C0 DE0F C15C C189    163          ED    TEMP(16),TOTDEP
+0002C6 D217 C10C C3B4    164          MVC   OUT(24),=C'TOTAL AMOUNT OF DEPOSITS'
+0002CC D20F C126 C15C    165          MVC   OUT+26(16),TEMP
+0002D2 E020 C10C 002F    166          XPRNT CC,47
+0002D8 07FB              167          BR    11
+                         168 *
+                         169 *
+                         170 *PRINTS NUMBER OF WITHDRAWAL AND TOTAL AMOUNT
+0002DA D20F C10C C3CC    171 PRNTWITH MVC   OUT(16),=C'# WITHDRAWALS = '
+0002E0 D205 C16D C391    172          MVC   TEMP2(6),=X'402020202020'
+0002E6 DE05 C16D C19C    173          ED    TEMP2(6),NUMWTH
+0002EC D205 C11D C16D    174          MVC   OUT+17(6),TEMP2
+0002F2 E020 C10C 0020    175          XPRNT CC,32
+0002F8 E020 C379 0001    176          XPRNT =C' ',1
+0002FE D217 C10C C3DC    177          MVC   OUT(24),=C'AMOUNT OF WITHDRAWALS = '
+000304 D20F C15C C3A4    178          MVC   TEMP(16),=X'40202020202020202020202020202020'
+00030A DE0F C15C C191    179          ED    TEMP(16),TOTWTH
+000310 D20F C11E C15C    180          MVC   OUT+18(16),TEMP
+000316 E020 C10C 0032    181          XPRNT CC,50
+00031C 07FB              182          BR    11
+                         183          END   AHPROG5
+00031E 40E3D9C1D5E24B40               =C' TRANS.    SAVINGS     ACCOUNT    CURRENT'
+000347 40C3D6C4C5404040               =C' CODE      AMOUNT      RATE       BALANCE'
+000370 0C                             =P'0'
+000371 1C                             =P'1'
+000372 40206B2020206B20               =X'40206B2020206B2021204B2020'
+00037F 40                             =C' '
+000380 40C3E4D9D9C5D5E3               =C' CURRENT BALANCE: '
+000392 40214B2020                     =X'40214B2020'
+000397 402020202020                   =X'402020202020'
+00039D 7B40C4C5D7D6E2C9               =C'# DEPOSITS = '
+0003AA 4020202020202020               =X'40202020202020202020202020202020'
+0003BA E3D6E3C1D340C1D4               =C'TOTAL AMOUNT OF DEPOSITS'
+0003D2 7B40E6C9E3C8C4D9               =C'# WITHDRAWALS = '
+0003E2 C1D4D6E4D5E340D6               =C'AMOUNT OF WITHDRAWALS = '
+
+
+*** 1 STATEMENTS FLAGGED - 1 ERRORS FOUND

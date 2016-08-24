@@ -1,0 +1,203 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Test Object Codes\TestFiles\Beaver\MBPROG4.PRT
+#
+         TITLE 'PROGRAM PROLOGUE'
+**********************************************************************
+*  MICHAEL BEAVER                                                    *
+*  CS 310, SPRING 2013                                    *
+*  PROGRAM 4                                                         *
+*  DUE: APRIL 3, 2013                                                *
+*                                      *
+*  DESCRIPTION:                                                      *
+*    THIS PROGRAM EXPECTS AS INPUT A DATA FILE WITH AN UNKNOWN NUMBER*
+*    OF DATA LINES. THE DATA FOLLOWS A SPECIFIC FORMAT WHERE EACH    *
+*    GROUP OF FIVE LINES REPRESENTS A PERSON'S DATA: FIRST, MIDDLE,  *
+*    AND LAST NAMES; STREET ADDRESS; CITY; STATE ABBREVIATION; AND,  *
+*    ZIP CODE. THE PROGRAM CONVERTS THIS 5-LINE FORMAT INTO A 3-LINE *
+*    FORMAT AND PRINTS THE RESULT. EACH 3-LINE DATA GROUP IS         *
+*    SEPARATED BY A GROUP OF THREE BLANK LINES. THE PROGRAM THEN     *
+*    TERMINATES AFTER REACHING THE END OF THE DATA FILE.             *
+*                                                                    *
+*  INTERNAL SUBROUTINES:                                             *
+*    READDATA: MAIN SUBROUTINE CALLS THE FOLLOWING SUBROUTINES TO    *
+*              READ IN AND FORMAT DATA FOR OUTPUT                    * 
+*    MAKENAME: FORMATS THE NAME LINE: LAST, FIRST M.                 *
+*     STRADDR: SIMPLY PRINTS THE ADDRESS LINE FROM THE DATA FILE     *
+*    CTYSTZIP: FORMATS THE CITY, STATE, AND ZIP CODE: CITY, ST  ZIP  *
+*    FINDBLNK: FINDS THE FIRST BLANK IN A MEMORY LOCATION (POINTED   *
+*              TO BY REG2)--THE RESULT IS RETURNED IN REG2           *
+*    CASCBLNK: CASCADES BLANK CHARACTERS INTO THE OUTLINE MEMORY     *
+**********************************************************************
+         TITLE 'MAIN PROGRAM'
+**********************************************************************
+*  REGISTER KEY:                                                     *
+*    REG11: USED TO CALL READDATA SUBROUTINE                         *
+**********************************************************************
+MBPROG4  START
+         STM   14,12,12(13)      BEGINNING HOUSEKEEPING
+         BALR  12,0
+         USING SAVING,12
+SAVING   ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+         SPACE 2
+         BAL   11,READDATA              ALL ACTION BEGINS HERE
+         SPACE 2
+         L     13,SAVEAREA+4      ENDING HOUSEKEEPING
+         LM    14,12,12(13)
+         BR    14
+         SPACE 2 
+SAVEAREA DS    18F
+REGSAVE  DS    16F
+CARD     DS    CL50
+CARRIAGE DC    C' '
+OUTLINE  DS    CL50
+         TITLE 'READDATA: CONVERT FROM 5-LINE FORMAT TO 3-LINE FORMAT'
+**********************************************************************
+*  REGISTER KEY:                                                     *
+*    REG11: USED TO CALL OTHER SUBROUTINES AND BRANCH BACK TO MAIN   *
+**********************************************************************
+READDATA STM   0,15,REGSAVE
+         SPACE
+READTOP  XREAD CARD,50                  READ UNTIL EOF
+         BC    B'0100',READEND
+         SPACE 2
+         BAL   11,MAKENAME              CONVERT FROM 5-LINE TO 3-LINE
+         BAL   11,STRADDR
+         BAL   11,CTYSTZIP
+         SPACE 2
+         XPRNT CARRIAGE,1               3-LINE SEPARATOR (BLANKS)
+         XPRNT CARRIAGE,1
+         XPRNT CARRIAGE,1
+         SPACE 2
+         B     READTOP
+         SPACE 
+READEND  LM    0,15,REGSAVE
+         BR    11
+         TITLE 'FORMAT NAME: LAST, FIRST M.'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*     REG2: POINTER TO CARD MEMORY AREA TO FIND INITIAL BLANKS;     *
+*           STEP SIZE (1) FOR LOOPS                                 *
+*     REG3: TERMINAL VALUE (BLANK LOCATION) FOR LOOPS               *
+*     REG4: POINTER TO OUTLINE MEMORY AREA                          *
+*     REG6: POINTER TO THE END OF THE FIRST NAME                    *
+*     REG7: POINTER TO THE MIDDLE NAME                              *
+*     REG8: POINTER TO THE BEGINNING OF THE LAST NAME; POINTER      *
+*           TO MEMORY TO BE COPIED INTO OUTLINE MEMORY (VIA LOOPS)  *
+*    REG10: USED TO CALL OTHER SUBROUTINES                          *
+*    REG11: USED TO RETURN TO CALLING SUBROUTINE                    * 
+*********************************************************************
+MAKENAME BAL   10,CASCBLNK
+         SPACE 
+         LA    2,CARD                   FIND BLANK AFTER FIRST NAME
+         BAL   10,FINDBLNK              
+         LR    6,2                      FIRST NAME ENDS AT REG6 LOC
+         SPACE 2
+         LA    7,1(2)                   MIDDLE INITIAL AT REG7 LOC
+         LR    2,7                      FIND BLANK AFTER MIDDLE NAME
+         BAL   10,FINDBLNK              
+         SPACE 2
+         LA    8,1(2)                   LAST NAME STARTS AT REG8 LOC
+         LR    2,8                      FIND BLANK ENDING LAST NAME
+         BAL   10,FINDBLNK              
+         SPACE 2
+         LR    3,2                      TERMINAL BLANK IN FULL NAME 
+         BCTR  3,0                      LAST CHARACTER IN FULL NAME
+         LA    2,1                     
+         LA    4,OUTLINE
+LASTNAME MVC   0(1,4),0(8)              COPY LAST NAME TO OUTLINE
+         LA    4,1(4)
+         BXLE  8,2,LASTNAME
+         MVI   0(4),C','
+         EJECT
+         LR    3,6
+         LA    4,2(4)                   LOCATION TO COPY TO IN OUTLINE
+         LA    8,CARD                      
+FRSTNAME MVC   0(1,4),0(8)              COPY FIRST NAME TO OUTLINE
+         LA    4,1(4)
+         BXLE  8,2,FRSTNAME
+         SPACE 
+MIDINIT  MVC   0(1,4),0(7)              COPY MIDDLE INITIAL TO OUTLINE
+         MVI   1(4),C'.'
+         SPACE 2
+         XPRNT CARRIAGE,51
+         BR    11
+         TITLE 'FORMAT STREET ADDRESS: JUST COPY STREET ADDRESS'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*    REG10: USED TO CALL OTHER SUBROUTINES                          *
+*    REG11: USED TO RETURN TO CALLING SUBROUTINE                    *
+********************************************************************* 
+STRADDR  BAL   10,CASCBLNK
+         SPACE
+         XREAD OUTLINE,50
+         XPRNT CARRIAGE,51
+         SPACE 
+         BR    11
+         TITLE 'FORMAT CITY, STATE, AND ZIP: CITY, ST  ZIP'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*     REG2: STEP SIZE FOR LOOPS                                     *
+*     REG3: TERMINAL VALUE FOR LOOPS                                *
+*     REG4: POINTER TO CARD MEMORY AREA                             *
+*     REG5: POINTER TO OUTLINE MEMORY AREA                          *
+*    REG10: USED TO CALL OTHER SUBROUTINES                          *
+*    REG11: USED TO RETURN TO CALLING SUBROUTINE                    *
+*********************************************************************
+CTYSTZIP BAL   10,CASCBLNK
+         SPACE 
+         XREAD CARD,50                  GET CITY DATA LINE
+         LA    4,CARD+50                START AT THE END OF THE LINE 
+         L     2,=F'-1'
+         LA    3,CARD-1 
+FINDCITY CLI   0(4),C' '                FIND WHERE THE CITY NAME ENDS
+         BC    B'0010',NOTBLANK
+         BXH   4,2,FINDCITY
+         SPACE 2
+NOTBLANK LA    2,1
+         LR    3,4                      REASSIGN FOR NEW TERMINAL LOC
+         LA    4,CARD                   
+         LA    5,OUTLINE
+COPYCITY MVC   0(1,5),0(4)              COPY CITY FROM CARD TO OUTLINE
+         LA    5,1(5)
+         BXLE  4,2,COPYCITY
+         SPACE 2
+         XREAD CARD,50                  GET STATE DATA LINE
+         MVI   0(5),C','
+COPYST   MVC   2(2,5),CARD              COPY STATE INITIALS TO OUTLINE
+         SPACE 2
+         XREAD CARD,50                  GET ZIP CODE DATA LINE
+COPYZIP  MVC   6(5,5),CARD              COPY ZIP CODE TO OUTLINE
+         SPACE 
+         XPRNT CARRIAGE,51
+         BR    11
+         TITLE 'FIND BLANK'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*     REG2: POINTER TO LOCATION IN WHICH TO FIND FIRST BLANK; RETURN*
+*           POINTER LOCATION TO BLANK                               *
+*    REG10: USED TO RETURN TO CALLING SUBROUTINE                    *
+*********************************************************************
+FINDBLNK STM   3,1,REGSAVE
+         SPACE 
+SRCHTOP  CLI   0(2),C' '                FIND THE FIRST BLANK
+         BC    B'1000',FOUND
+         LA    2,1(2)
+         B     SRCHTOP
+         SPACE 
+FOUND    LM    3,1,REGSAVE              POINTER RETURNED IN REG2
+         BR    10
+         TITLE 'CASCADE BLANKS INTO OUTLINE'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*    REG10: USED TO RETURN TO CALLING SUBROUTINE                    *
+*********************************************************************
+CASCBLNK MVI   OUTLINE,C' '
+         MVC   OUTLINE+1(49),OUTLINE
+         BR    10
+         END   MBPROG4
+$ENTRY ..\HUNT\PROG4.TXT

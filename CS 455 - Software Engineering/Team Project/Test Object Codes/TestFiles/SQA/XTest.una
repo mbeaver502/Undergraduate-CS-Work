@@ -1,0 +1,43 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Andrew\Documents\CS 455\TestCases\Classes\Assembler\Formats\XTest.PRT
+#
+XTEST    START
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+*
+         XPRNT CARD,80
+         XPRNT 4(4,5),80
+         XPRNT 4(,5),1
+         XPRNT 4(5),1
+         XPRNT 4,1
+         XPRNT CARD-1,80
+         XPRNT CARD+1,80
+         XDECO 4,=F'4'
+         XDECO 5,=F'10'
+         XDECO 4,4(4,5)
+         XDECO 5,4(,5)
+         XDECO 4,4(5)
+         XDECO 6,1 
+         XDECO 2,CARD-1
+         XDECO 7,CARD+1
+         XREAD CARD,80
+         XREAD 4(4,6),80
+         XREAD 4(,5),10
+         XREAD 4(5),1
+         XREAD 4,1
+         XDEC1 3,CARD
+*
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+CARD     DS    CL12
+         END   XTEST 
+$ENTRY

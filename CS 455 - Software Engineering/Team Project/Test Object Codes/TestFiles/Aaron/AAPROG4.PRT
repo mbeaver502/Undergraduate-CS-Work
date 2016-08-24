@@ -1,0 +1,206 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR: QQ 
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+                           1 *ANDREW AARON
+                           2 *ASSIGNMENT:PROGRAM 4
+                           3 *DUE: 4/3/2013
+                           4 *
+                           5 *DESCRIPTION:
+                           6 *    THIS PROGRAM WILL ACCEPT AS INPUT AN UNKNOWN SIZE FILE
+                           7 *  REPRESENTING PERSONAL DATA AND CONVERT IT TO ANOTHER FORMAT.
+                           8 *
+                           9 *INPUT: UNKNOWN NUMBER OF LINES CONTAINING PERSONAL DATA
+                          10 *OUTPUT: PERSONAL DATA IN A DIFFERENT FORMAT
+                          11 *
+                          12 *
+                          13 *REGISTER KEY:
+                          14 *  REGISTER 2 - POINTER TO THE SOURCE CHAR IN EACH FORMAT SUBROUTINE,
+                          15 *    ALSO CONTROL REGISTER FOR GETCITY LOOP
+                          16 *  REGISTER 3 - POINTER TO THE DESTINATION CHAR IN OUTPUT CHARACTER
+                          17 *    LISTS IN EACH FORMAT SUBROUTINE
+                          18 *  REGISTER 4 - STEP COUNTER IN GETCITY LOOP
+                          19 *  REGISTER 5 - END OF CITY NAME, TERMINAL VALUE IN GETCITY LOOP
+                          20 *  REGISTER 9 - HOLDS THE ADDRESS OF NEXT INSTRUCTION AFTER FNDSPACE
+                          21 *  REGISTER 10 - HOLDS THE ADDRESS OF NEXT INSTRUCTION AFTER THE
+                          22 *    FORMAT SUBROUTINES
+                          23 *  REGISTER 11 - HOLDS THE ADDRESS OF NEXT INSTRUCTION AFTER THE MAIN
+                          24 *    TWO SUBROUTINES, SUBREAD AND SUBPRNT
+                          25 *
+                          26 *VARIABLE KEY:
+                          27 *  CARD - HOLDS ONE DATA LINE AT A TIME
+                          28 *  CC - FOR DOUBLE SPACED CARRIAGE CONTROL
+                          29 *  NAMES - OUTPUT LINE TO HOLD THE REFORMATTED NAMES
+                          30 *  CC2 - SINGLE SPACED CARRIAGE CONTROL FOR STREET ADDRESS OUTPUT
+                          31 *  STREET - OUTPUT LINE FOR STREET ADDRESS
+                          32 *  CC3 - SINGLE SPACED CARRIAGE CONTROL FOR THE CSZ OUTPUT LINE
+                          33 *  CSZ - OUTPUT LINE FOR THE NEWLY FORMATTED CITY, STATE AND ZIP
+                          34 *
+                          35 **********************************************************************
+                          36 *                            BEGINNING HK
+000000                    37 PROJECT4 START
+000000 90EC D00C          38          STM   14,12,12(13)
+000004 05C0               39          BALR  12,0
+000006                    40          USING HERE,12
+000006 50D0 C02E          41 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C02A          42          LA    13,SAVEAREA
+
+                          44 **********************************************************************
+                          45 *                                BODY
+
+00000E 45B0 C144          47 LOOP     BAL   11,SUBREAD
+000012 4740 C018          48          BC    B'0100',ENDLOOP
+000016 45B0 C252          49          BAL   11,SUBPRNT
+00001A 47F0 C008          50          BC    B'1111',LOOP
+00001E E020 C0A4 0001     51 ENDLOOP  XPRNT CC,1
+
+                          53 **********************************************************************
+                          54 *                               END HK
+000024 58D0 C02E          55          L     13,SAVEAREA+4
+000028 98EC D00C          56          LM    14,12,12(13)
+00002C 07FE               57          BR    14
+000030                    58 SAVEAREA DS    18F
+                          59 **********************************************************************
+                          60 *                              VARIABLES
+
+000078                    62 CARD     DS    CL50            SEE VARIABLE KEY
+0000AA F0                 63 CC       DC    C'0'
+0000AB                    64 NAMES    DS    CL50
+0000DD 40                 65 CC2      DC    C' '
+0000DE                    66 STREET   DS    CL50
+000110 40                 67 CC3      DC    C' '
+000111                    68 CSZ      DS    CL57
+
+                          70 **********************************************************************
+                          71 *                             SUBROUTINES
+
+                          73 *
+                          74 *    SUBREAD IS THE MAIN SUBROUTINE WHICH WILL CALL OTHER SUBROUTINES
+                          75 *  TO REFORMAT THE INPUT LINES. IT WILL ALSO CLEAR THE OUTPUT LINES.
+                          76 *
+00014A 9240 C0A5          77 SUBREAD  MVI   NAMES,C' '            CLEAR GARBAGE FROM OUTPUT LINES
+00014E D230 C0A6 C0A5     78          MVC   NAMES+1(49),NAMES
+000154 9240 C0D8          79          MVI   STREET,C' '
+000158 D230 C0D9 C0D8     80          MVC   STREET+1(49),STREET
+00015E 9240 C10B          81          MVI   CSZ,C' '
+000162 D237 C10C C10B     82          MVC   CSZ+1(56),CSZ
+000168 45A0 C172          83          BAL   10,FMTNAMES
+00016C E000 C0D8 0032     84          XREAD STREET,50
+000172 45A0 C1E2          85          BAL   10,FMTCSZ
+000176 07FB               86          BR    11
+
+                          88 *
+                          89 *    FMTNAMES SUBFUNCTION WILL TAKE THE INPUT LINE AND MOVE THE
+                          90 *  NAMES ONE AT A TIME TO THE NAMES OUTPUT LINE, IN THE NEW FORMAT.
+                          91 *
+000178 E000 C072 0032     92 FMTNAMES XREAD CARD,50
+00017E 074B               93          BCR   B'0100',11
+000180 4120 C072          94          LA    2,CARD
+000184 4130 C0A5          95          LA    3,NAMES
+000188 4590 C244          96          BAL   9,FNDSPACE        FIND LAST NAME
+00018C 4122 0001          97          LA    2,1(2)
+000190 4590 C244          98          BAL   9,FNDSPACE
+000194 4122 0001          99          LA    2,1(2)            2 SHOULD BE AT LAST NAME
+000198 9540 2000         100 GETLAST  CLI   0(2),C' '
+00019C 4780 C1AC         101          BC    B'1000',ENDLAST
+0001A0 D200 3000 2000    102          MVC   0(1,3),0(2)       MOVE LAST NAME INTO NAMES
+0001A6 4122 0001         103          LA    2,1(2)
+0001AA 4133 0001         104          LA    3,1(3)            3 IS DESTINATION IN NAMES CHARLIST
+0001AE 47F0 C192         105          BC    B'1111',GETLAST
+0001B2 926B 3000         106 ENDLAST  MVI   0(3),C','
+0001B6 4133 0002         107          LA    3,2(3)
+0001BA 4120 C072         108          LA    2,CARD
+0001BE 9540 2000         109 GETFIRST CLI   0(2),C' '         DO THE SAME FOR FIRST NAME
+0001C2 4780 C1D2         110          BC    B'1000',ENDFIRST
+0001C6 D200 3000 2000    111          MVC   0(1,3),0(2)
+0001CC 4122 0001         112          LA    2,1(2)
+0001D0 4133 0001         113          LA    3,1(3)
+0001D4 47F0 C1B8         114          BC    B'1111',GETFIRST
+0001D8 D201 3000 2000    115 ENDFIRST MVC   0(2,3),0(2)       ADD THE MIDDLE INITIAL
+0001DE 4133 0002         116          LA    3,2(3)            WHICH IS JUST THE NEXT 2 CHARS
+0001E2 924B 3000         117          MVI   0(3),C'.'
+0001E6 07FA              118          BR    10
+
+                         120 *
+                         121 *    FMTCSZ SUBROUTINE FINDS AND MOVES THE CITY INTO THE CSZ LINE,
+                         122 *  AND THEN ADDS THE STATE AND ZIP CODE TO IT.
+                         123 *
+0001E8 E000 C072 0032    124 FMTCSZ   XREAD CARD,50
+0001EE 074B              125          BCR   B'0100',11
+0001F0 4120 C072         126          LA    2,CARD
+0001F4 4130 C10B         127          LA    3,CSZ
+0001F8 4140 0001         128          LA    4,1
+0001FC 4150 C0A3         129          LA    5,CARD+49         REG 5 WILL POINT TO THE END OF CITY
+000200 9540 5000         130 CITYEND  CLI   0(5),C' '         START AT THE END OF INPUT
+000204 4770 C208         131          BC    B'0111',GETCITY   GO BACK UNTIL NONSPACE CHAR FOUND
+000208 1B54              132          SR    5,4
+00020A 47F0 C1FA         133          BC    B'1111',CITYEND
+00020E D200 3000 2000    134 GETCITY  MVC   0(1,3),0(2)       MOVE CITY NAME INTO OUTPUT LINE
+000214 4133 0001         135          LA    3,1(3)
+000218 8724 C208         136          BXLE  2,4,GETCITY
+00021C 926B 3000         137          MVI   0(3),C','
+000220 4133 0002         138          LA    3,2(3)
+000224 E000 C072 0032    139          XREAD CARD,50           READ IN AND ADD THE STATE
+00022A 4120 C072         140          LA    2,CARD
+00022E D201 3000 2000    141          MVC   0(2,3),0(2)
+000234 4133 0004         142          LA    3,4(3)
+000238 E000 C072 0032    143          XREAD CARD,50           THEN READ IN AND ADD THE ZIP CODE
+00023E 4120 C072         144          LA    2,CARD
+000242 D204 3000 2000    145          MVC   0(5,3),0(2)
+000248 07FB              146          BR    11
+
+                         148 *
+                         149 *    FNDSPACE FINDS THE NEXT SPACE CHAR IN A CHAR LINE. IT ASSUMES
+                         150 *  REGISTER 2 IS POINTING TO A CHAR IN THE CHAR LINE.
+                         151 *
+00024A 9540 2000         152 FNDSPACE CLI   0(2),C' '
+00024E 0789              153          BCR   B'1000',9
+000250 4122 0001         154          LA    2,1(2)
+000254 47F0 C244         155          BC    B'1111',FNDSPACE
+
+                         157 *
+                         158 *    SUBPRNT PRINTS ALL THREE OUTPUT LINES, AS WELL AS EXTRA SPACE
+                         159 *  AT THE BOTTOM OF EACH SET OF INFORMATION.
+                         160 *
+000258 E020 C0A4 0033    161 SUBPRNT  XPRNT CC,51
+00025E E020 C0D7 0033    162          XPRNT CC2,51
+000264 E020 C10A 003A    163          XPRNT CC3,58
+00026A E020 C0A4 0001    164          XPRNT CC,1
+000270 07FB              165          BR    11
+
+                         167 *
+                         168 **********************************************************************
+                         169 *                            END OF PROGRAM
+                         170          END   PROJECT4
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+
+JONES, MARY J.                                    
+123 E. MAIN STREET                                
+NEW YORK, NY  12345                                      
+
+
+
+BEAVER, JAMES M.                                  
+24526 CRAFT ROAD                                  
+ATHENS, AL  35613                                        
+
+
+
+GIBBS, LEEROY J.                                  
+123 N. WASHINGTON BOULEVARD                       
+NORFOLK, VA  23501                                       
+
+
+
+
+
+*** EXECUTION COMPLETED ***

@@ -1,0 +1,204 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR: AF 
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+                           1 *ANDREW HAMILTON
+                           2 *PROGRAMMING ASSIGNMENT #2
+                           3 *3/13/13
+                           4 *THIS PROGRAM WILL READ IN 20 LINES OF DATA CONTAINING ONE INTEGER
+                           5 *PER LINE AND STORE THEM IN A TABLE TO BE PRINTED IN THE ORDER THEY
+                           6 *WERE INPUT FROM THE DATA LINES, THEN IN REVERSE ORDER.
+                           7 *REGISTER KEY
+                           8 *REG 2 - CONTROL LOOP FOR BXLE AND BXH LOOPS IN THE INPUT AND PRINT
+                           9 * ROUTINES
+                          10 *REG 3 - USED TO INPUT DATA INTO THE TABLE IN THE INPUT ROUTINE. USED
+                          11 *  USED TO OUTPUT DATA FROM THE TABLE IN THE PRINT ROUTINES
+                          12 *REG 4 - USED FOR THE STEP SIZE IN THE BXLE AND BXH LOOPS
+                          13 *REG 5 - USED AS THE TERMINATING CONDITION IN THE BXLE AND BXH LOOPS
+000000                    14 DATA2    START
+000000 90EC D00C          15          STM   14,12,12(13)
+000004 05C0               16          BALR  12,0
+000006                    17          USING HERE,12
+000006 50D0 C02E          18 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C02A          19          LA    13,SAVEAREA
+
+                          21 *CALL ROUTINES FOR DATA INPUT AND PRINT IN ORDER AND PRINT IN REVERSE
+                          22 *ORDER
+00000E 45B0 C120          23          BAL   11,INPUT
+000012 E020 C180 0016     24          XPRNT =C'1IN ORDER OF DATA READ',22
+000018 45B0 C140          25          BAL   11,PRNTFRWD
+00001C E020 C196 000E     26          XPRNT =C'1REVERSE ORDER',14
+000022 45B0 C160          27          BAL   11,PRNTREV
+
+000026 58D0 C02E          29          L     13,SAVEAREA+4
+00002A 98EC D00C          30          LM    14,12,12(13)
+00002E 07FE               31          BR    14
+000030                    32 SAVEAREA DS    18F
+
+000078                    34 LINE     DS    CL80
+0000C8                    35 TABLE    DS    20F
+000118 F0                 36 CC       DC    C'0'
+000119                    37 OUT      DS    CL12
+
+000126 4120 C0C2          39 INPUT    LA    2,TABLE       SET REG  2 TO POINT TO TABLE AND SET THE
+00012A 4140 0004          40          LA    4,4           INCREMENT SIZE AND STOPPING CONDITION
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 2
+
+00012E 4150 C10E          41          LA    5,TABLE+76    FOR THE INPUT LOOP
+000132 E000 C072 0050     42 INPTLOOP XREAD LINE,80
+000138 5330 C072          43          XDECI 3,LINE        LOOPS 20 TIMES, EACH LOOP ADDS A DATA
+00013C 5032 0000          44          ST    3,0(2)        LINE TO THE TABLE
+000140 8724 C12C          45          BXLE  2,4,INPTLOOP
+000144 07FB               46          BR    11
+
+000146 4120 C0C2          48 PRNTFRWD LA    2,TABLE       PRNTFRWD USES THE SAME LOOP SETUP AS
+00014A 4140 0004          49          LA    4,4           INPTLOOP BUT IT PRINTS OUT EACH ELEMENT
+00014E 4150 C10E          50          LA    5,TABLE+76    OF THE TABLE
+000152 5832 0000          51 FRWD     L     3,0(2)
+000156 5230 C113          52          XDECO 3,OUT
+00015A E020 C112 000D     53          XPRNT CC,13
+000160 8724 C14C          54          BXLE  2,4,FRWD
+000164 07FB               55          BR    11
+
+000166 4120 C10E          57 PRNTREV  LA    2,TABLE+76   SET REG 2 TO POINT TO THE END OF THE
+00016A 5840 C1A4          58          L     4,=F'-4'     TABLE
+00016E 4150 C0BE          59          LA    5,TABLE-4    INCREMENT EACH LOOP BY -4
+000172 5832 0000          60 REV      L     3,0(2)
+000176 5230 C113          61          XDECO 3,OUT        EACH LOOP PRINTS AN ELEMENT OF THE
+00017A E020 C112 000D     62          XPRNT CC,13        TABLE
+000180 8624 C16C          63          BXH   2,4,REV
+000184 07FB               64          BR    11
+                          65          END   DATA2
+000186 F1C9D540D6D9C4C5               =C'1IN ORDER OF DATA READ'
+00019C F1D9C5E5C5D9E2C5               =C'1REVERSE ORDER'
+0001AA FFFFFFFC                       =F'-4'
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+IN ORDER OF DATA READ
+
+           1
+
+           2
+
+           3
+
+           4
+
+           5
+
+           6
+
+           7
+
+           8
+
+           9
+
+           0
+
+           1
+
+           2
+
+           3
+
+           4
+
+           5
+
+           6
+
+           7
+
+           8
+
+           9
+
+           0
+REVERSE ORDER
+
+*** EXECUTION COMPLETED ***PSW AT ABEND:  XXXXXXXX 00X00016E      COMPLETION CODE: 0C6 SPECIFICATION
+
+** TRACE OF INSTRUCTIONS JUST BEFORE TERMINATION **
+
+           LOCATION    INSTRUCTION
+           ========    ===============
+            000160     8724 C14C
+            000152     5832 0000
+            000156     5230 C113
+            00015A     E020 C112 000D
+            000160     8724 C14C
+            000164     07FB
+            00001C     E020 C196 000E
+            000022     45B0 C160
+            000166     4120 C10E
+            00016A     5840 C1A4    <-- Last instruction executed.
+
+
+
+** TRACE OF LAST 10 BRANCH INSTRUCTIONS EXECUTED **
+
+           LOCATION    INSTRUCTION
+           ========    ===============
+            000160     8724 C14C
+            000160     8724 C14C
+            000160     8724 C14C
+            000160     8724 C14C
+            000160     8724 C14C
+            000160     8724 C14C
+            000160     8724 C14C
+            000160     8724 C14C
+            000164     07FB
+            000022     45B0 C160    <-- Last branch executed.
+
+
+
+R0-7 :F4F4F4F4 00000079 00000114 00000000 00000004 00000114 F4F4F4F4 F4F4F4F4 
+R8-15:F4F4F4F4 F4F4F4F4 F4F4F4F4 00000026 00000006 00000030 000001F8 00000000 
+
+
+USER STORAGE:   CORE ADDRESSES SPECIFIED - 000000 to 000A8C
+
+000000      90ECD00C   05C050D0   C02E41D0   C02A45B0      *..}..{.}{..}{...*
+000010      C120E020   C1800016   45B0C140   E020C196      *A.\.A.....A \.Ao*
+000020      000E45B0   C16058D0   C02E98EC   D00C07FE      *....A-.}{.q.}...*
+000030      F5F5F5F5   000001B0   F5F5F5F5   F5F5F5F5      *5555....55555555*
+000040      F5F5F5F5   F5F5F5F5   F5F5F5F5   F5F5F5F5      *5555555555555555*
+            LINES:   000040 - 000060    ARE IDENTICAL
+000070      F5F5F5F5   F5F5F5F5   F0404040   40404040      *555555550       *
+000080      40404040   40404040   40404040   40404040      *                *
+            LINES:   000080 - 0000B0    ARE IDENTICAL
+0000C0      40404040   40404040   00000001   00000002      *        ........*
+0000D0      00000003   00000004   00000005   00000006      *................*
+0000E0      00000007   00000008   00000009   00000000      *................*
+0000F0      00000001   00000002   00000003   00000004      *................*
+000100      00000005   00000006   00000007   00000008      *................*
+000110      00000009   00000000   F0404040   40404040      *........0       *
+000120      40404040   F0F54120   C0C24140   00044150      *    05..{B. ....*
+000130      C10EE000   C0720050   5330C072   50320000      *A.\.{.....{.....*
+000140      8724C12C   07FB4120   C0C24140   00044150      *g.A.....{B. ....*
+000150      C10E5832   00005230   C113E020   C112000D      *A.......A.\.A...*
+000160      8724C14C   07FB4120   C10E5840   C1A44150      *g.A<....A.. Au..*
+000170      C0BE5832   00005230   C113E020   C112000D      *{.......A.\.A...*
+000180      8624C16C   07FBF1C9   D540D6D9   C4C5D940      *f.A%..1IN ORDER *
+000190      D6C640C4   C1E3C140   D9C5C1C4   F1D9C5E5      *OF DATA READ1REV*
+0001A0      C5D9E2C5   40D6D9C4   C5D9FFFF   FFFCF5F5      *ERSE ORDER....55*
+0001B0      F5F5F5F5   F5F5F5F5   F5F5F5F5   000001F8      *555555555555...8*
+0001C0      00000000   F4F4F4F4   F4F4F4F4   F4F4F4F4      *....444444444444*
+0001D0      F4F4F4F4   F4F4F4F4   F4F4F4F4   F4F4F4F4      *4444444444444444*
+            LINES:   0001D0 - 0001E0    ARE IDENTICAL
+0001F0      F4F4F4F4   F4F4F4F4   F5F5F5F5   F5F5F5F5      *4444444455555555*
+000200      F5F5F5F5   F5F5F5F5   F5F5F5F5   F5F5F5F5      *5555555555555555*
+            LINES:   000200 - 000A70    ARE IDENTICAL
+000A80      F5F5F5F5   F5F5F5F5   F5F5F5F5                 *555555555555*
+
+                 ***  END OF USER MEMORY  ***

@@ -1,0 +1,166 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Test Object Codes\TestFiles\Beaver\BEAVER3.PRT
+#
+         TITLE 'PROGRAM PROLOGUE'
+**********************************************************************
+*  MICHAEL BEAVER                                                    *
+*  CS 310, SPRING 2013                                               *
+*  PROGRAM 3                                                         *
+*  DUE: MARCH 21, 2013                                               *
+*                                                                    *
+*  DESCRIPTION:                                                      *
+*    THIS PROGRAM EXPECTS AS INPUT A FILE CONTAINING ANYWHERE BETWEEN*
+*    1 AND 30 (INCLUSIVE) DATA LINES. EACH DATA LINE SHOULD CONTAIN  *
+*    ONE GRADE (INTEGER) PER LINE. EACH GRADE SHOULD BE BETWEEN      *
+*    0 TO 100 (INCLUSIVE). INVALID VALUES ARE IGNORED. THE PROGRAM   *
+*    DISPLAYS THE DATA IN THE ORDER IN WHICH IT WAS ORIGINALLY READ. *
+*    THE PROGRAM THEN SORTS THE DATA IN DESCENDING ORDER. FINALLY,   *
+*    THE PROGRAM DISPLAYS THE SORTED DATA.                           *
+*                                                                    *
+*  INTERNAL SUBROUTINES:                                             *
+*    DATAREAD: READS DATA FROM A FILE INTO A TABLE                   *
+*    PRINTTAB: PRINTS THE TABLE                                      *
+*    SORTDATA: SORTS THE DATA IN THE TABLE (DESCENDING ORDER)        *
+*                                                                    *
+*  REGISTER KEY:                                                     *
+*     REG2: LOCATION OF TERMINAL VALUE IN TABLE                      *
+*    REG11: BRANCH USED TO CALL AND RETURN FROM INTERNAL SUBROUTINES *
+**********************************************************************
+         TITLE 'MAIN PROGRAM'
+MBPROG3  START
+         STM   14,12,12(13)            BEGINNING HOUSEKEEPING
+         BALR  12,0
+         USING SAVING,12
+SAVING   ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+         SPACE 2
+         BAL   11,DATAREAD             READ DATA INTO TABLE
+         SPACE
+         BAL   11,PRINTTAB             PRINT DATA FROM TABLE
+         SPACE
+         BAL   11,SORTDATA             SORT DATA IN TABLE
+         SPACE
+         BAL   11,PRINTTAB             PRINT DATA FROM TABLE
+         SPACE 2
+         L     13,SAVEAREA+4           ENDING HOUSEKEEPING
+         LM    14,12,12(13)
+         BR    14
+         SPACE 2 
+SAVEAREA DS    18F
+REGSAVE  DS    9F
+DATATAB  DS    30F
+CARD     DS    CL80
+CARRIAGE DC    C' '
+OUTLINE  DS    CL12
+         TITLE 'DATAREAD SUBROUTINE: READ IN DATA AND STORE IN TABLE'
+**********************************************************************
+*  REGISTER KEY:                                                     *
+*     REG2: LOOP TABLE INDEX POINTER (FOR TRAVERSAL)                 *
+*     REG3: DATA GRABBED ON LINE (CARD) FROM DATA FILE               *
+*     REG5: LOWER GRADE BOUND USED IN COMPARISON TESTS               *
+*     REG6: UPPER GRADE BOUND USED IN COMPARISON TESTS               *
+*     REG8: LOOP STEP SIZE                                           *
+*     REG9: TERMINAL VALUE FOR LOOP (END OF TABLE)                   *
+*    REG11: `BREAD CRUMBS' TO RETURN TO CALLING LOCATION             *
+********************************************************************** 
+DATAREAD STM   3,10,REGSAVE            WANT TO RETURN POINTER IN REG2
+         LA    5,0
+         LA    6,100 
+         SPACE 2
+         LA    2,DATATAB              
+         LA    8,4
+         LA    9,DATATAB+116         
+         SPACE 
+TOPREAD  XREAD CARD,80                 LOOP THRU FILE & STORE DATA
+         BC    B'0100',ENDSUB1         EOF => EXIT LOOP 
+         XDECI 3,CARD
+         SPACE 2
+         CR    3,5                     CHECK LOWER BOUND
+         BL    KEEPSLOT
+         CR    3,6                     CHECK UPPER BOUND
+         BNH   STOREVAL
+KEEPSLOT S     2,=F'4'                 DON'T LEAVE EMPTY TABLE SLOTS
+         B     ENDREAD  
+STOREVAL ST    3,0(2)                  
+         SPACE 
+ENDREAD  BXLE  2,8,TOPREAD
+         SPACE 2
+ENDSUB1  S     2,=F'4'                 LOC OF LAST VAL IN TABLE
+         LM    3,10,REGSAVE
+         BR    11
+         TITLE 'PRINTTAB SUBROUTINE: PRINT DATA FROM TABLE'
+**********************************************************************
+*  REGISTER KEY:                                                     *
+*     REG2: TABLE INDEX POINTER USED IN LOOP TRAVERSAL               *
+*     REG3: HOLDS VALUE LOADED FROM TABLE                            *
+*     REG8: STEP SIZE FOR LOOP                                       *
+*     REG9: TERMINAL VALUE FOR LOOP (ADDR OF LAST VALUE IN TABLE)    *
+*    REG11: `BREAD CRUMBS' USED TO GET BACK TO CALLING LOCATION      *
+**********************************************************************
+PRINTTAB STM   2,10,REGSAVE            HOUSEKEEPING
+         XPRNT PRNTSTRT,26
+         SPACE 2
+         LR    9,2                     TERMINAL VALUE LOC (FROM MAIN)
+         LA    2,DATATAB                
+         LA    8,4
+         SPACE 
+TOPPRNT  L     3,0(2)                  LOOP & PRINT TABLE DATA
+         XDECO 3,OUTLINE
+         XPRNT CARRIAGE,13
+         SPACE
+         BXLE  2,8,TOPPRNT
+         SPACE 2
+         XPRNT PRNTEND,31
+         LM    2,10,REGSAVE
+ENDSUB2  BR    11
+PRNTSTRT DC    C'1PRINTING DATA FROM TABLE:'
+PRNTEND  DC    C' DONE PRINTING DATA FROM TABLE.'
+         TITLE 'SORTDATA SUBROUTINE: SORT DATA IN TABLE (DESCENDING)'
+**********************************************************************
+*  REGISTER KEY:                                                     *
+*     REG2: (FROM MAIN) THE TERMINAL VALUE TABLE LOCATION            *
+*     REG3: TEMPORARY STORAGE FOR DATA VALUE SWAP IN OUTER LOOP      *
+*     REG4: STEP SIZE OF BOTH LOOPS                                  *
+*     REG5: LOCATION OF LAST VALUE IN TABLE (LOOP TERMINAL VALUES)   *
+*     REG6: VALUE AT INDEX (TO BE COMPARED)                          *
+*     REG7: LARGEST FOUND VALUE                                      *
+*     REG8: `TOP OF SEARCH' POINTER                                  *
+*     REG9:  SEARCH POINTER                                          *
+*    REG10: POINTER TO LARGEST FOUND VALUE                           *
+*    REG11: `BREAD CRUMBS' TO RETURN TO CALLING LOCATION             *
+**********************************************************************
+SORTDATA STM   2,10,REGSAVE            HOUSEKEEPING
+         LA    10,DATATAB
+         LA    4,4
+         LR    5,2                     LOC OF TERMINAL TABLE VALUE
+         LR    8,10
+         SPACE 2
+OLOOPTOP LR    9,8                     RESET SEARCH PTR
+         LR    10,8                    RESET `LARGEST FOUND' PTR
+         L     7,0(10)                 SET INITIAL LARGEST VALUE
+         SPACE
+ILOOPTOP L     6,0(9)                  FIND LARGEST VALUE IN TABLE
+         CR    6,7
+         BC    B'1100',ILOOPEND        
+         LR    7,6                     COPY NEW LARGEST VALUE
+         LR    10,9                    MOVE `LARGEST FOUND' POINTER
+ILOOPEND BXLE  9,4,ILOOPTOP 
+         SPACE
+SWAPVALS L     3,0(8)                  ORIGINAL VALUE
+         ST    3,0(10)                 SAVE ORIGINAL VALUE TO NEW LOC
+         ST    7,0(8)                  OVERWRITE WITH LARGEST VALUE
+OLOOPEND BXLE  8,4,OLOOPTOP
+         SPACE 2
+         LM    2,10,REGSAVE
+ENDSUB3  BR    11
+         END   MBPROG3
+$ENTRY
+5
+1
+3
+100
+121

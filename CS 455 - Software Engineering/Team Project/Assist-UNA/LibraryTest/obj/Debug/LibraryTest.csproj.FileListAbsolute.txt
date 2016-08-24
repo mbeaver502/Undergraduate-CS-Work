@@ -1,0 +1,6 @@
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\LibraryTest\bin\Debug\LibraryTest.exe.config
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\LibraryTest\bin\Debug\LibraryTest.exe
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\LibraryTest\bin\Debug\LibraryTest.pdb
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\LibraryTest\obj\Debug\LibraryTest.csprojResolveAssemblyReference.cache
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\LibraryTest\obj\Debug\LibraryTest.exe
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\LibraryTest\obj\Debug\LibraryTest.pdb

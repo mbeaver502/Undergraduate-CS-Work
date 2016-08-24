@@ -1,0 +1,70 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Andrew\Documents\CS 455\TestCases\Classes\Assembler\LITTEST.PRT
+#
+HOUSE    START
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+*        LITERAL TESTS EXCEPT FOR A AND V. TEST CASES FOR A AND V
+*        CAN BE FOUND IN EXTTEST
+*
+         AP    TEST,=P'123'        PACKED
+         AP    TEST,=P'1234'
+         AP    TEST,=P'12345'
+*
+         A     5,=F'1'             FULLWORD
+         A     5,=F'12'
+         A     5,=F'123'
+*
+         A     5,=X'1'             HEX
+         A     5,=X'1A'
+*         A     5,=X'1FC'           ASSIST THROWS AN ERROR HERE
+*
+         A     5,=H'1'             HALFWORD
+         A     5,=H'1578'
+         A     5,=H'123'
+*
+         A     5,=D'1'             DOUBLEWORD
+         A     5,=D'12'
+         A     5,=D'123'
+*
+         A     5,=Z'123'           ZONED
+         A     5,=Z'12567'
+         A     5,=Z'1'
+*
+         XPRNT =C'0',1             CHARACTER
+         XPRNT =C'01',2
+         XPRNT =C'012',3
+*
+F1       DC    F'1'
+F2       DC    F'12'
+F3       DC    F'123'
+X1       DC    X'1'            LOC GETTING OFF
+X2       DC    X'1A'           COMPARE WITH ASSISTI
+X3       DC    X'1FC'
+H1       DC    H'1'
+H2       DC    H'1578'
+H3       DC    H'123'
+D1       DC    D'1'
+D2       DC    D'12'
+D3       DC    D'123'
+Z1       DC    Z'123'
+Z2       DC    Z'12567'
+Z3       DC    Z'1'
+C1       DC    C'0'
+C2       DC    C'01'
+C3       DC    C'012'    
+*
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+TEST     DS    PL5
+         END   HOUSE 
+$ENTRY

@@ -1,0 +1,292 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Test Object Codes\TestFiles\Kurzhal\KURZHAL5.PRT
+#
+KURZHAL5 START
+*----------------
+* KYLE KURZHAL  |
+* 4/4/14        |
+* ASSIGNMENT #5 |
+*--------------------------------------------------------------------
+* INPUT: UNKNOWN SIZE FILE.  DATA INCLUDES FIRST, MIDDLE, AND LAST
+*        NAMES; STREET ADDRESS; CITY; STATE (2 LETTERS); ZIP CODE
+*        (5 DIGITS).
+*
+* OUTPUT: PRINT (IN FOLLOWING FORMAT):
+*         LAST NAME, (FIRST NAME) (MIDDLE INITIAL).
+*         STREET ADDRESS
+*         CITY, STATE  ZIP
+*
+* ACTIONS: GET/CHECK THE FIRST NAME IN INPUT AND PRINT; GET THE
+*          ADDRESS AND PRINT; GET THE CITY, STATE, AND ZIP AND PRINT;
+*          CHECK FOR NEXT NAME AND PRINT.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                 9   ====> GLOBAL POINTER FOR INFOLINE+5.
+*                10   ====> GLOBAL POINTER FOR CARD.
+*                11   ====> RETURN FROM SUBROUTINES.
+*--------------------------------------------------------------------
+*
+*                         BEGINNING HOUSEKEEPING
+*                        ------------------------
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+*
+*                            MAIN PROGRAM
+*                           --------------
+         LA    10,CARD          SET UP GLOBAL CARD POINTER
+         LA    9,INFOLINE+5     SET UP GLOBAL INFOLINE POINTER
+         BAL   11,GETNAMES      GET/CHECK FIRST LINE OF INFO
+         BC    B'0100',ENDMAINP 
+MAINLOOP BAL   11,GTADRESS        GET AND PRINT ADDRESS
+         BAL   11,CTYSTZIP        GET AND PRINT CITY, STATE ZIP
+         BAL   11,GETNAMES        GET THE NEXT NAME IF AVAILABLE
+ENDMAINP BC    B'1000',MAINLOOP   END MAIN PROGRAM
+*
+*                          END HOUSEKEEPING
+*                         ------------------
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+*
+*                    DECLARE STORAGE AND CONSTANTS
+*                   -------------------------------
+CARD     DS    CL80
+INFOLINE DC    C'-'
+         TITLE 'GETNAMES SUBROUTINE'
+*                         GETNAMES SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: READ IN THE NAME LINE.
+*
+* OUTPUT: PRINT OUT THE FORMATTED NAME LINE:   LAST, FIRST MID.
+*
+* ACTIONS: READ FIRST LINE OF INPUT FOR EACH RECORD, FIND THE
+*          BEGINNING OF LAST NAME, STORE LAST NAME',' IN INFOLINE
+*          (OUTPUT), STORE THE FIRST NAME IN INFOLINE, STORE THE
+*          FIRST LETTER OF MIDDLE NAME'.' IN INFOLINE.  PRINT
+*          INFOLINE.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                 2   ====> RETURN POINTER FROM FRSTMNAM SUBROUTINE.
+*                 3   ====> INFOLINE POINTER/ITERATOR.
+*                 6   ====> FINDING LAST NAME ITERATOR; FRSTMNAM
+*                           SUBROUTINE POINTER.
+*                 7   ====> RETURN POINTER FOR GETLSTNM, COPYNAME
+*                           SUBROUTINE.
+*                 9   ====> GLOBAL POINTER FOR INFOLINE+5.
+*                10   ====> GLOBAL POINTER FOR CARD.
+*                11   ====> RETURN FROM GETNAMES SUBROUTINE.
+*--------------------------------------------------------------------
+GETNAMES XREAD CARD,80
+         BC    B'0100',ENDGTNMS   CHECK NAME LINE, END PRGM IF EMPTY
+         LR    6,10               SET CARD ITERATOR
+         LR    3,9                SET CARD
+         MVI   INFOLINE,C'-'      SET CARRIAGE RETURN FOR EACH RECORD
+         MVI   0(3),C' '          CASCADE BLANKS FOR THE INFO LINE
+         MVC   1(59,3),0(3)
+         LA    8,GETLSTNM         SET POINTER TO GETLSTNM SUBROUTINE
+         BALR  7,8                CALL GETLSTNM SUBROUTINE
+         LA    6,1(6)             MOVE POINTER TO FRONT OF LAST NAME
+         LA    8,COPYNAME         SET POINTER TO COPYNAME SUBROUTINE
+         BALR  7,8                CALL COPYNAME SUBROUTINE
+         LA    6,FRSTMNAM         SET POINTER TO FRSTMNAM SUBROUTINE
+         BALR  2,6                CALL FRSTMNAM SUBROUTINE
+         XPRNT INFOLINE,65        PRINT THE NAME LINE
+ENDGTNMS BR    11                 END SUBROUTINE
+         TITLE 'GETLSTNM SUBROUTINE'
+*                        GETLSTNM SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: CARD AND ITS ITERATOR.
+*
+* OUTPUT: CARD ITERATOR IS PLACED BEFORE THE LAST NAME.
+*
+* ACTIONS: ITERATE THROUGH CARD UNTIL TWO BLANKS ARE FOUND, LEAVE
+*          ITERATOR AT BLANK BEFORE BEGINNING OF LAST NAME.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                 4   ====> POINTER TO FNDBLNK1/FNDBLNK2 LOOP TOP.
+*                 6   ====> ITERATOR FOR FINDING LAST NAME.
+*                 7   ====> RETURN FROM GETLSTNM SUBROUTINE.
+*--------------------------------------------------------------------
+GETLSTNM BALR  4,0
+FNDBLNK1 CLI   1(6),C' '            COMPARE NEXT CHAR TO BLANK
+         LA    6,1(6)               INCREMENT CARD ITERATOR
+         BC    B'0110',0(4)         CHECK IF NEXT CHAR WAS BLANK
+         BALR  4,0
+FNDBLNK2 CLI   1(6),C' '            REPEAT PREVIOUS STEPS
+         LA    6,1(6)
+         BC    B'0110',0(4)
+         BR    7                    RETURN FROM WHEN 2 BLANKS FOUND
+         TITLE 'COPYNAME SUBROUTINE'
+*                          COPYNAME SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: CARD AND INFOLINE FOR MANIPULATION.
+*
+* OUTPUT: COPY OF CARD FROM STARTING POSITION TO BLANK INTO INFOLINE.
+*
+* ACTIONS: COPY ONE CHAR AT A TIME FROM CARD TO INFOLINE, CONTINUE
+*          UNTIL A BLANK IS FOUND.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                 3   ====> INFOLINE POINTER/ITERATOR.
+*                 6   ====> ITERATOR FOR FINDING LAST NAME.
+*                 7   ====> RETURN FROM COPYNAME SUBROUTINE.
+*                 8   ====> POINTER TO COPYNAME LOOP TOP.
+*--------------------------------------------------------------------
+COPYNAME MVC   0(1,3),0(6)    COPY CHAR FROM CARD TO INFOLINE
+         CLI   1(6),C' '      COMPARE NEXT CARD POSITION TO BLANK
+         LA    6,1(6)         INCREMENT CARD ITERATOR POSITION
+         LA    3,1(3)         INCREMENT INFOLINE ITERATOR POSITION
+         BC    B'0110',0(8)   CHECK FOR BLANK, CONTINUE OR END LOOP
+         BR    7              RETURN FROM COPYNAME SUBROUTINE
+         TITLE 'FRSTMNAM SUBROUTINE'
+*                         FRSTMNAM SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: READ IN THE NAME LINE.
+*
+* OUTPUT: PRINT OUT THE FORMATTED NAME LINE:   LAST, FIRST MID.
+*
+* ACTIONS: READ FIRST LINE OF INPUT FOR EACH RECORD, FIND THE
+*          BEGINNING OF LAST NAME, STORE LAST NAME',' IN INFOLINE
+*          (OUTPUT), STORE THE FIRST NAME IN INFOLINE, STORE THE
+*          FIRST LETTER OF MIDDLE NAME'.' IN INFOLINE.  PRINT
+*          INFOLINE.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                 2   ====> RETURN FROM GTADRESS SUBROUTINE.
+*                 3   ====> INFOLINE POINTER/ITERATOR.
+*                 6   ====> ITERATOR FOR FINDING FIRST NAME.
+*                 7   ====> RETURN POINTER FOR COPYNAME SUBROUTINE.
+*                 8   ====> POINTER TO COPYNAME SUBROUTINE.
+*                10   ====> GLOBAL POINTER FOR CARD.
+*--------------------------------------------------------------------
+FRSTMNAM MVI   0(3),C','      ADD A ',' AFTER LAST NAME
+         LA    3,2(3)         LEAVE A BLANK SPACE AFTER ','
+         LR    6,10           SET CARD ITERATOR
+         BALR  7,8            CALL COPYNAME SUBROUTINE
+         MVC   1(1,3),1(6)    GET THE MIDDLE INITIAL
+         MVI   2(3),C'.'      ADD '.' AFTER MIDDLE INITIAL
+         BR    2              RETURN FROM GTADRESS SUBROUTINE
+         TITLE 'GTADRESS SUBROUTINE'
+*                          GTADRESS SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: READ IN THE ADDRESS.
+*
+* OUTPUT: PRINT OUT THE ADDRESS.
+*
+* ACTIONS: READ IN THE ADDRESS, FORMAT THE CARRIAGE CONTROL FOR THE
+*          FOLLOWING LINES OF INFO, COPY ADDRESS INTO INFOLINE, PRINT
+*          INFOLINE.                                            
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                 9   ====> GLOBAL POINTER FOR INFOLINE+5.
+*                10   ====> GLOBAL POINTER FOR CARD.
+*                11   ====> RETURN FROM SUBROUTINE.
+*--------------------------------------------------------------------
+GTADRESS XREAD CARD,80          GET THE ADDRESS
+         MVI   INFOLINE,C' '    FORMAT THE CARRIAGE CONTROL
+         MVC   0(59,9),0(10)    COPY THE ADDRESS
+         XPRNT INFOLINE,65      PRINT THE ADDRESS
+         BR    11
+         TITLE 'CTYSTZIP SUBROUTINE'
+*                          CTYSTZIP SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: READ IN CITY, STATE, AND ZIP CODE LINES.
+*
+* OUTPUT:    PRINT IN FORMAT:  CITY, STATE  ZIP
+*
+* ACTIONS: READ CARD BACKWARD TO FIND THE END OF CITY, STORE CITY','
+*          IN INFOLINE, STORE STATE IN INFOLINE, STORE ZIP IN
+*          INFOLINE, AND PRINT FORMATTED INFOLINE.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                 2   ====> CARD POINTER/ITERATOR.
+*                 3   ====> INFOLINE POINTER/ITERATOR.
+*                 4   ====> STEP COUNT FOR STORECTY LOOP.
+*                 5   ====> FINDCITY LOOP ITERATOR; FINDS END OF CITY.
+*                 7   ====> BRANCH ADDRESS FOR ENDOFCTY LOOP.
+*                 8   ====> BRANCH ADDRESS FOR STORECTY LOOP.
+*                 9   ====> GLOBAL POINTER FOR INFOLINE+5.
+*                10   ====> GLOBAL POINTER FOR CARD.
+*                11   ====> RETURN FROM SUBROUTINE.
+*--------------------------------------------------------------------
+CTYSTZIP LR    2,10          PREPARE CARD/INFOLINE ITERATORS
+         LR    3,9
+         MVI   0(3),C' '     CASCADE THE BLANKS FOR INFOLINE
+         MVC   1(59,3),0(3)
+         XREAD CARD,80        READ IN THE CITY
+         LA    4,1            SET FINDCITY LOOP STEP CNT; FINDCITY SUB
+         LA    5,INFOLINE     SET BACKWARD STEP CARD ITERATOR
+         LA    6,GETCITY      POINT TO GETCITY SUBROUTINE
+         BALR  7,6            CALL GETCITY SUBROUTINE
+         MVI   0(3),C','      ADD A ',' TO THE CURRENT END OF INFOLINE
+         XREAD CARD,80        READ IN THE STATE
+         MVC   2(2,3),0(10)   COPY THE STATE TO INFOLINE
+         XREAD CARD,80        READ IN THE ZIP CODE
+         MVC   6(5,3),0(10)   COPY THE ZIP CODE TO INFOLINE
+         XPRNT INFOLINE,65    PRINT THE INFOLINE
+         BR    11             END SUBROUTINE
+*                           GETCITY SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: CITY LINE IN CARD.
+*
+* OUTPUT: CITY IS STORED FOR INFOLINE OUTPUT.
+*
+* ACTIONS: READ CARD BACKWARD TO FIND THE END OF CITY, STORE CITY
+*          IN INFOLINE.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                 2   ====> CARD POINTER/ITERATOR.
+*                 3   ====> INFOLINE POINTER/ITERATOR.
+*                 4   ====> STEP COUNT FOR STORECTY LOOP.
+*                 5   ====> FINDCITY LOOP ITERATOR; TERMINAL VALUE
+*                           FOR STORECTY LOOP.
+*                 7   ====> RETURN FROM GETCITY SUBROUTINE.
+*                 8   ====> FINDCITY/STORECTY LOOP TOP POINTER.
+*--------------------------------------------------------------------
+GETCITY  BALR  8,0
+FINDCITY BCTR  5,0            MOVE BACKWARD 1 CHAR IN CARD
+         CLI   0(5),C' '      COMPARE CURRENT POSITION TO A BLANK
+         BC    B'1000',0(8)   END IF THERE IS NO BLANK
+         BALR  8,0
+STORECTY MVC   0(1,3),0(2)    COPY CURRENT CHAR FROM CARD TO INFOLINE
+         LA    3,1(3)         INCREMENT POSITION IN INFOLINE
+         BXLE  2,4,0(8)       INCREMENT CARD POSITION, CHECK CITY END
+         BR    7              RETURN FROM GETCITY SUBROUTINE
+         END   KURZHAL5
+$ENTRY
+KYLE AUSTIN KURZHAL
+24 ASHWOOD DR.
+DECATUR
+AL
+35603
+CASEY MINA KURZHAL
+151 GILBERT COURT APT. F4
+FLORENCE
+AL
+35630
+RYAN BENJAMIN HOOD
+123 TEST STREET
+HAPPY CITY
+CO
+21521
+STACI HULA GORDAN
+656 COURT ST.
+TESTING TESTING TESTING
+AL
+00519

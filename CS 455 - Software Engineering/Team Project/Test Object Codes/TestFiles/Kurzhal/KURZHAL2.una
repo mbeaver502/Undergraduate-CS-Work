@@ -1,0 +1,133 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Test Object Codes\TestFiles\Kurzhal\KURZHAL2.PRT
+#
+KURZHAL2 START
+*-----------------
+* KYLE KURZHAL
+* 2/27/14
+* ASSIGNMENT #2
+*-----------------
+*
+*----------------------------------------------------------------
+* INPUT: 2 VALUES PER LINE.  1ST VALUE IS THE QUANTITY OF ITEMS
+*        PURCHASED.  2ND VALUE IS THE COST OF THE ITEM (IN CENTS)
+*
+* ACTIONS: COLLECT DATA FROM EACH LINE. FIND THE TOTAL COST OF
+*          THE QUNATITY OF A PURCHASED ITEM.  FIND THE AVERAGE
+*          COST OF EACH ITEM PURCHASED.  FIND THE AVERAGE
+*          QUANTITY OF ITEMS PURCHASED.
+*
+* OUTPUT: PRINT THE QUANTITY, COST, AND TOTAL COST OF EACH ITEM.
+*         PRINT THE AVERAGE QUANTITY AND COST OF ITEMS PURCHASED.
+*----------------------------------------------------------------
+*
+*----------------------------------------------------------------
+*                          | REGISTER KEY |
+*                          ****************
+*
+*            REG          VARIABLE
+*           =====        ==========
+*             2  -------> (EMPTY) EVEN REGISTER OF EVEN-ODD PAIR
+*             3  -------> QUANTITY OF EACH ITEM
+*             4  -------> AVERAGE QUANTITY CALCULATION REMAINDER
+*             5  -------> TOTAL # OF ITEMS PURCHASED; AVERAGE QUANTITY
+*             6  -------> LOOP COUNTER/NUMBER OF DIFFERENT ITEMS
+*             8  -------> COST OF EACH ITEM; AVERAGE COST CALCULATION
+*                         REMAINDER
+*             9  -------> TOTAL COST OF ALL ITEMS IN PURCHASE;
+*                         AVERAGE COST
+*----------------------------------------------------------------
+*
+*                        BEGIN HOUSEKEEPING
+*                       --------------------
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+*
+*                       BEGIN MAIN PROGRAM
+*                      --------------------
+         XREAD CARD,80            READ IN THE FIRST LINE TO CARD
+         BC    B'0100',SKIPPGRM   SKIP TO THE END IF UNSUCCESSFUL READ
+         SR    5,5                RESET OVERALL/AVERAGE QUANTITY TO 0
+         SR    9,9                RESET OVERALL/AVERAGE COST TO 0
+         SR    6,6                RESET # OF DIFFERENT ITEMS TO 0
+*
+         XPRNT MESSAGE1,39       PRINT HEADERS
+         XPRNT SUBMSSG1,39
+         XPRNT LINE1,39
+*
+*                         BEGIN MAIN LOOP
+*                        -----------------
+LOOPTOP  XDECI 3,CARD     CONVERT QUANTITY TO BINARY VALUE
+         XDECI 8,0(1)     CONVERT COST TO BINARY VALUE
+*
+         XDECO 3,PRNTDATA+1    PREPARE TO PRINT ITEM QUANTITY
+         XDECO 8,PRNTDATA+14   PREPARE TO PRINT ITEM COST
+*
+         AR    5,3        STORE OVERALL ITEM QUANTITIES
+         MR    2,8        MULTIPLY QUANTITY AND COST FOR TOTAL COST
+         AR    9,3        STORE OVERALL TOTAL COSTS
+*
+         XDECO 3,PRNTDATA+27   PREPARE TO PRINT ITEM TOTAL
+         XPRNT PRNTDATA,39     PRINT ITEM DATA
+         LA    6,1(6)          ADD 1 TO # OF ITEMS (LOOP COUNT)
+*
+*
+*                             END MAIN LOOP
+*                            ---------------
+         XREAD CARD,80          READ IN NEXT LINE
+         BC    B'1000',LOOPTOP  MOVE TO TOP OF LOOP IF A LINE IS LEFT
+*
+*
+*                            CALCULATE AVERAGES
+*                           --------------------
+         M     8,=F'1'     CASCADE FOR SAFE DIVISION
+         DR    8,5         DIVIDE TOTAL COST BY TOTAL QUANTITY
+         AR    8,8         DOUBLE THE REMAINDER
+         CR    8,5         COMPARE THE DOUBLED REMAINDER AND DIVISOR
+         BC    B'0100',NOROUNDQ   IF REMAINDER < DIVISOR, NO ROUND UP
+         LA    9,1(9)      ROUND THE QUOTIENT UP (AVERAGE COST)
+*
+NOROUNDQ M     4,=F'1'     CASCADE FOR SAFE DIVISION
+         DR    4,6         DIVIDE TOTAL QUANTITY BY # OF ITEMS
+         AR    4,4         DOUBLE THE REMAINDER
+         CR    4,6         COMPARE THE DOUBLED REMAINDER AND DIVISOR
+         BC    B'0100',NOROUNDC   IF REMAINDER < DIVISOR, NO ROUND UP
+         LA    5,1(5)      ROUND THE QUOTIENT UP (AVERAGE QUANTITY)
+*
+NOROUNDC XPRNT MESSAGE2,35    PRINT HEADERS
+         XPRNT SUBMSSG2,35
+         XPRNT LINE2,35
+*
+         XDECO 5,PRNTDATA+10    PREPARE TO PRINT AVERAGE QUANTITY
+         XDECO 9,PRNTDATA+23    PREPARE TO PRINT AVERAGE COST
+         XPRNT PRNTDATA,35      PRINT AVERAGE QUANTITY AND COST
+*
+*                         END HOUSEKEEPING
+*                        ------------------
+SKIPPGRM L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+*
+*                     DECLARE COSNTANTS AND STORAGE
+*                    -------------------------------
+CARD     DS    CL80
+PRNTDATA DC    C' '
+SUBMSSG1 DC    C'                   (CENTS)      (CENTS)'
+MESSAGE1 DC    C'0    QUANTITY        COST        TOTAL '
+LINE1    DC    C'     --------       ------      -------'
+SUBMSSG2 DC    C'             (CENTS)        (CENTS)'
+MESSAGE2 DC    C'0         AVG QUANTITY     AVG COST'
+LINE2    DC    C'          ------------     --------'
+         END   KURZHAL2
+$ENTRY
+20   360
+60   30
+5    1000

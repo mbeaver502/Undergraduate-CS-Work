@@ -1,0 +1,183 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR: KJH 
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+000000                     1 KURZHAL3 START
+                           2 *---------------
+                           3 * KYLE KURZHAL
+                           4 * 3/5/14
+                           5 * ASSIGNMENT #3
+                           6 *---------------
+                           7 *
+                           8 *--------------------------------------------------------------------
+                           9 * INPUT: 25 LINES, 2 VALUES EACH LINE.
+                          10 *
+                          11 * ACTIONS: READ IN VALUES, STORE FIRST VALUE IN FIRST TABLE, STORE
+                          12 *          SECOND VALUE IN SECOND TABLE.
+                          13 *
+                          14 * OUTPUT: PRINT OUT ALL VALUES IN EACH TABLE WITH TABLE HEADERS.
+                          15 *--------------------------------------------------------------------
+                          16 *
+                          17 *--------------------------------------------------------------------
+                          18 *                            | REGISTER KEY |
+                          19 *                            ****************
+                          20 *
+                          21 *          REG            VARIABLE
+                          22 *         =====          ==========
+                          23 *           2   ------->  POINTER TO STORAGE LOOP, TABLE 1 PRINTING
+                          24 *                         LOOP, TABLE 2 PRINTING LOOP
+                          25 *           3   ------->  STORE LOOP COUNT
+                          26 *           6   ------->  STORE EACH NUMBER READ IN/PRINTING OUT
+                          27 *           9   ------->  POINTER TO TABLES
+                          28 *--------------------------------------------------------------------
+                          29 *
+                          30 *                       BEGIN HOUSEKEEPING
+                          31 *                      --------------------
+000000 90EC D00C          32          STM   14,12,12(13)
+000004 05C0               33          BALR  12,0
+000006                    34          USING HERE,12
+000006 50D0 C096          35 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C092          36          LA    13,SAVEAREA
+                          37 *
+                          38 *                      ----------------
+                          39 *                      | MAIN PROGRAM |
+                          40 *                      ----------------
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 2
+
+                          41 *
+                          42 *                          READ/STORE LOOP VALUES
+                          43 *                         ------------------------
+00000E 4120 C014          44          LA    2,STORLOOP  POINT TO THE STORE TO TABLE LOOP
+000012 4130 0019          45          LA    3,25        SET THE LOOP COUNT TO 25
+000016 4190 C136          46          LA    9,TABLE1    POINT TO THE FIRST TABLE FOR INSERTIONS
+                          47 *
+00001A E000 C0DA 0050     48 STORLOOP XREAD CARD,80     TOP OF LOOP, READ IN EACH LINE
+                          49 *
+000020 5360 C0DA          50          XDECI 6,CARD      GET FIRST VALUE
+000024 5069 0000          51          ST    6,0(9)      STORE VALUE IN TABLE 1
+000028 5360 C0DA          52          XDECI 6,CARD      GET SECOND VALUE
+00002C 5069 0064          53          ST    6,100(9)    STORE VALUE IN TABLE 2
+000030 4199 0004          54          LA    9,4(9)      MOVE THE TABLE POINTER TO THE NEXT INDEX
+000034 0632               55          BCTR  3,2         LOOP IF THERE ARE STILL MORE ITERATIONS
+                          56 *
+                          57 *                           PRINT TABLE 1
+                          58 *                          ---------------
+000036 4120 C048          59          LA    2,PRNTTBL1   POINT TO THE TOP OF PRINT TABLE 1 LOOP
+00003A 4130 0019          60          LA    3,25         SET THE LOOP COUNT TO 25
+00003E 4190 C136          61          LA    9,TABLE1     POINT TO THE BEGINNING OF TABLE 1
+000042 E020 C1FE 000C     62          XPRNT HEADING1,12  PRINT TABLE 1 HEADING
+000048 E020 C20A 000C     63          XPRNT SUBHEAD1,12  PRINT TABLE 1 SUBHEADING
+                          64 *
+00004E 5869 0000          65 PRNTTBL1 L     6,0(9)       BEGIN INNER LOOP, GET TABLE VALUE
+000052 5260 C12A          66          XDECO 6,PRNTTABL   PREPARE TO PRINT TABLE VALUE
+000056 E020 C12A 000C     67          XPRNT PRNTTABL,12  PRINT TABLE VALUE
+00005C 4199 0004          68          LA    9,4(9)       POINT TO THE NEXT VALUE
+000060 0632               69          BCTR  3,2          END OF PRINT TABLE 1 LOOP
+                          70 *
+                          71 *                          PRINT TABLE 2
+                          72 *                         ---------------
+000062 4130 0019          73          LA    3,25          SET THE LOOP COUNT TO 25
+000066 4120 C074          74          LA    2,PRNTTBL2    POINT TO THE TOP OF PRINT TABLE 2 LOOP
+00006A 4190 C19A          75          LA    9,TABLE2
+00006E E020 C216 000C     76          XPRNT HEADING2,12   PRINT THE HEADING FOR TABLE 2
+000074 E020 C222 000C     77          XPRNT SUBHEAD2,12   PRINT THE SUBHEADING FOR TABLE 2
+                          78 *
+00007A 5869 0000          79 PRNTTBL2 L     6,0(9)        BEGIN INNER LOOP, GET TABLE VALUE
+00007E 5260 C12A          80          XDECO 6,PRNTTABL    PREPARE TO PRINT TABLE VALUE
+000082 E020 C12A 000C     81          XPRNT PRNTTABL,12   PRINT TABLE VALUE
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 2
+
+000088 4199 0004          82          LA    9,4(9)        POINT TO THE NEXT TABLE VALUE
+00008C 0632               83          BCTR  3,2           END OF PRINT TABLE 2 LOOP
+                          84 *
+                          85 *                          ---------------------
+                          86 *                          |  END MAIN PROGRAM |
+                          87 *                          ---------------------
+                          88 *
+                          89 *                             END HOUSEKEEPING
+                          90 *                            ------------------
+00008E 58D0 C096          91          L     13,SAVEAREA+4
+000092 98EC D00C          92          LM    14,12,12(13)
+000096 07FE               93          BR    14
+000098                    94 SAVEAREA DS    18F
+                          95 *                       DECLARE STORAGE AND CONSTANTS
+                          96 *                      -------------------------------
+0000E0                    97 CARD     DS    CL80
+000130                    98 PRNTTABL DS    CL12
+00013C                    99 TABLE1   DS    25F
+0001A0                   100 TABLE2   DS    25F
+000204 4040404040E3C1C2  101 HEADING1 DC    C'     TABLE 1'
+000210 4040404040606060  102 SUBHEAD1 DC    C'     -------'
+00021C F040404040E3C1C2  103 HEADING2 DC    C'0    TABLE 2'
+000228 4040404040606060  104 SUBHEAD2 DC    C'     -------'
+                         105          END   KURZHAL3
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+    TABLE 1
+    -------
+          1
+          2
+          5
+          4
+          5
+          6
+          7
+          8
+          9
+         10
+         11
+         12
+         13
+         14
+         15
+         16
+         17
+         18
+         19
+         20
+         21
+         22
+         23
+         24
+         25
+
+    TABLE 2
+    -------
+          1
+          2
+          5
+          4
+          5
+          6
+          7
+          8
+          9
+         10
+         11
+         12
+         13
+         14
+         15
+         16
+         17
+         18
+         19
+         20
+         21
+         22
+         23
+         24
+         25
+
+*** EXECUTION COMPLETED ***

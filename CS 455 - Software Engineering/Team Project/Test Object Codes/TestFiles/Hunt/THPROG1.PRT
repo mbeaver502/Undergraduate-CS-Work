@@ -1,0 +1,98 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR: QGQ 
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+                           1 ***********************************
+                           2 * TRAVIS HUNT *
+                           3 * 02/20/2013 *
+                           4 * PROGRAM 1 *
+                           5 ***********************************
+                           6 * DESCRIPTION *
+                           7 * THIS PROGRAM WILL TAKE IN AS    *
+                           8 * INPUT AN UNKNOWN NUMBER OF DATA *
+                           9 * LINES WHICH EACH CONTAIN 3  *
+                          10 * INTEGER VALUES SEPARATED BY AT  *
+                          11 * LEAST 1 BLANK. *
+                          12 * THE PROGRAM WILL THEN PRINT THE *
+                          13 * LARGEST VALUE ON EACH LINE AS *
+                          14 * WELL AS THE SUM OF THE LARGEST  *
+                          15 * VALUES. THE LARGEST VALUE FOR  *
+                          16 * EACH LINE WILL BE STORED IN *
+                          17 * REGISTER 7. IF THE VALUE IN  *
+                          18 * REGISTER 8 IS GREATER, THE *
+                          19 * VALUE IS COPIED INTO REGISTER 8 *
+                          20 ***********************************
+                          21 * REGISTER KEY *
+                          22 * REG 7 - 1ST/LARGE NUMBER *
+                          23 * REG 8 - SECOND NUMBER *
+                          24 * REG 9 - SUM OF LARGEST *
+                          25 ***********************************
+000000                    26 PROG1    START
+000000 90EC D00C          27 BEGINHK  STM   14,12,12(13)   BEGINNING HOUSEKEEPING
+000004 05C0               28          BALR  12,0   .
+000006                    29          USING HERE,12   .
+000006 50D0 C05E          30 HERE     ST    13,SAVEAREA+4   .
+00000A 41D0 C05A          31          LA    13,SAVEAREA   .
+                          32 *
+00000E 1B99               33          SR    9,9   SETS REG 9 TO 0 FOR SUM
+                          34 *
+                          35 ****************************************
+                          36 *      READ TILL END OF FILE LOOP  *
+                          37 ****************************************
+000010 E000 C0A2 0050     38 TOPREAD  XREAD LINE,80
+000016 4740 C040          39          BC    B'0100',ENDREAD   EOF REACHED, GO TO END
+00001A 5370 C0A2          40 GETFIRST XDECI 7,LINE   GETS THE FIRST INTEGER
+00001E 5381 0000          41 GETNEXT  XDECI 8,0(1)   GETS THE NEXT INTEGER
+000022 1978               42          CR    7,8
+000024 47A0 C024          43          BC    B'1010',GETTHIRD   SKIPS NEXT IF REG7 > REG8
+000028 1878               44          LR    7,8
+00002A 5381 0000          45 GETTHIRD XDECI 8,0(1)   GETS THE THIRD INTEGER
+00002E 1978               46          CR    7,8
+000030 47A0 C030          47          BC    B'1010',PRINT   SKIPS NEXT IF REG7 > REG8
+000034 1878               48          LR    7,8
+000036 5270 C10C          49 PRINT    XDECO 7,OUTLINE
+00003A E020 C0F2 0026     50          XPRNT CC,38   PRINTS LARGEST IN LINE
+000040 1A97               51 SUMNUMS  AR    9,7   ADDS NUMBER TO SUM REG
+000042 47F0 C00A          52 BOTTOM   BC    B'1111',TOPREAD   LOOPS BACK TO READ NEXT
+                          53 *
+000046 5290 C132          54 ENDREAD  XDECO 9,SUMOUT
+00004A E020 C118 0026     55          XPRNT FINAL,38   PRINTS SUM OF LARGEST
+000050 E020 C13E 0008     56          XPRNT =C'0CORRECT',8
+                          57 *
+000056 58D0 C05E          58 ENDHK    L     13,SAVEAREA+4   END HOUSEKEEPING
+00005A 98EC D00C          59          LM    14,12,12(13)   .
+00005E 07FE               60          BR    14   .
+000060                    61 SAVEAREA DS    18F   .
+                          62 ****************************************
+                          63 *               STORAGE                *
+                          64 ****************************************
+0000A8                    65 LINE     DS    CL80   STORAGE FOR INPUT LINE
+0000F8 F0D3C1D9C7C5E2E3   66 CC       DC    C'0LARGEST NUMBER IN ROW:   '
+000112                    67 OUTLINE  DS    CL12   STORAGE FOR NUMBER OUTPUT
+00011E F0E2E4D440D6C640   68 FINAL    DC    C'0SUM OF LARGEST INTEGERS: '
+000138                    69 SUMOUT   DS    CL12   STORAGE FOR SUM OF LARGEST
+                          70 *
+                          71          END   PROG1
+000144 F0C3D6D9D9C5C3E3               =C'0CORRECT'
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+
+LARGEST NUMBER IN ROW:              4
+
+LARGEST NUMBER IN ROW:              3
+
+LARGEST NUMBER IN ROW:              5
+
+SUM OF LARGEST INTEGERS:           12
+
+CORRECT
+
+*** EXECUTION COMPLETED ***

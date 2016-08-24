@@ -1,0 +1,141 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR:  
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 2
+
+                           1 ************************************************************************
+                           2 *                                                                      *
+                           3 *  MICHAEL BEAVER                                                      *
+                           4 *  CS 310, SPRING 2013                                                 *
+                           5 *  PROGRAM 2                                                           *
+                           6 *  DUE: MARCH 11, 2013                                                 *
+                           7 *                                                                      *
+                           8 *  DESCRIPTION:                                                        *
+                           9 *    THIS PROGRAM EXPECTS AS INPUT A DATA FILE CONTAINING 20 LINES OF  *
+                          10 *    INTEGER DATA (ONE INTEGER PER LINE). THE PROGRAM WILL READ IN THE *
+                          11 *    DATA FROM THE FILE AND STORE IT INTO A TABLE. NEXT, THE PROGRAM   *
+                          12 *    WILL PRINT THE DATA FROM THE TABLE FROM FIRST-TO-LAST (IN THE     *
+                          13 *    ORDER THE DATA WAS ORIGINALLY READ). NEXT, THE PROGRAM WILL PRINT *
+                          14 *    THE DATA FROM THE TABLE FROM LAST-TO-FIRST (IN THE OPPOSITE ORDER *
+                          15 *    THE DATA WAS ORIGINALLY READ). FINALLY, THE PROGRAM TERMINATES.   *
+                          16 *                                                                      *
+                          17 *  REGISTER KEY:                                                       *
+                          18 *    REG 2: INDEX POINTER FOR SUBROUTINES' LOOP-BASED TABLE OPERATIONS *
+                          19 *    REG 3: DATA VALUE HOLDER FOR SUBROUTINES' OPERATIONS              *
+                          20 *    REG 8: STEP-SIZE HOLDER FOR SUBROUTINES' LOOPS                    *
+                          21 *    REG 9: TERMINAL VALUE HOLDER FOR SUBROUTINES' LOOPS               *
+                          22 *    REG11: SUBROUTINE BRANCHING (BREAD CRUMBS)                        *
+                          23 *                                                                      *
+                          24 ************************************************************************
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 3
+
+                          25 BEAVER2  START
+
+
+00024C                    26          STM   14,12,12(13)            BEGINNING HOUSEKEEPING
+000000                    27          BALR  12,0
+                          28          USING SAVING,12
+00024C                    28 SAVING   ST    13,SAVEAREA+4
+000000 90EC D00C          29          LA    13,SAVEAREA
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 4
+
+000004 05C0               30          BAL   11,DATAREAD             READ IN DATA TO TABLE
+
+
+000006 50D0 C022          32          BAL   11,PRINTFTL             PRINT TABLE FIRST-TO-LAST
+
+
+00024C                    34          BAL   11,PRINTLTF             PRINT TABLE LAST-TO-FIRST
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 5
+
+00000E 45B0 C114          35          L     13,SAVEAREA+4           ENDING HOUSEKEEPING
+00024C                    36          LM    14,12,12(13)
+000012 45B0 C15E          37          BR    14
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 6
+
+                          38 SAVEAREA DS    18F
+                          38 DATATAB  DS    20F
+                          38 CARD     DS    CL80
+                          38 CARRIAGE DC    C' '
+                          38 OUTLINE  DS    CL12
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 7
+
+00024C                    38 DATAREAD XPRNT READSTRT,23
+
+
+00024C                    40          LA    2,DATATAB
+00001A 58D0 C022          41          LA    8,4
+00001E 98EC D00C          42          LA    9,DATATAB+76
+000022 07FE               43 TOPREAD  XREAD CARD,80                 LOOP THRU DATA & STORE IN TABLE
+00024C                    44          XDECI 3,CARD
+000024                    45          ST    3,0(2)
+00006C                    46          BXLE  2,8,TOPREAD
+
+
+00010C   40               48          XPRNT READEND,6
+00010D                    49          BR    11                      END DATAREAD SUBROUTINE
+                          50 READSTRT DC    C'1READING IN DATA . . . '
+                          50 READEND  DC    C'+DONE.'
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 8
+
+00024C                    50 PRINTFTL XPRNT PFTLSTRT,41
+
+
+00024C                    52          LA    2,DATATAB
+000120 4120 C066          53          LA    8,4
+000124 4180 0004          54          LA    9,DATATAB+76
+000128 4190 C0B2          55 TOPPFTL  L     3,0(2)              LOOP & PRINT TABLE FIRST-TO-LAST
+00012C E000 C0B6 0050     56          XDECO 3,OUTLINE
+000132 5330 C0B6          57          XPRNT CARRIAGE,13
+000136 5032 0000          58          BXLE  2,8,TOPPFTL
+
+
+00024C                    60          XPRNT PFTLEND,29
+00013E E020 C157 0006     61          BR    11                  END PRINTFTL SUBROUTINE
+000144 07FB               62 PFTLSTRT DC    C'1PRINTING TABLE FROM FIRST-TO-LAST VALUE:'
+000146 F1D9C5C1C4C9D5C7   63 PFTLEND  DC    C' DONE PRINTING FIRST-TO-LAST.'
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 9
+
+00015D 4EC4 D6D5 C54B     64 PRINTLTF XPRNT PLTFSTRT,41
+
+
+000164 E020 C18A 0029     66          LA    2,DATATAB+76
+00024C                    67          L     8,=F'-4'
+00016A 4120 C066          68          LA    9,DATATAB-4
+00016E 4180 0004          69 TOPPLTF  L     3,0(2)              LOOP & PRINT TABLE LAST-TO-FIRST
+000172 4190 C0B2          70          XDECO 3,OUTLINE
+000176 5832 0000          71          XPRNT CARRIAGE,13
+00017A 5230 C107          72          BXH   2,8,TOPPLTF
+
+
+000184 8728 C170          74          XPRNT PLTFEND,29
+00024C                    75          BR    11                  END PRINTLTF SUBROUTINE
+000188 E020C1B3001D       76 PLTFSTRT DC    C'1PRINTING TABLE FROM LAST-TO-FIRST VALUE:'
+00018E 07FB               77 PLTFEND  DC    C' DONE PRINTING LAST-TO-FIRST.'
+                          78          END   BEAVER2
+000248 FFFFFFFC                       =F'-4'
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***

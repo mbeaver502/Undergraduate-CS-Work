@@ -1,0 +1,200 @@
+#
+#9999
+#9999
+#9999
+#9999
+#C:\Users\Travis\Documents\Courses\Spring 2014\Software Engineering\Team Project\Test Files\Assembler\THPROG4.PRT
+#
+************************************
+* TRAVIS HUNT  *
+* 04/22/13  *
+* PROGRAM 6  *
+************************************
+* DESCRIPTION  *
+* THIS PROGRAM ACCEPT AS INPUT A  *
+* NUMBER OF LINES EQUAL TO UP TO  *
+* 30 LINES. EACH LINE MUST CONTAIN *
+* ONE TEST SCORE IN THE RANGE 0 TO *
+* 100. THE SCORES WILL THEN BE   *
+* DISPLAYED IN THE ORDER THEY WERE *
+* READ IN. NEXT, THE SCORES WILL   *
+* BE SORTED IN DESCENDING ORDER    *
+* AND DISPLAYED AGAIN IN THAT  *
+* ORDER. THIS ULTILIZES EXTERNAL  *
+* SUBROUTINES.   *
+************************************
+* REGISTER KEY  *
+* REG 2 - STEPSIZE FOR LOOPS  *
+* REG 3 - TERMINAL VALUE FOR LOOPS *
+* REG 4 - POINTER FOR TABLE   *
+* REG 5 - USED FOR OUTPUT/SEARCH  *
+* REG 6 - POINTER TO LAST ITEM  *
+* REG 7 - HOLDS LARGEST VALUE  *
+* REG 8 - USED FOR TEMP FOR SWAP  *
+* REG 11 - USED TO CALL SUBPROGRAM *
+************************************
+THPROG6  START
+         TITLE 'DRIVER CODE'
+         STM   14,12,12(13) BEGINNING HOUSEKEEPING
+         BALR  12,0 .
+         USING HERE,12 .
+HERE     ST    13,SAVEAREA+4 .
+         LA    13,SAVEAREA .
+         SPACE
+         LA    1,PARMLIST
+         L     15,=V(READIN)
+         BALR  14,15 CALLS SUBPROGRAM TO READ IN VALUES
+*
+         LA    1,PARMLIST
+         XPRNT LINE1,20
+         L     15,=V(PRINT)
+         BALR  14,15 CALLS SUBPROGRAM TO PRINT TABLE
+         SPACE
+*
+         LA    1,PARMLIST
+         L     15,=V(SORT)
+         BALR  14,15 CALLS SUBPROGRAM TO SORT VALUES
+*
+         LA    1,PARMLIST
+         XPRNT LINE2,18
+         L     15,=V(PRINT)
+         BALR  14,15 CALLS SUBPROGRAM TO PRINT TABLE
+         SPACE
+*
+         L     13,SAVEAREA+4 END HOUSEKEEPING
+         LM    14,12,12(13) .
+         BR    14 .
+SAVEAREA DS    18F .
+TABLE    DS    30F STORAGE FOR NUMBERS
+LINE1    DC    C'1THE ORIGINAL TABLE:'
+LINE2    DC    C'0THE SORTED TABLE:'
+BOTPOINT DS    F
+PARMLIST DC    A(TABLE)
+         DC    A(BOTPOINT)
+         LTORG
+         TITLE 'SUBPROGRAM CODE'
+         SPACE
+***************************
+* WILL READ IN DATA FILE  *
+*********************************************
+*   REGISTER KEY   *
+*-------------------------------------------*
+* REG 2 - STEP SIZE    *
+* REG 3 - TERMINAL VALUE   *
+* REG 4 - TOP OF TABLE   *
+* REG 5 - USED FOR OUTPUT   *
+* REG 6 - USED AS TEMP TO SAVE END OF TABLE *
+* REG 11 - USED TO BRANCH BACK TO DRIVER *
+*********************************************
+READIN   CSECT
+         STM   14,12,12(13)
+         BALR  12,0
+         USING READHERE,12
+READHERE ST    13,READSAVE+4
+         LA    13,READSAVE
+*
+         L     4,0(1) MAKES REG 4 POINT TO TABLE
+         L     7,4(1)
+         LA    2,4
+         LA    3,116(4) POINTER TO LAST ITEM IN TABLE
+READTOP  XREAD LINE,80
+         BC    B'0100',READDONE NO MORE LINES TO READ
+         XDECI 5,LINE
+         BC    B'0100',READTOP NEGATIVE,BRANCH TOP W/O INCREMENTING
+         C     5,=F'100'
+         BC    B'0010',READTOP TOO BIG,BRANCH TOP W/O INCREMENTING
+         ST    5,0(4)
+BOTTOMRE BXLE  4,2,READTOP
+READDONE LR    6,4 SAVES ADDRESS OF LAST ITEM STORED
+         S     6,=F'4'
+         ST    6,0(7)
+*
+         L     13,READSAVE+4
+         LM    14,12,12(13)
+         BR    14 END READSUB, RETURN TO DRIVER
+*
+LINE     DS    CL80
+READSAVE DS    18F
+         LTORG
+         EJECT
+****************************
+*     WILL PRINT TABLE     *
+**********************************************
+*   REGISTER KEY     *
+*--------------------------------------------*
+* REG 2 - STEP SIZE    *
+* REG 3 - TERMINAL VALUE (LAST ITEM IN LIST) * 
+* REG 4 - TOP OF TABLE    *
+* REG 5 - USED AS OUTPUT    *
+* REG 11 - USED TO BRANCH BACK TO DRIVER  *
+********************************************** 
+PRINT    CSECT  BEGIN PRINT HOUSEKEEPING
+         STM   14,12,12(13)
+         BALR  12,0
+         USING PRINHERE,12
+PRINHERE ST    13,PRINSAVE+4
+         LA    13,PRINSAVE 
+*
+         LA    2,4
+         L     4,0(1) BEGIN PRINT REGULAR SUBROUTINE
+         L     3,4(1)
+         L     3,0(3)
+PRINTTOP L     5,0(4)
+         XDECO 5,OUTLINE
+         XPRNT CC,13
+         BXLE  4,2,PRINTTOP
+*
+         L     13,PRINSAVE+4
+         LM    14,12,12(13) 
+         BR    14 END PRINTREG, RETURN TO DRIVER
+CC       DC    C' '
+OUTLINE  DS    CL12 STORAGE FOR OUTPUT
+PRINSAVE DS    18F
+         LTORG
+         EJECT
+****************************
+*   WILL SORT THE TABLE    *
+**********************************************
+*   REGISTER KEY     *
+*--------------------------------------------*
+* REG 2 - STEP SIZE    *
+* REG 3 - TERMINAL VALUE (LAST ITEM IN LIST) *
+* REG 4 - TOP OF SEARCH    *
+* REG 5 - SEARCH POINTER    * 
+* REG 6 - POINTER TO LARGEST VALUE   *
+* REG 7 - HOLDS LARGEST VALUE    *
+* REG 8 - TEMP TO HOLD TOP FOR SWAP   *
+* REG 11 - USED TO BRANCH TO DRIVER   * 
+**********************************************
+SORT     CSECT  SORT BEGIN HOUSEKEEPING
+         STM   14,12,12(13) .
+         BALR  12,0 .
+         USING SORTHERE,12 .
+SORTHERE ST    13,SORTSAVE+4 .
+         LA    13,SORTSAVE .
+*
+         LA    2,4
+         L     4,0(1)
+         L     3,4(1)
+         L     3,0(3)
+OUTTER   LR    6,4 SETS LARGEST TO TOP ITEM
+         LA    5,4(4) SETS SEARCH TO NEXT ITEM
+         L     7,0(6) 
+INNER    C     7,0(5) COMPARES CURRENT LARGEST W/ SEARCH
+         BC    B'0010',INBOTTOM 
+         LR    6,5 MAKES LARGEST POINT TO SEARCH
+         L     7,0(6) SAVES LARGEST VALUE
+INBOTTOM BXLE  5,2,INNER
+         L     8,0(4) SAVES TOP VALUE IN TEMP
+         ST    7,0(4) STORES LARGEST TO TOP
+         ST    8,0(6) STORES TEMP VALUE IN SEARCH
+OUTBOTT  BXLE  4,2,OUTTER
+*
+         L     13,SORTSAVE+4 SORT END HOUSEKEEPING
+         LM    14,12,12(13) .
+         BR    14 DONE, BRANCH BACK TO DRIVER
+SORTSAVE DS    18F .
+         LTORG
+*
+         END   THPROG6
+$ENTRY DATA6.TXT

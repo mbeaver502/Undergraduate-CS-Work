@@ -1,0 +1,152 @@
+ASSIST/UNA Version 1.0      GRADE RUN FOR: AQ 
+
+
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 1
+
+                           1 ************************************
+                           2 * TRAVIS HUNT  *
+                           3 * 03/11/13  *
+                           4 * PROGRAM 2  *
+                           5 ************************************
+                           6 * DESCRIPTION  *
+                           7 * THIS PROGRAM ACCEPTS AS INPUT A  *
+                           8 * DATA FILE CONTAINING EXACLTY 20  *
+                           9 * LINES OF INTEGERS, ONE INTEGER   *
+                          10 * PER LINE. THE DATA ARE STORED    *
+                          11 * IN A TABLE. THE PROGRAM WILL   *
+                          12 * THEN PRINT THE VALUES IN THE   *
+                          13 * ORDER IN WHICH THEY WERE STORED. *
+                          14 * FINALLY, THE VALUES WILL BE   *
+                          15 * PRINTED AGAIN IN THE REVERSE  *
+                          16 * ORDER.    *
+                          17 ************************************
+                          18 * REGISTER KEY  *
+                          19 * REG 2 - POINTER TO THE TABLE  *
+                          20 * REG 5 - USED FOR OUTPUT  *
+                          21 * REG 8 - STEP SIZE FOR LOOPS   *
+                          22 * REG 9 - TERMINAL VALUE FOR LOOPS *
+                          23 * REG 11 - USED TO CALL SUBPROGRAM *
+                          24 ************************************
+000000                    25 THPROG2  START
+
+DRIVER CODE
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 2
+
+000000 90EC D00C          27          STM   14,12,12(13) BEGINNING HOUSEKEEPING
+000004 05C0               28          BALR  12,0 .
+000006                    29          USING HERE,12 .
+000006 50D0 C02E          30 HERE     ST    13,SAVEAREA+4 .
+00000A 41D0 C02A          31          LA    13,SAVEAREA .
+
+00000E 45B0 C072          33          BAL   11,READSUB CALLS SUBPROGRAM TO READ IN VALUES
+                          34 *
+000012 E020 C17A 0014     35          XPRNT =C'1THE TABLE IN ORDER:',20
+000018 45B0 C0E2          36          BAL   11,PRINTREG CALLS SUBPROGRAM TO PRINT REGULAR
+                          37 *
+00001C E020 C18E 001C     38          XPRNT =C'1THE TABLE IN REVERSE ORDER:',28
+000022 45B0 C0FA          39          BAL   11,PRINTREV CALLS SUBPROGRAM TO PRINT REVERSE
+
+000026 58D0 C02E          41          L     13,SAVEAREA+4 END HOUSEKEEPING
+00002A 98EC D00C          42          LM    14,12,12(13) .
+00002E 07FE               43          BR    14 .
+000030                    44 SAVEAREA DS    18F .
+
+SUBPROGRAM CODE
+  LOC     OBJECT CODE    STMT   SOURCE STATEMENT 				 PAGE 3
+
+
+                          47 ***************************
+                          48 * WILL READ IN DATA FILE  *
+                          49 ***************************
+000078 4120 C12A          50 READSUB  LA    2,TABLE BEGIN READ SUBROUTINE
+00007C 4180 0004          51          LA    8,4
+000080 4190 C176          52          LA    9,TABLE+76 POINTER TO LAST ITEM IN TABLE
+000084 E000 C092 0050     53 READTOP  XREAD LINE,80
+00008A 5350 C092          54          XDECI 5,LINE
+00008E 5052 0000          55          ST    5,0(2)
+000092 8728 C07E          56          BXLE  2,8,READTOP
+000096 07FB               57          BR    11 END READSUB, RETURN TO DRIVER
+000098                    58 LINE     DS    CL80
+
+                          60 ****************************
+                          61 * WILL PRINT TABLE REGULAR *
+                          62 ****************************
+0000E8 4120 C12A          63 PRINTREG LA    2,TABLE BEGIN PRINT REGULAR SUBROUTINE
+0000EC 5852 0000          64 REGTOP   L     5,0(2)
+0000F0 5250 C11B          65          XDECO 5,OUTLINE
+0000F4 E020 C11A 000D     66          XPRNT CC,13
+0000FA 8728 C0E6          67          BXLE  2,8,REGTOP
+0000FE 07FB               68          BR    11 END PRINTREG, RETURN TO DRIVER
+
+                          70 ****************************
+                          71 * WILL PRINT TABLE REVERSE *
+                          72 ****************************
+000100 4120 C176          73 PRINTREV LA    2,TABLE+76 BEGIN PRINT REVERSE SUBROUTINE
+000104 5880 C1AA          74          L     8,=F'-4'
+000108 4190 C126          75          LA    9,TABLE-4
+00010C 5852 0000          76 REVTOP   L     5,0(2)
+000110 5250 C11B          77          XDECO 5,OUTLINE
+000114 E020 C11A 000D     78          XPRNT CC,13
+00011A 8628 C106          79          BXH   2,8,REVTOP
+00011E 07FB               80          BR    11 END PRINTREV, RETURN TO DRIVER
+000120 40                 81 CC       DC    C' '
+000121                    82 OUTLINE  DS    CL12 STORAGE FOR OUTPUT
+000130                    83 TABLE    DS    20F    STORAGE FOR NUMBERS
+                          84 *
+                          85          END   THPROG2
+000180 F1E3C8C540E3C1C2               =C'1THE TABLE IN ORDER:'
+000194 F1E3C8C540E3C1C2               =C'1THE TABLE IN REVERSE ORDER:'
+0001B0 FFFFFFFC                       =F'-4'
+
+
+*** 0 STATEMENTS FLAGGED - 0 ERRORS FOUND
+
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+THE TABLE IN ORDER:
+           1
+           2
+           3
+           4
+           5
+           6
+           7
+           8
+           9
+           0
+           1
+           2
+           3
+           4
+           5
+           6
+           7
+           8
+           9
+           0
+THE TABLE IN REVERSE ORDER:
+           0
+           9
+           8
+           7
+           6
+           5
+           4
+           3
+           2
+           1
+           0
+           9
+           8
+           7
+           6
+           5
+           4
+           3
+           2
+           1
+
+*** EXECUTION COMPLETED ***

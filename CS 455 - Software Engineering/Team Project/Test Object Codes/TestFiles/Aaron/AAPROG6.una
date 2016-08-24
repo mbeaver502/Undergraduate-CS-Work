@@ -1,0 +1,225 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Test Object Codes\TestFiles\Aaron\AAPROG6.PRT
+#
+*ANDREW AARON
+*ASSIGNMENT:PROGRAM 6
+*DUE: 4/22/2013
+*
+*DESCRIPTION:
+*    THIS PROGRAM WILL READ IN INTEGERS, VERIFY THAT THEY ARE VALID
+*  GRADES, INSERT UP TO 30 INTO A TABLE, AND PRINT THEM OUT.
+*    THE PROGRAM WILL THEN SORT THE GRADES IN THE TABLE, AND PRINT
+*  OUT THE SORTED TABLE.
+*
+*INPUT: UNKNOWN NUMBER OF INTEGERS, ONLY READS UP TO 30 VALID ONES
+*OUTPUT: FIRST PRINTS THE TABLE AS ENTERED, THEN THE SORTED TABLE
+*    
+*
+*REGISTER KEY:
+*  REGISTER 2 - HOLDS THE CONTROL REGISTER IN THE READ LOOP. HOLDS
+*    THE TOP OF SEARCH POINTER IN THE SORT LOOP.
+*  REGISTER 3 - TEMPORARILY HOLDS EACH INTEGER IN THE READ LOOP
+*  REGISTER 4 - HOLDS THE STEP COUNT OF THE LOOPS
+*  REGISTER 5 - HOLDS THE TERMINAL VALUE FOR THE LOOPS
+*  REGISTER 6 - POINTER TO THE GREATEST VALUE IN THE SORT LOOP
+*               ALSO HOLDS POINTER TO TABLLAST IN READ
+*  REGISTER 7 - HOLDS THE SEARCH POINTER IN THE SORT LOOP
+*  REGISTER 8 - HOLDS THE GREATEST VALUE FOUND PER LOOP
+*  REGISTER 9 - USED AS A TEMP VARIABLE TO SWAP GRADES
+*
+*VARIABLE KEY:
+*  TABLE - WHERE THE ARRAY OF INTEGERS IS STORED
+*  TABLLAST � POINTER TO THE LAST NUMBER ENTERED
+*  CARD - HOLDS ONE DATA LINE AT A TIME
+*  CC - FOR CARRIAGE CONTROL
+*  OUT - HOLDS OUTPUT LINE
+*  MAXGRADE - GREATEST INTEGER THAT IS A VALID GRADE
+*  MINGRADE - SMALLEST INTEGER THAT IS A VALID GRADE
+*  HEADER1 - HEADER FOR SUBREAD SUBROUTINE
+*  HEADER2 - HEADER FOR SUBSORT SUBROUTINE
+*  HEADER3 - HEADER FOR SUBPRNT SUBROUTINE
+**********************************************************************
+*                            BEGINNING HK
+PROJECT3 START         
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+         SPACE
+**********************************************************************
+*                                BODY
+         SPACE
+         LA    1,READPARM         
+         L     15,=V(SUBREAD)    READ IN RANDOM INTEGERS
+         BALR  14,15
+         SPACE
+         LA    1,READPARM         
+         L     15,=V(SUBPRNT)    PRINT INTEGERS AS ENTERED
+         BALR  14,15
+         SPACE
+         LA    1,READPARM
+         L     15,=V(SUBSORT)    SORT INTEGERS
+         BALR  14,15
+         SPACE
+         LA    1,READPARM
+         L     15,=V(SUBPRNT)    PRINT SORTED INTEGERS
+         BALR  14,15
+         SPACE
+**********************************************************************
+*                               END HK
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+**********************************************************************
+*                              VARIABLES
+         SPACE
+TABLE    DS    30F            SEE VARIABLE KEY
+TABLLAST DS    1F
+READPARM DC    A(TABLE)
+         DC    A(TABLLAST)
+         LTORG
+         SPACE
+**********************************************************************
+*                             SUBROUTINES
+*
+*THIS SUBROUTINE FIRST READS IN AND VARIFIES ONE INTEGER AT A TIME.
+*IF THE INTEGER IS A VALID GRADE, IT STORES IT IN TABLE AND LOOPS BACK
+         SPACE             
+SUBREAD  CSECT                BEGINNING HOUSEKEEPING
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE1,12
+HERE1    ST    13,SAVEREAD+4
+         LA    13,SAVEREAD
+*
+****READ BODY
+*
+         L     2,0(1)            LOAD TABLE FROM PARAM
+         LA    4,4
+         L     5,4(1)            LOAD END OF TABL FROM PARAM
+         LR    6,5               PUT TABLLAST IN REG 6
+         SR    5,4               SUBTRACT 4 FROM REG5 TO GET END
+         XPRNT HEADER1,26
+TOPREAD  XREAD CARD,80
+         BC    B'0100',ENDREAD   IF EOF, STOP READING
+         XDECI 3,CARD
+         C     3,MAXGRADE        IF INT READ IS >100
+         BC    B'0010',TOPREAD   THEN ITS NOT A VALID GRADE
+         C     3,MINGRADE        ALSO INVALID IF ITS <0
+         BC    B'0100',TOPREAD
+         ST    3,0(2)            STORES ONLY IF A VALID GRADE
+         BXLE  2,4,TOPREAD
+ENDREAD  LR    5,2              SET NEW TERMINAL VALUE
+         SR    5,4
+         ST    5,0(6)           STORE LAST ENTERED VALUE
+*        BR    11
+*
+****END HOUSEKEEPING
+*
+         L     13,SAVEREAD+4
+         LM    14,12,12(13)
+         BR    14
+SAVEREAD DS    18F
+*
+****LOCAL VARIABLES
+*
+CARD     DS    CL80
+MAXGRADE DC    F'100'
+MINGRADE DC    F'0'
+HEADER1  DC    C'0READING IN VALID INPUT...'
+         LTORG
+*
+*
+*THIS SUBROUTINE WILL SORT THE INTEGERS IN THE TABLE.
+*
+         SPACE
+SUBSORT  CSECT                BEGINNING HOUSEKEEPING
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE2,12
+HERE2    ST    13,SAVESORT+4
+         LA    13,SAVESORT
+*
+****SORT BODY
+*
+         L     2,0(1)            LOAD TABLE FROM PARAM
+         LA    4,4
+         L     5,4(1)            LOAD END OF TABL FROM PARAM
+         L     5,0(5)
+         XPRNT HEADER2,18
+OUTLOOP  L     8,0(2)            SET LARGEST FOUND TO TOPOFSEARCH
+         LR    7,2               RESET SEARCH POINTER TO CURRENT TOP
+         LR    6,7
+INLOOP   C     8,0(7)            IS VALUE AT SEARCH POINTER>GREATEST
+         BC    B'1010',TRYNEXT   IF NOT, SKIP IT FOR NOW
+         L     8,0(7)            IF SO, SET IT AS NEW GREATEST
+         LR    6,7               AND SET LARGEST FOUND POINTER
+TRYNEXT  BXLE  7,4,INLOOP
+         L     9,0(2)            SWAP TOPOFSEARCH WITH GREATEST
+         ST    9,0(6)
+         ST    8,0(2)
+         BXLE  2,4,OUTLOOP
+*
+****END HOUSEKEEPING
+*
+         L     13,SAVESORT+4
+         LM    14,12,12(13)
+         BR    14
+SAVESORT DS    18F
+*
+****LOCAL VARIABLES
+*
+HEADER2  DC    C'0SORTING GRADES...'
+         LTORG
+*
+*
+*THIS SUBROUTINE WILL PRINT THE INTEGERS IN THE TABLE.
+*
+         SPACE
+SUBPRNT  CSECT                BEGINNING HOUSEKEEPING
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE3,12
+HERE3    ST    13,SAVEPRNT+4
+         LA    13,SAVEPRNT
+*
+****PRNT BODY
+*
+         L     2,0(1)          LOAD TABLE FROM PARAM
+         LA    4,4
+         L     5,4(1)          LOAD END OF TABL FROM PARAM
+         L     5,0(5)
+         XPRNT HEADER3,19
+TOPPRNT  L     3,0(2)          LOAD EACH INTEGER FROM TABLE TO REG3
+         XDECO 3,OUT           CONVERT & PRINT EACH INT FROM REG 3
+         XPRNT CC,13
+         BXLE  2,4,TOPPRNT
+*
+****END HOUSEKEEPING
+*
+         L     13,SAVEPRNT+4
+         LM    14,12,12(13)
+         BR    14
+SAVEPRNT DS    18F
+*
+****LOCAL VARIABLES
+*
+HEADER3  DC    C'1INTEGERS IN TABLE:'
+CC       DC    C' '
+OUT      DS    CL12
+         LTORG
+*
+**********************************************************************
+*                            END OF PROGRAM
+         END   PROJECT3
+$ENTRY
+1
+2
+100
+25

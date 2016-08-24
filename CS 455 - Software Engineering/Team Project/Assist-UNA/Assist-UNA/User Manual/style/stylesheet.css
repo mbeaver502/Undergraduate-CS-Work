@@ -1,0 +1,74 @@
+﻿body
+{
+}
+
+div#container
+{
+    height: 900px;
+    width: 1080px;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 2px solid black;
+}
+
+div#header
+{
+    height: 90px;
+    padding-top:5px;
+    padding-left:5px;
+    background-color: purple;
+}
+
+div#sidebar
+{
+    font-family: monospace, "lucida console";
+    height: 675px;
+    width: 15%;
+    background-color: purple;
+    float: left;
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+div#sidebar a
+{
+    color: yellow;
+}
+
+div#sidebar a:hover
+{
+    color:black;
+    background-color: yellow;
+    text-decoration: none;
+}
+
+div#content
+{
+    height: 675px;
+    width: 83%;
+    overflow: scroll;
+    background-color: white;
+    float: left;
+    padding-left: 10px;
+    padding-top: 10px;
+    
+}
+
+div#footer
+{
+    height: 125px;
+    background-color: purple;
+    clear: both;
+    text-align:center;
+}
+
+.shadow
+{
+    font-family: monotype,"lucida console";
+    color: yellow;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}

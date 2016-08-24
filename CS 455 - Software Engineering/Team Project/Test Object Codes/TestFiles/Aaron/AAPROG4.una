@@ -1,0 +1,178 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Test Object Codes\TestFiles\Aaron\AAPROG4.PRT
+#
+*ANDREW AARON
+*ASSIGNMENT:PROGRAM 4
+*DUE: 4/3/2013
+*
+*DESCRIPTION:
+*    THIS PROGRAM WILL ACCEPT AS INPUT AN UNKNOWN SIZE FILE
+*  REPRESENTING PERSONAL DATA AND CONVERT IT TO ANOTHER FORMAT.
+*
+*INPUT: UNKNOWN NUMBER OF LINES CONTAINING PERSONAL DATA
+*OUTPUT: PERSONAL DATA IN A DIFFERENT FORMAT
+*    
+*
+*REGISTER KEY:
+*  REGISTER 2 - POINTER TO THE SOURCE CHAR IN EACH FORMAT SUBROUTINE,
+*    ALSO CONTROL REGISTER FOR GETCITY LOOP
+*  REGISTER 3 - POINTER TO THE DESTINATION CHAR IN OUTPUT CHARACTER
+*    LISTS IN EACH FORMAT SUBROUTINE
+*  REGISTER 4 - STEP COUNTER IN GETCITY LOOP
+*  REGISTER 5 - END OF CITY NAME, TERMINAL VALUE IN GETCITY LOOP
+*  REGISTER 9 - HOLDS THE ADDRESS OF NEXT INSTRUCTION AFTER FNDSPACE
+*  REGISTER 10 - HOLDS THE ADDRESS OF NEXT INSTRUCTION AFTER THE 
+*    FORMAT SUBROUTINES
+*  REGISTER 11 - HOLDS THE ADDRESS OF NEXT INSTRUCTION AFTER THE MAIN
+*    TWO SUBROUTINES, SUBREAD AND SUBPRNT
+*
+*VARIABLE KEY:
+*  CARD - HOLDS ONE DATA LINE AT A TIME
+*  CC - FOR DOUBLE SPACED CARRIAGE CONTROL
+*  NAMES - OUTPUT LINE TO HOLD THE REFORMATTED NAMES
+*  CC2 - SINGLE SPACED CARRIAGE CONTROL FOR STREET ADDRESS OUTPUT
+*  STREET - OUTPUT LINE FOR STREET ADDRESS
+*  CC3 - SINGLE SPACED CARRIAGE CONTROL FOR THE CSZ OUTPUT LINE
+*  CSZ - OUTPUT LINE FOR THE NEWLY FORMATTED CITY, STATE AND ZIP
+*
+**********************************************************************
+*                            BEGINNING HK
+PROJECT4 START         
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+         SPACE
+**********************************************************************
+*                                BODY
+         SPACE
+LOOP     BAL   11,SUBREAD
+         BC    B'0100',ENDLOOP
+         BAL   11,SUBPRNT
+         BC    B'1111',LOOP
+ENDLOOP  XPRNT CC,1
+         SPACE
+**********************************************************************
+*                               END HK
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+**********************************************************************
+*                              VARIABLES
+         SPACE
+CARD     DS    CL50            SEE VARIABLE KEY
+CC       DC    C'0'
+NAMES    DS    CL50
+CC2      DC    C' '
+STREET   DS    CL50
+CC3      DC    C' '
+CSZ      DS    CL57
+         SPACE
+**********************************************************************
+*                             SUBROUTINES
+         SPACE
+* 
+*    SUBREAD IS THE MAIN SUBROUTINE WHICH WILL CALL OTHER SUBROUTINES
+*  TO REFORMAT THE INPUT LINES. IT WILL ALSO CLEAR THE OUTPUT LINES.
+*
+SUBREAD  MVI   NAMES,C' '            CLEAR GARBAGE FROM OUTPUT LINES
+         MVC   NAMES+1(49),NAMES
+         MVI   STREET,C' '
+         MVC   STREET+1(49),STREET
+         MVI   CSZ,C' '
+         MVC   CSZ+1(56),CSZ
+         BAL   10,FMTNAMES
+         XREAD STREET,50
+         BAL   10,FMTCSZ
+         BR    11
+         SPACE
+*
+*    FMTNAMES SUBFUNCTION WILL TAKE THE INPUT LINE AND MOVE THE
+*  NAMES ONE AT A TIME TO THE NAMES OUTPUT LINE, IN THE NEW FORMAT.
+*
+FMTNAMES XREAD CARD,50
+         BCR   B'0100',11
+         LA    2,CARD
+         LA    3,NAMES
+         BAL   9,FNDSPACE        FIND LAST NAME
+         LA    2,1(2)
+         BAL   9,FNDSPACE
+         LA    2,1(2)            2 SHOULD BE AT LAST NAME
+GETLAST  CLI   0(2),C' '
+         BC    B'1000',ENDLAST
+         MVC   0(1,3),0(2)       MOVE LAST NAME INTO NAMES
+         LA    2,1(2)
+         LA    3,1(3)            3 IS DESTINATION IN NAMES CHARLIST
+         BC    B'1111',GETLAST 
+ENDLAST  MVI   0(3),C','
+         LA    3,2(3)
+         LA    2,CARD
+GETFIRST CLI   0(2),C' '         DO THE SAME FOR FIRST NAME
+         BC    B'1000',ENDFIRST
+         MVC   0(1,3),0(2)
+         LA    2,1(2)
+         LA    3,1(3)
+         BC    B'1111',GETFIRST
+ENDFIRST MVC   0(2,3),0(2)       ADD THE MIDDLE INITIAL
+         LA    3,2(3)            WHICH IS JUST THE NEXT 2 CHARS
+         MVI   0(3),C'.'
+         BR    10
+         SPACE
+*
+*    FMTCSZ SUBROUTINE FINDS AND MOVES THE CITY INTO THE CSZ LINE,
+*  AND THEN ADDS THE STATE AND ZIP CODE TO IT.
+*
+FMTCSZ   XREAD CARD,50
+         BCR   B'0100',11
+         LA    2,CARD
+         LA    3,CSZ
+         LA    4,1
+         LA    5,CARD+49         REG 5 WILL POINT TO THE END OF CITY
+CITYEND  CLI   0(5),C' '         START AT THE END OF INPUT
+         BC    B'0111',GETCITY   GO BACK UNTIL NONSPACE CHAR FOUND
+         SR    5,4
+         BC    B'1111',CITYEND
+GETCITY  MVC   0(1,3),0(2)       MOVE CITY NAME INTO OUTPUT LINE
+         LA    3,1(3)
+         BXLE  2,4,GETCITY
+         MVI   0(3),C','
+         LA    3,2(3)
+         XREAD CARD,50           READ IN AND ADD THE STATE
+         LA    2,CARD
+         MVC   0(2,3),0(2)
+         LA    3,4(3)
+         XREAD CARD,50           THEN READ IN AND ADD THE ZIP CODE
+         LA    2,CARD
+         MVC   0(5,3),0(2)
+         BR    11
+         SPACE
+*
+*    FNDSPACE FINDS THE NEXT SPACE CHAR IN A CHAR LINE. IT ASSUMES
+*  REGISTER 2 IS POINTING TO A CHAR IN THE CHAR LINE.
+*
+FNDSPACE CLI   0(2),C' '
+         BCR   B'1000',9
+         LA    2,1(2)
+         BC    B'1111',FNDSPACE 
+         SPACE
+*
+*    SUBPRNT PRINTS ALL THREE OUTPUT LINES, AS WELL AS EXTRA SPACE
+*  AT THE BOTTOM OF EACH SET OF INFORMATION.
+*
+SUBPRNT  XPRNT CC,51
+         XPRNT CC2,51
+         XPRNT CC3,58
+         XPRNT CC,1
+         BR    11
+         SPACE
+*
+**********************************************************************
+*                            END OF PROGRAM
+         END   PROJECT4
+$ENTRY PROG4.TXT

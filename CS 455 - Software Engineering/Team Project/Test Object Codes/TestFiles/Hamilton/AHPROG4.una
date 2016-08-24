@@ -1,0 +1,104 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Andrew\Documents\CS 455\TestCases\Classes\Simulator\AHPROGS\AHPROG2.PRT
+#
+*ANDREW HAMILTON
+*PROGRAM #4
+*4/3/13
+*THIS PROGRAM WILL ACCEPT 5 LINES OF INPUT CONTAINING FIRST, MIDDLE,
+*AND LAST NAMES, STREET ADDRESS, CITY, STATE, AND ZIP CODE, AND 
+*FORMAT THEM TO FIT ON 3 LINES.
+*REGISTER KEY
+*REG 2 - POINTER ON THE INPUT LINE
+*REG 3 - POINTER ON THE OUTPUT LINE
+*REG 5,6,7 - USED TO CONTROL LOOPS
+AHPROG4  START
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+         MVI   OUT1,C' '
+         MVC   OUT1+1(49),OUT1  FILL THE OUTPUT LINES WITH BLANKS
+         MVI   OUT2,C' '
+         MVC   OUT2+1(49),OUT2
+         MVI   OUT3,C' '
+         MVC   OUT3+1(49),OUT3
+         XREAD LINE,50
+         LA    2,LINE       READ FIRST LINE AND USE FNDSPC TO
+         BAL   11,FNDSPC    GET TO THE LAST NAME
+         LA    2,1(2)
+         BAL   11,FNDSPC
+         LA    2,1(2)
+         LA    3,OUT1
+COPYLAST MVC   0(1,3),0(2)  COPY THE LAST NAME ONE CHAR AT A TIME
+         LA    2,1(2)       UNTIL A BLANK IS FOUND
+         LA    3,1(3)
+         CLI   0(2),C' '
+         BC    B'1000',BLANK
+         BC    B'1111',COPYLAST
+BLANK    LA    2,LINE
+         MVI   0(3),C' '     ADD A SPACE AND A COMMA
+         MVI   0(3),C','
+COPYFRST MVC   0(1,3),0(2)   COPY THE FIRST NAME AFTER THE LAST 
+         LA    2,1(2)        USING THE SAME TECHNIQUE AS BEFORE 
+         LA    3,1(3)        
+         CLI   0(2),C' '
+         BC    B'1000',BLANK2
+         BC    B'1111',COPYFRST
+BLANK2   LA    3,1(3)
+         LA    2,LINE
+         BAL   11,FNDSPC      GO TO THE MIDDLE NAME AND COPY THE 
+         LA    2,1(2)         FIRST LETTER TO GET THE MIDDLE 
+         MVC   0(1,3),0(2)    INITIAL
+         XPRNT CC1,51         PRINT FIRST LINE
+         XREAD OUT2,50
+         XPRNT CC2,51         SECOND LINE DOESN'T NEED TO BE CHANGED
+         LA    5,3
+         XREAD LINE,50        READ LINE 3
+         LA    2,LINE
+         LA    3,OUT3
+         LA    7,LINE+50      START FROM THE END OF LINE 3 AND MOVE
+BACK     CLI   0(7),C' '      BACK UNTIL THE FIRST NON-BLANK IS FOUND
+         BC    B'1000',FND    REG 7 POINTS TO THE END OF THE CITY
+         BCTR  7,0
+         BC    B'1111',BACK
+FND      LA    6,1
+CITY     MVC   0(1,3),0(2)     COPY CHARS FROM REG 2 TO 7, THIS WILL
+         LA    3,1(3)          COPY THE ENTIRE ADDRESS
+         BXLE  2,6,CITY
+         LA    3,1(3)
+         XREAD LINE,50         
+         LA    2,LINE          READ FOURTH LINE AND COPY 2 CHARS
+         MVC   1(2,3),0(2)     FOR THE STATE
+         XREAD LINE,50
+         LA    2,LINE
+         MVC   1(5,3),0(2)     READ FIFTH LINE AND COPY 5 CHARS
+         XPRNT CC3,51          FOR THE ZIP CODE, OUTPUT FINAL 
+         L     13,SAVEAREA+4   LINE
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+LINE     DS    CL50
+CC1      DS    C'0'
+OUT1     DS    CL50
+CC2      DS    C'0'
+OUT2     DS    CL50
+CC3      DS    C'0'
+OUT3     DS    CL50
+*FNDSPC WILL SET REG 2 TO POINT TO THE FIRST SPACE FOUND ON A LINE
+FNDSPC   CLI   0(2),C' '
+         BC    B'1000',FOUND
+         LA    2,1(2)
+         BC    B'1111',FNDSPC
+FOUND    BR    11
+         END   AHPROG4
+$ENTRY
+FIRST MIDDLE LAST
+STREET ADDRESS 
+CITY 
+ST 
+12345 

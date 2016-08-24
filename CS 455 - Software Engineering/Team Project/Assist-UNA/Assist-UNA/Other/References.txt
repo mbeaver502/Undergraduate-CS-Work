@@ -1,0 +1,23 @@
+﻿Reference 1: 
+Used in: CustomSourceEditor.cs
+Used for: Disabling zoom in source editor.
+Author(s):	Rong-Chun Zhang
+Retrieved from: 
+http://social.msdn.microsoft.com/Forums/windows/en-US/8701593f-47ff-403c-ba19-a7aa1b622c15/how-can-
+	i-disable-text-zoom-in-richtextbox-when-holding-the-ctrl-key-and-mouse-wheeling?forum=winforms
+
+
+Reference 2:
+Used in: MainForm.cs
+Used for: Disabling text flash when syntax highlighting in source editor.
+Author(s): Danny Battison (gabehabe)
+Retrieved from:
+http://www.dreamincode.net/forums/topic/57072-syntax-highlight-in-c%23/
+
+
+Reference 3:
+Used in: Library.cs
+Used for: Converting ASCII to EBCDIC
+Author(s): Kaushik Chakraborti
+Retrieved from:
+http://kodesharp.blogspot.com/2007/12/c-convert-ascii-to-ebcdic.html

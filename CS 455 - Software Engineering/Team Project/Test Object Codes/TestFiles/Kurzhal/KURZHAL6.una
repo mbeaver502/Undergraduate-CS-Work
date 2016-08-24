@@ -1,0 +1,394 @@
+#
+#5000
+#500
+#100
+#2700
+#
+#
+KURZHAL6 START
+*----------------
+* KYLE KURZHAL  |
+* 4/22/14       |
+* ASSIGNMENT #6 |
+*--------------------------------------------------------------------
+* INPUT: AN UNKNOWN NUMBER OF LINES CONSISTING OF 3 POSSIBLE CARDS:
+*        0 - INITIAL BALANCE
+*        1 - DEPOSIT
+*        2 - WITHDRAWAL
+*        3 - INTEREST
+*
+* OUTPUT: A LIST OF ALL THE CARDS AND APPROPRIATE AMOUNTS WERE TO
+*         BE PRINTED.  A LIST OF THE NUBMER OF DEPOSITS/WITHDRAWALS,
+*         THE TOTAL OF EACH, AND THE AVERAGE OF EACH WERE TO BE
+*         PRINTED.
+*
+* ACTIONS: KEEP TRACK OF AND CALCULATE BALANCE, WITHDRAWALS,
+*          DEPOSITS, AND INTEREST.  CALCULATE THE AVG OF
+*          WITHDRAWALS/DEPOSITS. 
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                11  ======> CALL EACH MAIN SUBROUTINE AS NECESSARY.
+*--------------------------------------------------------------------
+*
+*                         BEGINNING HOUSEKEEPING
+*                        ------------------------
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+*
+*                            MAIN PROGRAM
+*                           --------------
+*         ZAP   DEPSTOTL(5),=P'0'   CLEAR ALL MEMORY TO BE USED
+*         ZAP   WITHTOTL(5),=P'0'   THIS WAS DONE DUE TO ODD ISSUES
+         XREAD CARD,80                 READ THE FIRST LINE
+*         XPRNT PRGMNAME,35             PRINT THE PROGRAM HEADERS
+*         XPRNT HEADER,48
+MAINLOOP MVI   AMOUNTLN,C' '           CLEAR THE LINE FOR NEW OUTPUT
+         MVC   AMOUNTLN+1(79),AMOUNTLN
+         CLI   CARD,C'1'               CHECK FOR THE ACTION TYPE
+         BC    B'1010',SKIPINIT
+         BAL   9,INITIALB          SET THE INITIAL BALANCE
+         BC    B'1111',PRNTBLNC
+SKIPINIT BC    B'0011',SKIPDEPS
+         BAL   11,DEPOSIT          CALL THE DEPOSIT SUBROUTINE
+         BC    B'1111',PRNTBLNC
+SKIPDEPS CLI   CARD,C'2'           CHECK IF CARD IS WITHDRAW/INTEREST
+         BC    B'0011',SKIPWITH    CALL INTEREST SUB IF NOT WITHDRAW
+         BAL   11,WITHDRAW         CALL THE WITHDRAW SUBROUTINE
+         BC    B'1111',PRNTBLNC
+SKIPWITH BAL   11,INTEREST         CALL THE INTEREST SUBROUTINE
+PRNTBLNC XPRNT AMOUNTLN,80         PRINT THE CARD AND BALANCE
+         XREAD CARD,80
+         BC    B'1000',MAINLOOP
+PRNTFINL BAL   11,LASTINFO         CALL THE LAST DISPLAY
+*                          END HOUSEKEEPING
+*                         ------------------
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+*
+*                    DECLARE STORAGE AND CONSTANTS
+*                   -------------------------------
+CARD     DS    CL80
+AMOUNTLN DS    CL80
+INTRBLNC DC    P'0'
+NEWAMNT  DS    PL5
+BALANCE  DC    P'0'
+DEPSTOTL DS    PL5
+WITHTOTL DS    PL5
+DEPSCNTR DC    P'0'
+WITHCNTR DC    P'0'
+PATTERN  DC    X'40206B2020206B2020214B2020'
+AMNTPTRN DS    XL13
+PRGMNAME DC    C'-            SAVINGS ACCOUNT REPORT'
+HEADER   DC    C' TRAN.CODE     AMOUNT    RATE    CURRENT BALANCE'
+         TITLE 'FORMATLN SUBROUTINE'
+*
+*                          FORMATLN SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: RECEIVES THE BALANCE AND NEW CARD AMOUNT FOR FORMATTING.
+*
+* OUTPUT: A FORMATED CARD OUTPUT LINE.
+*
+* ACTIONS: FORMATS THE BALANCE AND NEW CARD AMOUNT FOR PRINTING THE
+*          CARD RESULT.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                10  ======> RETURN FROM THE SUBROUTINE.
+*--------------------------------------------------------------------
+FORMATLN MVC   AMOUNTLN+5(1),CARD      COPY ACTION NUMBER FOR PRNTING
+         MVC   AMNTPTRN(13),PATTERN    PREPARE THE PRINTING PATTERN
+         ED    AMNTPTRN(13),BALANCE      FORMAT THE BALANCE
+         MVC   AMOUNTLN+34(13),AMNTPTRN  MOVE FORMATTED BLNC TO PRTLN
+         MVC   AMNTPTRN(13),PATTERN    PREPARE THE PRINTING PATTERN
+         ED    AMNTPTRN(13),NEWAMNT      FORMAT THE AMOUNT FROM CARD
+         MVC   AMOUNTLN+9(13),AMNTPTRN  MOVE AMNT FORMAT TO PRNT LN
+         BR    10
+         TITLE 'CHEKLOWB SUBROUTINE'
+*                          CHEKLOWB SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: USES TEH CURRENT BALANCE AND LOWEST BALANCE SINCE LAST
+*        INTEREST CALCULATION.
+*
+* OUTPUT: SETS THE NEW LOWEST BALANCE SINCE LAST INTEREST CALCULATION.
+*
+* ACTIONS: CHECK IF THE LOWEST INTEREST IS 0, WHICH MEANS THAT IT HAS
+*          JUST UNDERGONE A CALCULATION.  SET THE LOWEST BALANCE SINCE
+*          LAST INTEREST ACCORDINGLY.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                10  ======>  RETURN FROM SUBROUTINE.
+*--------------------------------------------------------------------
+*CHEKLOWB CP    INTRBLNC(7),=P'0'       SET NEW LOW BALANCE IF AT 0
+CHEKLOWB CP    INTRBLNC(1),=P'0'
+         BC    B'0010',NOSETMIN
+         ZAP   INTRBLNC(7),BALANCE(5)
+         BC    B'1111',NOLOWITR
+*
+NOSETMIN CP    INTRBLNC(7),BALANCE(5)   COMPARE BALANCE/LOWEST BALNC
+         BC    B'1100',NOLOWITR         IF BALANCE < LOWEST BALANCE,
+         ZAP   INTRBLNC(7),BALANCE(5)   COPY BALANCE TO INTEREST BALC
+NOLOWITR BR    10
+         TITLE 'INITIALB SUBROUTINE'
+*                          INITIALB SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: RECEIVES NEW AMOUNT FOR STORING AS DEPOSIT.
+*
+* OUTPUT: A THE BALANCE IS INCREASED BY DEPOSIT, THE TOTAL DEPOSIT IS
+*
+* ACTIONS: ADD THE DEPOSIT TO BALANCE AND OVERALL DEPOSIT. SET THE
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                9  ======>   RETURN FROM THE SUBROUTINE.
+*--------------------------------------------------------------------
+INITIALB ZAP   DEPSTOTL(5),=P'0'   CLEAR ALL MEMORY TO BE USED
+         ZAP   WITHTOTL(5),=P'0'   THIS WAS DONE DUE TO ODD ISSUES
+         ZAP   INTRBLNC(7),=P'0'
+         ZAP   BALANCE(5),=P'0'
+         ZAP   DEPSCNTR(2),=P'0'
+         ZAP   WITHCNTR(2),=P'0'
+         XPRNT PRGMNAME,35             PRINT THE PROGRAM HEADERS
+         XPRNT HEADER,48
+         BAL   11,DEPOSIT
+         BR    9
+         TITLE 'DEPOSIT SUBROUTINE'
+*                          DEPOSIT SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: RECEIVES NEW AMOUNT FOR STORING AS DEPOSIT.
+*
+* OUTPUT: A THE BALANCE IS INCREASED BY DEPOSIT, THE TOTAL DEPOSIT IS
+*         INCREASED, A NEW MINIMUM BALANCE IS SET FOR INTEREST IF
+*         NECESSARY.
+*
+* ACTIONS: ADD THE DEPOSIT TO BALANCE AND OVERALL DEPOSIT. SET THE
+*          LOWEST BALANCE SINCE LAST INTEREST CALCULATION, INCREMENT
+*          THE NUMBER OF DEPOSITS.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                11  ======>   RETURN FROM THE SUBROUTINE.
+*--------------------------------------------------------------------
+DEPOSIT  PACK  NEWAMNT(5),CARD+1(9)    PACK AMOUNT FOR MANIPULATION
+         CP    NEWAMNT(5),=P'0'        SKIP THE CARD IF DEPOSIT = 0
+         BC    B'1000',NODEPCRD
+         AP    BALANCE(5),NEWAMNT(5)   ADD NEW AMNT TO BALANCE
+         BAL   10,CHEKLOWB             CALL CHEKLOWB SUBROUTINE
+         BAL   10,FORMATLN             CALL FORMATLN SUBROUTINE
+         CLI   CARD,C'1'
+         BC    B'0111',NODEPCRD        IF TRAN.CODE = 0, COUNTER STAY
+         AP    DEPSTOTL(5),NEWAMNT(5)  ADD TO THE TOTAL DEPOSIT AMNT
+         AP    DEPSCNTR,=P'1'          ADD 1 TO DEPOSIT COUNT
+NODEPCRD BR    11
+         TITLE 'WITHDRAW SUBROUTINE'
+*                          WITHDRAW SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: RECEIVES NEW AMOUNT FOR REDUCING THE BALANCE.
+*
+* OUTPUT: A THE BALANCE IS DECREASED BY WITHDRAW, THE TOTAL WITHDRAW
+*         IS INCREASED, A NEW MINIMUM BALANCE IS SET FOR INTEREST IF
+*         NECESSARY.
+*
+* ACTIONS: ADD THE DEPOSIT TO BALANCE AND OVERALL DEPOSIT. SET THE
+*          LOWEST BALANCE SINCE LAST INTEREST CALCULATION, INCREMENT
+*          THE NUMBER OF DEPOSITS.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                11  ======>   RETURN TO FROM SUBROUTINE.
+*--------------------------------------------------------------------
+WITHDRAW PACK  NEWAMNT(5),CARD+1(9)    PACK AMOUNT FOR MANIPULATION
+         CP    NEWAMNT(5),=P'0'        CHECK IF WITHDRAW IS 0
+         BC    B'1000',NOWITHCD        IF 0, SKIP ADDING THE CARD
+         CP    BALANCE(5),NEWAMNT(5)   CHECK IF BALANCE < NEWAMNT
+         BC    B'0100',NOWITHCD        IF SO, NO CARD TRANSACTION
+         SP    BALANCE(5),NEWAMNT(5)   DETRACT FROM BALANCE
+         AP    WITHTOTL(5),NEWAMNT(5)  ADD TO WITHDRAW TOTAL
+         BAL   10,CHEKLOWB             CALL CHEKLOWB SUBROUTINE
+         BAL   10,FORMATLN             CALL FORMATLN SUBROUTINE
+         AP    WITHCNTR,=P'1'          ADD 1 TO WITHDRAW COUNT
+NOWITHCD BR    11
+         TITLE 'INTEREST SUBROUTINE'
+*                          INTEREST SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: LOWEST BALANCE SINCE LAST INTEREST CALCULATION, THE INTEREST
+*        APPLIED TO THE BALANCE.
+*
+* OUTPUT: LINE WITH INTEREST CARD INFORMATION, INCLUDING RESULTING
+*         CALCULATED BALANCE.
+*
+* ACTIONS: GRAB THE INTEREST, MULTIPLY IT BY THE LOWEST BALANCE SINCE
+*          LAST INTEREST CALCULATION, PACK AND UNPACK THE VALUES IN
+*          ORDER TO GET CORRECTLY PACKED VALUE, FORMAT THE OUTPUT
+*          LINE.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                11  ======>   RETURN FROM THE SUBROUTINE.
+*--------------------------------------------------------------------
+INTEREST MVI   AMOUNTLN+5,C'3'
+         PACK  INTRNUM(2),CARD+1(3)    PACK AMOUNT FOR MANIPULATION
+         MP    INTRBLNC(7),INTRNUM(2)   MULT LOW BALNC AND INTEREST
+         UNPK  TEMPCNVT(13),INTRBLNC(7) CONVERT THE VALUE FOR GETTING
+         PACK  INTRBLNC(5),TEMPCNVT(9)  DECIMALS
+         AP    BALANCE(5),INTRBLNC(5)  ADD INTEREST TO BALANCE
+         MVC   AMNTPTRN(13),PATTERN    PREPARE THE PRINTING PATTERN
+         ED    AMNTPTRN(13),BALANCE
+         MVC   AMOUNTLN+34(13),AMNTPTRN
+*
+         MVC   COPYPTRN(5),INTRPTRN    PREPARE THE PRINTING PATTERN
+         ED    COPYPTRN(5),INTRNUM      FORMAT THE INTEREST FROM CARD
+         MVC   AMOUNTLN+24(5),COPYPTRN  MOVE AMNT FORMAT TO PRNT LN
+         ZAP   INTRBLNC(7),=P'0'        RESETTING THE LOW BALANCE
+         BR    11
+INTRNUM  DS    PL2
+INTRPTRN DC    X'40214B2020'
+COPYPTRN DS    XL5
+TEMPBLNC DS    ZL9
+TEMPCNVT DS    ZL13
+         TITLE 'LASTINFO SUBROUTINE'
+*                          LASTINFO SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: THE COUNTERS AND TOTAL AMOUNTS OF DEPOSIT/WITHDRAW.  
+*
+* OUTPUT: OUTPUTS NUMBER, TOTAL AMOUNT, AND AVG OF DEPOSITS/WITHDRAWS;
+*         OUTPUTS CURRENT BALANCE.
+*
+* ACTIONS: GET, FORMAT, PRINT THE AMOUNT OF DEPOSITS/WITHDRAWS; GET,
+*          FORMAT, PRINT THE TOTAL AMOUNT OF DEPOSITS/WITHDRAWS;
+*          CALCULATE, FORMAT, AND PRINT THE AVG DEPOSITS/WITHDRAWS;
+*          GET, FORMAT, PRINT THE CURRENT BALANCE.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                2   ======>  USED AS AN INPUT TO GETAVG SUBROUTINE
+*                3   ======>  USED AS AN INPUT TO GETAVG SUBROUTINE
+*                5   ======>  USED AS AN INPUT TO GETDOLLR SUBROUTINE
+*                9   ======>  RETURN REGISTER FROM GETDOLLR SUBROUTINE
+*               10   ======>  RETURN REGISTER FROM GETAVG SUBROUTINE
+*--------------------------------------------------------------------
+LASTINFO MVC   UNPKPTRN(4),TOTALUPK    PREPARE THE COUNTER PATTERN
+         ED    UNPKPTRN(4),DEPSCNTR    COPY DEPOSIT COUNTER INTO FORM
+         MVC   PRNTDEPS+14(4),UNPKPTRN    PUT COUNTER IN OUTPUT LINE
+         XPRNT PRNTDEPS,18
+         LA    5,DEPSTOTL                PREPARE INPUT, CALL GETDOLLR
+         BAL   9,GETDOLLR
+         MVC   PRNTTTLD+26(13),AMNTPTRN   PUT DEPOSIT TOTALS IN OUTPUT
+         XPRNT PRNTTTLD,39
+*
+         LA    2,DEPSTOTL            PREPARE DEPOSIT TOTALS AS INPUT
+         LA    3,DEPSCNTR            PREPARE DEPOSIT # AS INPUT
+         BAL   10,GETAVG                    CALL THE GETAVG SUB
+         MVC   PRNTAVGD+26(13),AMNTPTRN      PUT DEPOSIT AVG IN OUTPUT
+         XPRNT PRNTAVGD,39
+*
+         ED    TOTALUPK(4),WITHCNTR      PREPARE WITHDRAW COUNTER
+         MVC   PRNTWITH+16(4),TOTALUPK
+         XPRNT PRNTWITH,20               PRINT WITHDRAW COUNTER
+         LA    5,WITHTOTL                PREPARE WITHDRAW TOTALS INPUT
+         BAL   9,GETDOLLR                CALL GETDOLLR SUBROUTINE
+         MVC   PRNTTTLW+30(13),AMNTPTRN  PUT WITHDRAW TOTALS IN OUTPUT
+         XPRNT PRNTTTLW,43
+*
+         LA    2,WITHTOTL              PREPARE WITHDRAW TOTALS INPUT
+         LA    3,WITHCNTR              PREPARE WITHDRAW COUNTER INPUT
+         BAL   10,GETAVG                  CALL GETAVG SUBROUTINE
+         MVC   PRNTAVGW+30(13),AMNTPTRN   PUT WITHDRAW AVG IN OUTPUT
+         XPRNT PRNTAVGW,43
+*
+         LA    5,BALANCE                 PREPARE CURRENT BALANCE INPUT
+         BAL   9,GETDOLLR                CALL GETDOLLR SUBROUTINE
+         MVC   PRNTCURR+30(13),AMNTPTRN  PUT CURRENT BALANCE IN OUTPUT
+         XPRNT PRNTCURR,43               PRINT THE CURRENT BALANCE
+         BR    11
+TOTALUPK DC    X'40202020'
+UNPKPTRN DS    XL4
+PRNTDEPS DC    C'0# DEPOSITS = '
+PRNTTTLD DC    C' TOTAL AMOUNT OF DEPOSITS='
+PRNTAVGD DC    C' AVG. AMOUNT/DEPOSIT     ='
+PRNTWITH DC    C'0# WITHDRAWALS = '
+PRNTTTLW DC    C' TOTAL AMOUNT OF WITHDRAWALS ='
+PRNTAVGW DC    C' AVG. AMOUNT/WITHDRAWAL      ='
+PRNTCURR DC    C'0            CURRENT BALANCE ='
+         TITLE 'GETAVG SUBROUTINE'
+*                            GETAVG SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: THE TOTAL TO BE AVERAGED, AND THE NUMBER TO AVERAGE BY.
+*
+* OUTPUT: RESULTS IN AN AVERAGE OF THE INPUT, FORMATTED FOR PRINTING.
+*
+* ACTIONS: MOVE THE TOTAL TO A LARGER PACKED DECIMAL FOR DIVIDING,
+*          DIVIDE TO GET THE AVERAGE, DETERMINE IF THE AVG NEEDS TO
+*          BE ROUNDED UP, CALL THE GETDOLLR ROUTINE TO FORMAT THE
+*          RESULT.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                 5  ======>   A POINTER TO QUOTIENT, USED FOR A
+*                              QUICKER ROUNDING, AND PASSING AS INPUT
+*                              TO GETDOLLR.
+*                 9  ======>   RETURN FROM THE GETDOLLR SUBROUTINE.
+*                11  ======>   RETURN FROM THIS SUBROUTINE.
+*--------------------------------------------------------------------
+GETAVG   LA    5,QUOTIENT
+         ZAP   LARGTOTL(7),0(5,2)         COPY VALUE TO LARGER DECIMAL
+         DP    LARGTOTL(7),0(2,3)         GET THE AVERAGE
+         AP    REMAINDR(2),REMAINDR(2)    DOUBLE THE REMAINDER
+         CP    REMAINDR(2),0(2,3)         COMPARE FOR NEEDED ROUNDING
+         BC    B'0100',NOROUND            NO ROUND IF < DIVISOR
+         AP    0(5,5),=P'1'
+NOROUND  BAL   9,GETDOLLR                 CALL THE GETDOLLR SUBROUTINE
+         BR    10
+LARGTOTL DS    0PL7
+QUOTIENT DS    PL5
+REMAINDR DS    PL2
+         TITLE 'GETDOLLR SUBROUTINE'
+*                            GETDOLLR SUBROUTINE
+*--------------------------------------------------------------------
+* INPUT: A PREDETERMINED FORMAT AND ITEM TO FORMAT.
+*
+* OUTPUT: RESULTS IN FORMATED NUMBER, WITH A '$' IN FRONT.
+*
+* ACTIONS: SET REGISTER 1 IN CASE THE SIGNIFICANCE INDICATOR IS NOT
+*          TURNED ON WITHOUT FORCE, COPY THE PATTERN TO ANOTHER
+*          STORAGE IN ORDER NOT TO LOSE THE FORMAT, ADD THE '$' IN
+*          FRONT OF THE FORMATTED NUMBER.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                1   ======>  USED TO ADD A '$' IN FRONT OF AMOUNTS
+*                5   ======>  THE INPUT FOR FORMATTING THE OUTPUT.
+*                9   ======>  RETURN FROM THIS SUBROUTINE.
+*--------------------------------------------------------------------
+GETDOLLR LA    1,AMNTPTRN+11
+         MVC   AMNTPTRN(13),PATTERN    PREPARE THE PRINTING PATTERN
+         EDMK  AMNTPTRN(13),0(5)
+         BCTR  1,0
+         MVI   0(1),C'$'
+         BR    9
+         END   KURZHAL6
+$ENTRY
+0000100000
+1000100000
+1000000000
+1002000111
+3500
+2001000000
+2000000000
+1000111999
+2900000000
+2000100000
+2001000000
+3500
+0000001000
+1000010000
+2000005000
+1000001000
+2000000500
+3550

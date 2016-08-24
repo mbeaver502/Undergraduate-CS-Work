@@ -1,0 +1,6 @@
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\MemoryTest\bin\Debug\MemoryTest.exe.config
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\MemoryTest\bin\Debug\MemoryTest.exe
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\MemoryTest\bin\Debug\MemoryTest.pdb
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\MemoryTest\obj\Debug\MemoryTest.csprojResolveAssemblyReference.cache
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\MemoryTest\obj\Debug\MemoryTest.exe
+C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Assist-UNA\MemoryTest\obj\Debug\MemoryTest.pdb

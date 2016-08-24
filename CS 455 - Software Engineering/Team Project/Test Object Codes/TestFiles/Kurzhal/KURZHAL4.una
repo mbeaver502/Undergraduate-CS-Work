@@ -1,0 +1,223 @@
+#
+#5000
+#500
+#100
+#2700
+#C:\Users\Michael\Desktop\Papers\Computer Science\CS 455\Team Project\Test Object Codes\TestFiles\Kurzhal\KURZHAL4.PRT
+#
+KURZHAL4 START
+*----------------
+* KYLE KURZHAL  |
+* 3/21/14       |
+* ASSIGNMENT #4 |
+*--------------------------------------------------------------------
+* INPUT: UP TO 30 LINES, EACH WITH ITS OWN VALUE BETWEEN 0-100.
+*
+* OUTPUT: A PRINTED LIST OF THE UNSORTED TABLE VALUES, AND A PRINTED
+*         LIST OF THE SORTED TABLE VALUES.
+*
+* ACTIONS: READ IN VALUES TO THE TABLE, PRINT THE UNSORTED TABLE,
+*          SORT THE TABLE FROM LOW-TO-HIGH VALUES, PRINT THE SORTED
+*          TABLE.
+*--------------------------------------------------------------------
+*            | REG |        | PURPOSE |
+*            *******        ***********
+*               11   =====> THE REGISTER THAT IS USED TO RETURN FROM
+*                           ALL SUBROUTINES.
+*--------------------------------------------------------------------
+*
+*                       BEGINNING HOUSEKEEPING
+*                      ------------------------
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+*
+*                            MAIN PROGRAM
+*                           --------------
+         BAL   11,TABLREAD    READ IN INPUT VALUES TO THE TABLE
+         XPRNT UNSRTHED,19    PRINT UNSORTED TABLE HEADER
+         XPRNT UNSRTSUB,19
+         BAL   11,PRNTTABL    PRINT THE TABLE VALUES
+         BAL   11,SORTTABL    SORT THE TABLE VALUES
+         XPRNT SRTDHEAD,18    PRINT SORTED TABLE HEADER
+         XPRNT SRTDSUBH,18
+         BAL   11,PRNTTABL    PRINT THE TABLE VALUES
+*
+*                           END HOUSKEEPING
+*                          -----------------
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+*
+*                      DECLARE STORAGE AND CONSTANTS
+*                     -------------------------------
+VALTABLE DS    30F
+TABLEEND DS    0F
+TBLOUTPT DC    C' '
+UNSRTHED DC    C'      UNSORTED LIST'
+UNSRTSUB DC    C'      -------------'
+SRTDHEAD DC    C'-      SORTED LIST'
+SRTDSUBH DC    C'       -----------'
+         TITLE =C'TABLREAD SUBROUTINE'
+*--------------------------------------------------------------------
+* INPUT: UNKNOWN AMOUNT OF LINES, EACH WITH ITS OWN VALUE.
+*
+* OUTPUT: A TABLE OF UP TO 30 VALUES, EACH VALUE BETWEEN 0-100, AND
+*         A LOOP/TABLE VALUE COUNTER TO KNOW HOW MANY VALUES WERE
+*         ADDED TO THE TABLE.
+*
+* ACTIONS: READ IN EACH VALUE, ADD THE VALUE TO THE TABLE IF BETWEEN
+*          0-100, AND ALLOW THE LOOP/TABLE VALUE COUNTER TO BE USED
+*          IN THE OTHER SUBROUTINES.
+*--------------------------------------------------------------------
+*             | REG |       | PURPOSE |
+*             *******       ***********
+*                 2   ====> HOLDS THE VALUE 0 FOR COMPARISON.
+*                 3   ====> LOOP/TABLE VALUE COUNTER.
+*                 4   ====> HOLDS THE VALUE 100 FOR COMPARISON.
+*                 6   ====> STEP VALUE FOR ITERATING THROUGH TABLE.
+*                 7   ====> ADDRESS OF THE END OF THE TABLE.
+*                 8   ====> ADDRESS OF TOP OF TBLRDTOP LOOP.
+*                 9   ====> TABLE ITERATOR.
+*                10   ====> CONTAINS EACH VALUE AS IT'S READ.
+*                11   ====> USED TO RETURN TO THE MAIN PROGRAM.
+*--------------------------------------------------------------------
+TABLREAD LA    9,VALTABLE      POINT TO TOP OF TABLE
+         LA    6,4             SET STEP VALUE TO 4 FOR LOOPS
+         LA    7,TABLEEND-4    POINT TO THE END OF THE TABLE
+         LA    8,TBLRDTOP      POINT TO TOP OF TABLE READ-IN LOOP
+         SR    2,2             SET LOWEST POSSIBLE VALUE TO STORE
+         SR    3,3             ZERO OUT LOOP/TABLE VALUE COUNTER
+         LA    4,100
+         XREAD CARD,80             READ IN FIRST VALUE
+         BC    B'0100',ENDROUTN    END THE ROUTINE IF NO DATA
+TBLRDTOP XDECI 10,CARD
+         CR    10,2               COMPARE THE READ VALUE TO 0
+         BC    B'0100',SKIPSTOR   DO NOT STORE VALUE IF < 0
+         CR    10,4               COMPARE THE READ VALUE TO 100
+         BC    B'0010',SKIPSTOR   DO NOT STORE VALUE IF > 100
+         ST    10,0(9)            STORE THE VALUE IN THE TABLE
+         LA    3,1(3)             ADD 1 TO LOOP/TABLE VALUE COUNTER
+         AR    9,6                MOVE TOP TABLE POINTER TO NEXT
+SKIPSTOR XREAD CARD,80
+         BC    B'0100',ENDROUTN   END THE ROUTINE IF NO LINES LEFT
+         CR    9,7
+         BC    B'1100',0(8)       END ROUTINE IF AT END OF TABLE
+ENDROUTN BR    11
+CARD     DS    CL80
+         TITLE =C'SORTTABL SUBROUTINE'
+*---------------------------------------------------------------------
+* INPUT: USING THE UNSORTED TABLE, AND THE TABLE VALUE COUNTER.
+*
+* OUTPUT: A SORTED TABLE OF VALUES FROM LOWEST TO HIGHEST.
+*
+* ACTIONS: LOOPING THROUGH THE TABLE WHILE SORTING THE VALUES LOWEST
+*          TO HIGHEST.
+*---------------------------------------------------------------------
+*          | REG |      | PURPOSE |
+*          *******      ***********
+*              2   ===> ADDRESS OF TOP OF INNER LOOP.
+*              3   ===> THE TABLE VALUE COUNTER.
+*              4   ===> ADDRESS OF CURRENT LOWEST VALUE PER ITERATION.
+*              5   ===> THE VALUE OF THE CURRENT LOWEST VALUE.
+*              6   ===> STEP VALUE FOR ITERATING THROUGH TABLE.
+*              7   ===> ADDRESS FOR END OF TABLE VALUES.
+*              8   ===> TABLE ITERATOR FOR INTERNAL LOOP.
+*              9   ===> TABLE ITERATOR FOR EXTERNAL LOOP.
+*             10   ===> HOLDS EACH VALUE TO COMPARE TO CURRENT VALUE.
+*             11   ===> USED TO RETURN TO THE MAIN PROGRAM.
+*--------------------------------------------------------------------- 
+SORTTABL LA    9,VALTABLE   SET POINTER TO TOP OF TABLE
+         LR    5,3          PREPARE END OF TABLE VALUES ADDRESS
+         MR    4,6
+         SR    5,6
+         AR    5,9
+         LR    7,5          SET END OF TABLE VALUES ADDRESS
+         LA    2,INNRLOOP
+SRTTBTOP LR    8,9          SET INNER LOOP ITERATOR
+         L     5,0(9)       RESET THE CURRENT LOWEST VALUE
+         LR    4,9          RESET THE CURRENT LOWEST VALUE ADDRESS
+INNRLOOP L     10,0(8)      BEGIN INNER LOOP/GET NEXT VALUE TO COMPARE
+         CR    5,10               COMPARE TO DETERMINE LOWEST VALUE
+         BC    B'1100',ENDINLUP   MOVE TO NEXT COMPARE IF CURRENT <=
+         LA    4,0(8)             SET CURRENT LOWEST VALUE ADDRESS
+         LR    5,10               SET THE CURRENT LOWEST VALUE
+ENDINLUP BXLE  8,6,0(2)           CHECK/END INNER LOOP
+         CR    4,9
+         BC    B'1000',SKIPSWAP   SKIP VAL SWAP IF LOW VAL = CURR ITER
+         L     10,0(9)            GET VALUE FROM EXTERNAL ITERATOR
+         ST    10,0(4)            SWAP LOW VAL AND CURR ITER STORAGE
+         ST    5,0(9)
+SKIPSWAP BXLE  9,6,SRTTBTOP       CHECK/END EXTERNAL LOOP
+         BR    11
+         TITLE =C'PRNTTABL SUBROUTINE'
+*---------------------------------------------------------------------
+* INPUT: USING THE UNSORTED/SORTED TABLE, AND THE TABLE VALUE COUNTER.
+*
+* OUTPUT: PRINTS THE UNSORTED/SORTED TABLE TO THE SCREEN.
+*
+* ACTIONS: ITERATE THROUGH THE TABLE, PRINTING EACH VALUE IN THE TABLE
+*          UNTIL REACHING THE END OF THE VALUES THAT WERE READ IN.
+*---------------------------------------------------------------------
+*              | REG |        | PURPOSE |
+*              *******        ***********
+*                  3   =====> TABLE VALUE COUNTER.
+*                  4   =====> STEP VALUE FOR TABLE ITERATION.
+*                  5   =====> ADDRESS FOR END OF TABLE VALUES.
+*                  6   =====> USED TO TRANSFER STEP VALUE.
+*                  8   =====> ADDRESS OF TOP OF LOOP
+*                  9   =====> TABLE ITERATOR.
+*                 11   =====> USED TO RETURN TO THE MAIN PROGRAM.
+*--------------------------------------------------------------------
+PRNTTABL LA    9,VALTABLE   POINT TO TOP OF TABLE
+         LR    5,3          PREPARE END OF TABLE VALUES ADDRESS
+         MR    4,6
+         AR    5,9
+         SR    5,6          SET END OF TABLE VALUES ADDRESS
+         LR    4,6          SET THE STEP VALUE FOR ITERATION
+         LA    8,PRTTBTOP   SET ADDRESS FOR TOP OF PRINT LOOP
+PRTTBTOP L     10,0(9)        GET AND PREPARE VALUE FOR PRINTING
+         XDECO 10,TBLOUTPT+1
+         XPRNT TBLOUTPT,13    PRINT THE VALUE
+         BXLE  9,4,0(8)       CHECK/END LOOP
+         BR    11
+         END   KURZHAL4
+$ENTRY
+99
+100
+0
+27
+255
+26
+25
+-1
+24
+23
+22
+21
+20
+19
+101
+18
+17
+16
+15
+14
+13
+12
+11
+10
+9
+8
+-255
+7
+6
+5
+4
+3
+2
+1
+0
