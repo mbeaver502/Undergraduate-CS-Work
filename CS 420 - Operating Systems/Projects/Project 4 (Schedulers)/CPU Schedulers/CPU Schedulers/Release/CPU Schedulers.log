@@ -1,0 +1,36 @@
+﻿Build started 12/2/2013 1:25:15 PM.
+     1>Project "C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\CPU Schedulers\CPU Schedulers.vcxproj" on node 2 (build target(s)).
+     1>PrepareForBuild:
+         Creating directory "C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Release\".
+       InitializeBuildStatus:
+         Creating "Release\CPU Schedulers.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt driver.cpp PCB.cpp Priority.cpp RoundRobin.cpp Schedule.cpp SJF.cpp
+         driver.cpp
+     1>driver.cpp(190): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+         PCB.cpp
+         Priority.cpp
+         RoundRobin.cpp
+     1>RoundRobin.cpp(191): warning C4018: '<=' : signed/unsigned mismatch
+         Schedule.cpp
+         SJF.cpp
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Release\CPU Schedulers.exe" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\CPU Schedulers.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Release\CPU Schedulers.pdb" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Release\CPU Schedulers.lib" /MACHINE:X86 Release\driver.obj
+         Release\PCB.obj
+         Release\Priority.obj
+         Release\RoundRobin.obj
+         Release\Schedule.obj
+         Release\SJF.obj
+         Generating code
+         Finished generating code
+         CPU Schedulers.vcxproj -> C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Release\CPU Schedulers.exe
+       Manifest:
+         c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Release\CPU Schedulers.exe;#1" /manifest "Release\CPU Schedulers.exe.intermediate.manifest"
+       FinalizeBuildStatus:
+         Deleting file "Release\CPU Schedulers.unsuccessfulbuild".
+         Touching "Release\CPU Schedulers.lastbuildstate".
+     1>Done Building Project "C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\CPU Schedulers\CPU Schedulers.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:07.88

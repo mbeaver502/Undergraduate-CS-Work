@@ -1,0 +1,27 @@
+﻿Build started 12/3/2013 11:23:44 AM.
+     1>Project "C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\CPU Schedulers\CPU Schedulers.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\CPU Schedulers.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt driver.cpp
+         driver.cpp
+     1>c:\users\michael\desktop\papers\computer science\cs 420\projects\project 4 (schedulers)\cpu schedulers\cpu schedulers\driver.cpp(66): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Debug\CPU Schedulers.exe" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\CPU Schedulers.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Debug\CPU Schedulers.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Debug\CPU Schedulers.lib" /MACHINE:X86 Debug\driver.obj
+         Debug\PCB.obj
+         Debug\Priority.obj
+         Debug\RoundRobin.obj
+         Debug\Schedule.obj
+         Debug\SJF.obj
+         LINK : C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Debug\CPU Schedulers.exe not found or not built by the last incremental link; performing full link
+         CPU Schedulers.vcxproj -> C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Debug\CPU Schedulers.exe
+       Manifest:
+         c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\Debug\CPU Schedulers.exe;#1" /manifest "Debug\CPU Schedulers.exe.intermediate.manifest"
+       FinalizeBuildStatus:
+         Deleting file "Debug\CPU Schedulers.unsuccessfulbuild".
+         Touching "Debug\CPU Schedulers.lastbuildstate".
+     1>Done Building Project "C:\Users\Michael\Desktop\Papers\Computer Science\CS 420\Projects\Project 4 (Schedulers)\CPU Schedulers\CPU Schedulers\CPU Schedulers.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:04.41
