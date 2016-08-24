@@ -1,0 +1,171 @@
+/	Michael Beaver
+/	CS 311 - Fall 2013
+/
+/	This program raises an integer to a given power. The first input is the
+/	base, and the second input is the exponent. The result is stored in 
+/	Temp, which is printed to the output region.
+/
+/
+	ORG	100
+Start,	INPUT
+	STORE	Base		/Input Base b
+	STORE	Temp
+	STORE	Temp2
+	SKIPCOND 000		/Skip if negative Base
+	JUMP	GetExp
+	JNS	GetAbs		/Calculate |b| (abs. value)
+/
+GetExp,	INPUT			/Input Exponent n
+	STORE	Expnt
+/
+	LOAD	Base
+	SKIPCOND 400		/Checking for 0^n
+	JUMP	Here		/Not 0^n
+	JUMP	EOne		/Go to output 0
+/
+Here,	LOAD	Expnt
+	SKIPCOND 800		/Skip if positive Exponent
+	JUMP	EZero		/b^0 => output 1
+/
+	LOAD	Base		/Testing if Base == 1
+	SUBT	One
+	SKIPCOND 800		
+	JUMP	Btween		/Base <= 1
+	JUMP	There		/Base > 1
+Btween,	SKIPCOND 400		/Skip if Base == 1
+	SKIPCOND 000		/Skip if Base != 1
+	JUMP	EZero		/Base == 1
+/
+There,	LOAD	Expnt
+	SUBT	One
+	SKIPCOND 800		/Checking if exponent > 1
+	JUMP	EOne		/b^1 => output b
+/
+	STORE	Ctr1
+	LOAD	Base
+	SKIPCOND 800		/Checking for base's sign
+	JUMP	NegBs		/Negative Base
+/
+ELoop1,	JNS	Mult		/Exponentiate positive base
+	LOAD	Ctr1
+	SUBT	One
+	STORE	Ctr1
+	SKIPCOND 400
+	JUMP	ELoop1
+	JUMP	End
+/
+NegBs,	LOAD	Base
+	STORE	Temp3
+	STORE	Temp
+ELoop2,	JNS	MulNeg		/Exponentiate negative base
+	LOAD	Ctr1
+	SUBT	One
+	STORE	Ctr1
+	SKIPCOND 400
+	JUMP	ELoop2
+	LOAD	Temp3
+	STORE	Temp
+/
+	JNS	Div2		/Testing for even exponent
+	SKIPCOND 000
+	JUMP	EvnExp
+OddExp,	JUMP	End		/Do nothing if odd exponent
+EvnExp,	JNS	GetAbs		/Get absolute value if even exponent
+	JUMP	End
+/
+EZero,	LOAD	One		/b^0 = 1  OR  1^n = 1
+	STORE	Temp
+	JUMP	End
+/
+EOne,	LOAD	Base		/b^1 = b  OR  0^n = 0
+	STORE	Temp
+	JUMP	End
+/
+End,	LOAD	Temp
+	OUTPUT
+	HALT
+/
+/
+Base,	DEC	0	
+Expnt,	DEC	0	
+Result,	DEC	0
+Temp,	DEC	0
+Temp2,	DEC	0
+Temp3,	DEC	0
+Temp4,	DEC	0
+Ctr1,	DEC	0
+Ctr2,	DEC	0
+One,	DEC	1	
+Two,	DEC	2
+/
+/
+/	Mult is a function that multiplies a positive base for exponentiation.
+/
+Mult,	HEX	0		
+	LOAD	Base
+	SUBT	One	
+	STORE	Ctr2
+MLoop,	LOAD	Temp		/Multiply by using repetitive addition
+	ADD	Temp2
+	STORE	Temp
+	LOAD	Ctr2
+	SUBT	One	
+	STORE	Ctr2
+	SKIPCOND 400	
+	JUMP	MLoop	
+	LOAD	Temp
+	STORE	Temp2
+	JUMPI	Mult		/Return to caller
+/
+/	MulNeg is a function that multiplies a negative base for exponentiation.
+/
+MulNeg,	HEX	0		
+	LOAD	Temp2
+	SUBT	One	
+	SKIPCOND 800
+	JUMP	MNEnd
+	STORE	Ctr2
+NLoop,	LOAD	Temp		/Multiply by using repetitive addition
+	ADD	Temp3
+	STORE	Temp
+	LOAD	Ctr2
+	SUBT	One	
+	STORE	Ctr2
+	SKIPCOND 400	
+	JUMP	NLoop	
+MNEnd,	LOAD	Temp
+	STORE	Temp3
+	JUMPI	MulNeg		/Return to caller
+/
+/	GetAbs calculates the absolute value of a negative value.
+/
+GetAbs,	HEX	0		
+	CLEAR
+	STORE	Ctr2
+	LOAD	Temp
+GoZero,	ADD	One		/Calculate absolute value by adding until zero
+	STORE	Temp
+	LOAD	Ctr2
+	ADD	One
+	STORE	Ctr2
+	LOAD	Temp
+	SKIPCOND 400
+	JUMP	GoZero
+	LOAD	Ctr2
+	STORE	Temp
+	STORE	Temp2
+	JUMPI	GetAbs		/Return to caller
+/
+/	Div2 performs a rudimentary division of the exponent by two.
+/
+Div2,	HEX	0		
+	LOAD	Expnt
+	STORE	Temp4
+DLoop,	SKIPCOND 800		/Divide by using repetitive subtraction
+	JUMP	DEnd
+	LOAD	Temp4
+	SUBT	Two
+	STORE	Temp4
+	JUMP	DLoop
+DEnd,	JUMPI	Div2		/Return to caller
+	END

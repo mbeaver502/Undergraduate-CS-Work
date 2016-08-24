@@ -1,0 +1,106 @@
+     Assembly listing for: MichaelBeaver5.mas
+                Assembled: Wed Nov 06 15:40:15 CST 2013
+
+         |                          /	Michael Beaver
+         |                          /	CS 311 - Fall 2013
+         |                          /
+         |                          /	This program calculates N! (N-factorial), where the user
+         |                          /	specifies N. The result is stored in Fact, which is 
+         |                          /	printed to the output region.
+         |                          /
+         |                          /
+         |         ORG 100           
+100 5000 |  Start  INPUT             
+101 8000 |         SKIPCOND 000     /Check for negative input
+102 9104 |         JUMP Here         
+103 9110 |         JUMP End          
+         |                          /
+104 8400 |  Here   SKIPCOND 400     /Check for 0 input
+105 9107 |         JUMP There        
+106 910E |         JUMP Zero1        
+         |                          /
+107 2113 |  There  STORE N          /Input > 0, calculate Factorial
+108 2114 |         STORE Fact        
+109 4115 |         SUBT One          
+10A 8800 |         SKIPCOND 800      
+10B 910E |         JUMP Zero1        
+10C 0126 |         JNS DoFact        
+10D 9110 |         JUMP End          
+         |                          /
+10E 1115 |  Zero1  LOAD One         /Input either is 0 or 1
+10F 2114 |         STORE Fact        
+         |                          /
+110 1114 |  End    LOAD Fact         
+111 6000 |         OUTPUT            
+112 7000 |         HALT              
+         |                          /
+         |                          /
+113 0000 |  N      DEC 0             
+114 0000 |  Fact   DEC 0             
+115 0001 |  One    DEC 1             
+116 0000 |  Prod   DEC 0             
+117 0000 |  Ctr1   DEC 0             
+118 0000 |  Ctr2   DEC 0             
+         |                          /
+         |                          /
+         |                          /	Mult multiplies two integer values.
+         |                          /
+119 0000 |  Mult   HEX 0             
+11A 1117 |         LOAD Ctr1         
+11B 4115 |         SUBT One          
+11C 2118 |         STORE Ctr2        
+         |                          /
+11D 1116 |  MLoop  LOAD Prod        /Multiply by repetitive addition
+11E 3114 |         ADD Fact          
+11F 2116 |         STORE Prod        
+120 1118 |         LOAD Ctr2         
+121 4115 |         SUBT One          
+122 2118 |         STORE Ctr2        
+123 8000 |         SKIPCOND 000      
+124 911D |         JUMP MLoop        
+125 C119 |         JUMPI Mult       /Return to caller
+         |                          /
+         |                          /	DoFact computes the factorial of an integer N.
+         |                          /
+126 0000 |  DoFact HEX 0             
+127 1113 |         LOAD N            
+128 4115 |         SUBT One          
+129 2117 |         STORE Ctr1        
+         |                          /
+12A 0119 |  FLoop  JNS Mult         /Multiply N x (N - 1) x . . . x 1
+12B 1116 |         LOAD Prod         
+12C 2114 |         STORE Fact        
+12D A000 |         CLEAR            /Zero-out product
+12E 2116 |         STORE Prod        
+12F 1117 |         LOAD Ctr1         
+130 4115 |         SUBT One          
+131 2117 |         STORE Ctr1        
+132 8400 |         SKIPCOND 400      
+133 912A |         JUMP FLoop        
+134 C126 |         JUMPI DoFact     /Return to caller
+         |         END               
+
+Assembly successful.
+
+         SYMBOL TABLE
+         --------------------------------------------------
+          Symbol | Defined | References 
+         --------+---------+-------------------------------
+          Ctr1   |   117   | 11A, 129, 12F, 131
+          Ctr2   |   118   | 11C, 120, 122
+          DoFact |   126   | 10C, 134
+          End    |   110   | 103, 10D
+          FLoop  |   12A   | 133
+          Fact   |   114   | 108, 10F, 110, 11E, 12C
+          Here   |   104   | 102
+          MLoop  |   11D   | 124
+          Mult   |   119   | 125, 12A
+          N      |   113   | 107, 127
+          One    |   115   | 109, 10E, 11B, 121, 128, 130
+          Prod   |   116   | 11D, 11F, 12B, 12E
+          Start  |   100   | 
+          There  |   107   | 105
+          Zero1  |   10E   | 106, 10B
+         --------------------------------------------------
+
+

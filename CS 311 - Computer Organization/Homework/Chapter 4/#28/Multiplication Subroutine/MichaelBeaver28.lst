@@ -1,0 +1,98 @@
+     Assembly listing for: MichaelBeaver28.mas
+                Assembled: Thu Oct 10 17:47:26 CDT 2013
+
+         |                          /
+         |                          /Michael Beaver
+         |                          /CS 311 - Fall 2013
+         |                          /p. 264, #28: A X B + C X D => (A X B) + (C X D) by PEMDAS
+         |                          /The final answer is located in the Accumulator.
+         |                          /Assuming A = 5, B = 2, C = 8, D = 3	
+         |                          /Multiplication is performed by a subroutine.
+         |                          /
+         |         ORG 100           
+         |                          /
+         |                          / Calculate A X B
+         |                          /
+100 111D |  Start  LOAD B           /Load value of B
+101 2115 |         STORE TempN      /Store B into TempN
+102 111C |         LOAD A           /Load value of A
+103 2116 |         STORE TempM      /Store A to temp for multiplication
+104 1118 |         LOAD Prod1       /Load value of Prod1
+105 2117 |         STORE TempQ      /Store Prod1 to temp for multiplication
+106 0120 |         JNS Mult         /Perform multiplication
+107 1117 |         LOAD TempQ       /Load product of multiplication
+108 2118 |         STORE Prod1      /Store to Prod1
+         |                          /	
+         |                          / Calculate C X D
+         |                          /
+109 111F |         LOAD D           /Load value of D
+10A 2115 |         STORE TempN      /Store D into TempN
+10B 111E |         LOAD C           /Load value of C
+10C 2116 |         STORE TempM      /Store C to temp for multiplication
+10D 1119 |         LOAD Prod2       /Load value of Prod2
+10E 2117 |         STORE TempQ      /Store Prod2 to temp for multiplication
+10F 0120 |         JNS Mult         /Perform multiplication
+110 1117 |         LOAD TempQ       /Load product of multiplication
+111 2119 |         STORE Prod2      /Store to Prod2
+         |                          /
+         |                          / Calculate A X B + C X D, or (A X B) + (C X D)
+         |                          /
+112 1118 |         LOAD Prod1       /Load product A X B
+113 3119 |         ADD Prod2        /Add product C X D => AC holds A X B + C X D
+114 7000 |         HALT              
+         |                          /
+         |                          / Memory declarations
+         |                          /
+115 0000 |  TempN  DEC 0            /Temp multiplier
+116 0000 |  TempM  DEC 0            /Temp multiplier
+117 0000 |  TempQ  DEC 0            /Temp quotient
+118 0000 |  Prod1  DEC 0            /Product A X B
+119 0000 |  Prod2  DEC 0            /Product C X D
+11A 0000 |  Ctr    DEC 0            /Loop counter
+11B 0001 |  One    DEC 1             
+11C 0005 |  A      DEC 5             
+11D 0002 |  B      DEC 2             
+11E 0008 |  C      DEC 8             
+11F 0003 |  D      DEC 3             
+         |                          /
+         |                          / Multiplication Subroutine:
+         |                          / M X N is defined as M + M, N-times
+         |                          /
+120 0000 |  Mult   HEX 0            /Store return address to caller
+121 1115 |         LOAD TempN       /Load TempN as loop counter
+122 411B |         SUBT One         /Decrement Counter
+123 211A |         STORE Ctr        /Store this value into loop counter
+124 1117 |  Loop   LOAD TempQ       /Load value of TempQ into AC
+125 3116 |         ADD TempM        /Add TempM to TempQ
+126 2117 |         STORE TempQ      /Store product
+127 111A |         LOAD Ctr         /Load counter
+128 411B |         SUBT One         /Decrement Counter
+129 211A |         STORE Ctr        /Store loop counter
+12A 8000 |         SKIPCOND 000     /If loop counter < 0, exit loop
+12B 9124 |         JUMP Loop        /Jump to top of Loop
+12C C120 |         JUMPI Mult       /Return to caller
+         |         END               
+
+Assembly successful.
+
+         SYMBOL TABLE
+         --------------------------------------------------
+          Symbol | Defined | References 
+         --------+---------+-------------------------------
+          A      |   11C   | 102
+          B      |   11D   | 100
+          C      |   11E   | 10B
+          Ctr    |   11A   | 123, 127, 129
+          D      |   11F   | 109
+          Loop   |   124   | 12B
+          Mult   |   120   | 106, 10F, 12C
+          One    |   11B   | 122, 128
+          Prod1  |   118   | 104, 108, 112
+          Prod2  |   119   | 10D, 111, 113
+          Start  |   100   | 
+          TempM  |   116   | 103, 10C, 125
+          TempN  |   115   | 101, 10A, 121
+          TempQ  |   117   | 105, 107, 10E, 110, 124, 126
+         --------------------------------------------------
+
+

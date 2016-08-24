@@ -1,0 +1,26 @@
+/	Michael Beaver
+/	CS 311 - Fall 2013
+/
+/	This program sums integers as the user inputs them. The running
+/	Sum is printed to the output region after each summation. The user
+/	may enter a zero to terminate the program. The final Sum is 
+/	printed to the output region upon program termination.
+/
+/
+	ORG	100
+Start,	INPUT
+	SKIPCOND 400		/Goto end if input is Zero
+	JUMP	Here
+	JUMP	End
+/
+Here,	ADD	Sum		/Keep running sum and output it
+	STORE	Sum
+	OUTPUT
+	JUMP	Start	
+/
+End,	LOAD	Sum		/Output final sum
+	OUTPUT
+	HALT
+/
+/
+Sum,	DEC	0

@@ -1,0 +1,18 @@
+ -----------------
+ Symbol | Location
+ -------+---------
+ A      |   11C
+ B      |   11D
+ C      |   11E
+ Ctr    |   11A
+ D      |   11F
+ Loop   |   124
+ Mult   |   120
+ One    |   11B
+ Prod1  |   118
+ Prod2  |   119
+ Start  |   100
+ TempM  |   116
+ TempN  |   115
+ TempQ  |   117
+

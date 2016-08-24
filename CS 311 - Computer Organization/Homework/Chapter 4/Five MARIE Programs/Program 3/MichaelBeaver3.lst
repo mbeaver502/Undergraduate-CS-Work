@@ -1,0 +1,43 @@
+     Assembly listing for: MichaelBeaver3.mas
+                Assembled: Wed Nov 06 15:38:47 CST 2013
+
+         |                          /	Michael Beaver
+         |                          /	CS 311 - Fall 2013
+         |                          /
+         |                          /	This program sums integers as the user inputs them. The running
+         |                          /	Sum is printed to the output region after each summation. The user
+         |                          /	may enter a zero to terminate the program. The final Sum is 
+         |                          /	printed to the output region upon program termination.
+         |                          /
+         |                          /
+         |         ORG 100           
+100 5000 |  Start  INPUT             
+101 8400 |         SKIPCOND 400     /Goto end if input is Zero
+102 9104 |         JUMP Here         
+103 9108 |         JUMP End          
+         |                          /
+104 310B |  Here   ADD Sum          /Keep running sum and output it
+105 210B |         STORE Sum         
+106 6000 |         OUTPUT            
+107 9100 |         JUMP Start        
+         |                          /
+108 110B |  End    LOAD Sum         /Output final sum
+109 6000 |         OUTPUT            
+10A 7000 |         HALT              
+         |                          /
+         |                          /
+10B 0000 |  Sum    DEC 0             
+
+Assembly successful.
+
+         SYMBOL TABLE
+         --------------------------------------------------
+          Symbol | Defined | References 
+         --------+---------+-------------------------------
+          End    |   108   | 103
+          Here   |   104   | 102
+          Start  |   100   | 107
+          Sum    |   10B   | 104, 105, 108
+         --------------------------------------------------
+
+

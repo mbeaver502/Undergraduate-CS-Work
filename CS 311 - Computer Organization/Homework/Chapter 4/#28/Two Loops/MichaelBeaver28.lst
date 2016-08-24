@@ -1,0 +1,67 @@
+     Assembly listing for: MichaelBeaver28.mas
+                Assembled: Tue Oct 08 19:52:02 CDT 2013
+
+         |                          /Michael Beaver
+         |                          /#28: A X B + C X D => (A X B) + (C X D) by PEMDAS
+         |                          /Assuming A = 5, B = 2, C = 8, D = 3	
+         |         ORG 100           
+100 1123 |  Start  LOAD B           /Load value of B
+101 211D |         STORE Num        /Store B into Num
+102 111D |         LOAD Num         /Load Num (B) as loop counter
+103 4121 |         SUBT One         /Decrement
+104 2120 |         STORE Ctr        /Store this value into loop counter
+105 111E |  Loop1  LOAD Prod1       /Load value of Prod1 into AC
+106 3122 |         ADD A            /Add A to Prod1
+107 211E |         STORE Prod1      /Store product
+108 1120 |         LOAD Ctr         /Load counter
+109 4121 |         SUBT One         /Decrement
+10A 2120 |         STORE Ctr        /Store loop counter
+10B 8000 |         SKIPCOND 000     /If loop counter < 0, exit loop
+10C 9105 |         JUMP Loop1       /Jump to top of Loop1
+10D 1125 |         LOAD D           /Load value of D
+10E 211D |         STORE Num        /Store D into Num
+10F 111D |         LOAD Num         /Load Num (D) as loop counter
+110 4121 |         SUBT One         /Decrement
+111 2120 |         STORE Ctr        /Store this value into loop counter
+112 111F |  Loop2  LOAD Prod2       /Load value of Prod2 into AC
+113 3124 |         ADD C            /Add C to Prod2
+114 211F |         STORE Prod2      /Store the product
+115 1120 |         LOAD Ctr         /Load loop counter
+116 4121 |         SUBT One         /Decrement
+117 2120 |         STORE Ctr        /Store loop counter
+118 8000 |         SKIPCOND 000     /If loop counter < 0, exit loop
+119 9112 |         JUMP Loop2       /Jump to top of Loop2
+11A 111E |         LOAD Prod1       /Load product A X B
+11B 311F |         ADD Prod2        /Add product C X D => AC holds A X B + C X D
+11C 7000 |         HALT              
+11D 0000 |  Num    DEC 0             
+11E 0000 |  Prod1  DEC 0             
+11F 0000 |  Prod2  DEC 0             
+120 0000 |  Ctr    HEX 0             
+121 0001 |  One    DEC 1             
+122 0005 |  A      DEC 5             
+123 0002 |  B      DEC 2             
+124 0008 |  C      DEC 8             
+125 0003 |  D      DEC 3             
+
+Assembly successful.
+
+         SYMBOL TABLE
+         --------------------------------------------------
+          Symbol | Defined | References 
+         --------+---------+-------------------------------
+          A      |   122   | 106
+          B      |   123   | 100
+          C      |   124   | 113
+          Ctr    |   120   | 104, 108, 10A, 111, 115, 117
+          D      |   125   | 10D
+          Loop1  |   105   | 10C
+          Loop2  |   112   | 119
+          Num    |   11D   | 101, 102, 10E, 10F
+          One    |   121   | 103, 109, 110, 116
+          Prod1  |   11E   | 105, 107, 11A
+          Prod2  |   11F   | 112, 114, 11B
+          Start  |   100   | 
+         --------------------------------------------------
+
+

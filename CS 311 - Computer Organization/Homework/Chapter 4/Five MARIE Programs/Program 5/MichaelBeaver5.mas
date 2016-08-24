@@ -1,0 +1,78 @@
+/	Michael Beaver
+/	CS 311 - Fall 2013
+/
+/	This program calculates N! (N-factorial), where the user
+/	specifies N. The result is stored in Fact, which is 
+/	printed to the output region.
+/
+/
+	ORG	100
+Start,	INPUT
+	SKIPCOND 000		/Check for negative input
+	JUMP	Here
+	JUMP	End
+/
+Here,	SKIPCOND 400		/Check for 0 input
+	JUMP 	There
+	JUMP	Zero1
+/
+There,	STORE	N		/Input > 0, calculate Factorial
+	STORE	Fact
+	SUBT	One
+	SKIPCOND 800
+	JUMP	Zero1
+	JNS	DoFact
+	JUMP	End
+/
+Zero1,	LOAD	One		/Input either is 0 or 1
+	STORE	Fact
+/
+End,	LOAD	Fact
+	OUTPUT
+	HALT
+/
+/
+N,	DEC	0
+Fact,	DEC	0
+One,	DEC	1
+Prod,	DEC	0
+Ctr1,	DEC	0
+Ctr2,	DEC	0
+/
+/
+/	Mult multiplies two integer values.
+/
+Mult,	HEX	0	
+	LOAD	Ctr1	
+	SUBT	One	
+	STORE	Ctr2	
+/
+MLoop,	LOAD	Prod		/Multiply by repetitive addition
+	ADD	Fact
+	STORE	Prod	
+	LOAD	Ctr2	
+	SUBT	One	
+	STORE	Ctr2	
+	SKIPCOND 000		
+	JUMP	MLoop	
+	JUMPI	Mult		/Return to caller
+/
+/	DoFact computes the factorial of an integer N.
+/
+DoFact,	HEX	0	
+	LOAD	N
+	SUBT	One
+	STORE	Ctr1
+/
+FLoop,	JNS	Mult		/Multiply N x (N - 1) x . . . x 1
+	LOAD	Prod
+	STORE	Fact
+	CLEAR			/Zero-out product
+	STORE	Prod
+	LOAD	Ctr1
+	SUBT	One
+	STORE	Ctr1
+	SKIPCOND 400
+	JUMP	FLoop
+	JUMPI	DoFact		/Return to caller
+	END

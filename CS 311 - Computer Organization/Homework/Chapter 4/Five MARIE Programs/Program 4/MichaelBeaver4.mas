@@ -1,0 +1,59 @@
+/	Michael Beaver
+/	CS 311 - Fall 2013
+/
+/	This program calculates the sum 12 + 22 + 32 + . . . + N2, where
+/	the user specifies N. The result of the summation is stored in
+/	Sum, which is printed to the output region.
+/
+/
+	ORG	100
+Start,	INPUT
+	STORE	N
+	SKIPCOND 800		/If N <= 0, skip summation altogether
+	JUMP 	End
+	SUBT	One
+	STORE	Ctr1
+/
+SLoop,	JNS	Mult		/Turn each number A in [1..N] into A2: (A x 10 + 2)
+	LOAD	Prod
+	ADD	Two
+	ADD	Sum		/Update running sum
+	STORE	Sum
+	CLEAR			/Zero-out the product
+	STORE	Prod	
+	LOAD	Ctr1
+	STORE	N
+	SUBT	One
+	STORE	Ctr1
+	SKIPCOND 000
+	JUMP	SLoop
+/
+End,	LOAD	Sum	
+	OUTPUT	
+	HALT
+/
+N,	DEC	0
+Ten,	DEC	10
+One,	DEC	1
+Two,	DEC	2
+Prod,	DEC	0
+Sum,	DEC	0
+Ctr1,	DEC	0
+Ctr2,	DEC	0
+/
+/	Mult multiplies a positive integer value by 10.
+/
+Mult,	HEX	0	
+	LOAD	Ten	
+	SUBT	One	
+	STORE	Ctr2	
+MLoop,	LOAD	Prod		/Multiply by using repetitive addition
+	ADD	N	
+	STORE	Prod	
+	LOAD	Ctr2	
+	SUBT	One	
+	STORE	Ctr2	
+	SKIPCOND 000		
+	JUMP	MLoop	
+	JUMPI	Mult		/Return to caller
+	END

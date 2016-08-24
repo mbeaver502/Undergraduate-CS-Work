@@ -1,0 +1,8 @@
+/Michael Beaver
+Start,	LOAD	A	/=> LOAD 104
+	ADD	B	/=> ADD 105
+	STORE	C	/=> STORE 106
+	HALT
+A,	HEX	0023	/A => 104
+B,	HEX	FFE9	/B => 105
+C,	HEX	0000	/C => 106

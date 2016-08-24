@@ -1,0 +1,54 @@
+     Assembly listing for: MichaelBeaver2.mas
+                Assembled: Wed Nov 06 15:38:09 CST 2013
+
+         |                          /	Michael Beaver
+         |                          /	CS 311 - Fall 2013
+         |                          /
+         |                          /	This program sums numbers 1 + 2 + 3 + . . . + N, where the
+         |                          /	user specifies N. The result is stored in Sum, which is
+         |                          /	printed to the output region.
+         |                          /
+         |                          /
+         |         ORG 100           
+100 5000 |         INPUT             
+101 2112 |         STORE N           
+102 8800 |         SKIPCOND 800     /Skip the summation if N <= 0
+103 910F |         JUMP End          
+         |                          /
+104 1113 |  Loop   LOAD Ctr         /Perform summation
+105 3115 |         ADD One           
+106 2113 |         STORE Ctr         
+107 A000 |         CLEAR             
+108 1114 |         LOAD Sum          
+109 3113 |         ADD Ctr           
+10A 2114 |         STORE Sum         
+10B 1112 |         LOAD N            
+10C 4113 |         SUBT Ctr          
+10D 8400 |         SKIPCOND 400      
+10E 9104 |         JUMP Loop         
+         |                          /
+10F 1114 |  End    LOAD Sum          
+110 6000 |         OUTPUT            
+111 7000 |         HALT              
+         |                          /
+         |                          /
+112 0000 |  N      DEC 0             
+113 0000 |  Ctr    DEC 0             
+114 0000 |  Sum    DEC 0             
+115 0001 |  One    DEC 1             
+
+Assembly successful.
+
+         SYMBOL TABLE
+         --------------------------------------------------
+          Symbol | Defined | References 
+         --------+---------+-------------------------------
+          Ctr    |   113   | 104, 106, 109, 10C
+          End    |   10F   | 103
+          Loop   |   104   | 10E
+          N      |   112   | 101, 10B
+          One    |   115   | 105
+          Sum    |   114   | 108, 10A, 10F
+         --------------------------------------------------
+
+

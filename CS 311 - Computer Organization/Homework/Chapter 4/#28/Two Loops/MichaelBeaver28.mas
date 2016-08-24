@@ -1,0 +1,42 @@
+/Michael Beaver
+/#28: A X B + C X D => (A X B) + (C X D) by PEMDAS
+/Assuming A = 5, B = 2, C = 8, D = 3	
+	ORG	100
+Start,	LOAD	B	/Load value of B
+	STORE	Num	/Store B into Num
+	LOAD	Num	/Load Num (B) as loop counter
+	SUBT	One	/Decrement
+	STORE	Ctr	/Store this value into loop counter
+Loop1,	LOAD	Prod1	/Load value of Prod1 into AC
+	ADD	A	/Add A to Prod1
+	STORE	Prod1	/Store product
+	LOAD	Ctr	/Load counter
+	SUBT	One	/Decrement
+	STORE	Ctr	/Store loop counter
+	SKIPCOND 000	/If loop counter < 0, exit loop
+	JUMP	Loop1	/Jump to top of Loop1
+	LOAD	D	/Load value of D
+	STORE	Num	/Store D into Num
+	LOAD	Num	/Load Num (D) as loop counter
+	SUBT	One	/Decrement
+	STORE	Ctr	/Store this value into loop counter
+Loop2,	LOAD	Prod2	/Load value of Prod2 into AC
+	ADD	C	/Add C to Prod2
+	STORE	Prod2	/Store the product
+	LOAD	Ctr	/Load loop counter
+	SUBT	One	/Decrement
+	STORE	Ctr	/Store loop counter
+	SKIPCOND 000	/If loop counter < 0, exit loop
+	JUMP	Loop2	/Jump to top of Loop2
+	LOAD	Prod1	/Load product A X B
+	ADD	Prod2	/Add product C X D => AC holds A X B + C X D
+	HALT
+Num,	DEC	0
+Prod1,	DEC	0
+Prod2,	DEC	0
+Ctr,	HEX	0
+One,	DEC	1
+A,	DEC	5
+B,	DEC	2
+C,	DEC	8
+D,	DEC	3

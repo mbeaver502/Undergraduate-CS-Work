@@ -1,0 +1,85 @@
+     Assembly listing for: MichaelBeaver4.mas
+                Assembled: Wed Nov 06 15:39:25 CST 2013
+
+         |                          /	Michael Beaver
+         |                          /	CS 311 - Fall 2013
+         |                          /
+         |                          /	This program calculates the sum 12 + 22 + 32 + . . . + N2, where
+         |                          /	the user specifies N. The result of the summation is stored in
+         |                          /	Sum, which is printed to the output region.
+         |                          /
+         |                          /
+         |         ORG 100           
+100 5000 |  Start  INPUT             
+101 2116 |         STORE N           
+102 8800 |         SKIPCOND 800     /If N <= 0, skip summation altogether
+103 9113 |         JUMP End          
+104 4118 |         SUBT One          
+105 211C |         STORE Ctr1        
+         |                          /
+106 011E |  SLoop  JNS Mult         /Turn each number A in [1..N] into A2: (A x 10 + 2)
+107 111A |         LOAD Prod         
+108 3119 |         ADD Two           
+109 311B |         ADD Sum          /Update running sum
+10A 211B |         STORE Sum         
+10B A000 |         CLEAR            /Zero-out the product
+10C 211A |         STORE Prod        
+10D 111C |         LOAD Ctr1         
+10E 2116 |         STORE N           
+10F 4118 |         SUBT One          
+110 211C |         STORE Ctr1        
+111 8000 |         SKIPCOND 000      
+112 9106 |         JUMP SLoop        
+         |                          /
+113 111B |  End    LOAD Sum          
+114 6000 |         OUTPUT            
+115 7000 |         HALT              
+         |                          /
+116 0000 |  N      DEC 0             
+117 000A |  Ten    DEC 10            
+118 0001 |  One    DEC 1             
+119 0002 |  Two    DEC 2             
+11A 0000 |  Prod   DEC 0             
+11B 0000 |  Sum    DEC 0             
+11C 0000 |  Ctr1   DEC 0             
+11D 0000 |  Ctr2   DEC 0             
+         |                          /
+         |                          /	Mult multiplies a positive integer value by 10.
+         |                          /
+11E 0000 |  Mult   HEX 0             
+11F 1117 |         LOAD Ten          
+120 4118 |         SUBT One          
+121 211D |         STORE Ctr2        
+122 111A |  MLoop  LOAD Prod        /Multiply by using repetitive addition
+123 3116 |         ADD N             
+124 211A |         STORE Prod        
+125 111D |         LOAD Ctr2         
+126 4118 |         SUBT One          
+127 211D |         STORE Ctr2        
+128 8000 |         SKIPCOND 000      
+129 9122 |         JUMP MLoop        
+12A C11E |         JUMPI Mult       /Return to caller
+         |         END               
+
+Assembly successful.
+
+         SYMBOL TABLE
+         --------------------------------------------------
+          Symbol | Defined | References 
+         --------+---------+-------------------------------
+          Ctr1   |   11C   | 105, 10D, 110
+          Ctr2   |   11D   | 121, 125, 127
+          End    |   113   | 103
+          MLoop  |   122   | 129
+          Mult   |   11E   | 106, 12A
+          N      |   116   | 101, 10E, 123
+          One    |   118   | 104, 10F, 120, 126
+          Prod   |   11A   | 107, 10C, 122, 124
+          SLoop  |   106   | 112
+          Start  |   100   | 
+          Sum    |   11B   | 109, 10A, 113
+          Ten    |   117   | 11F
+          Two    |   119   | 108
+         --------------------------------------------------
+
+

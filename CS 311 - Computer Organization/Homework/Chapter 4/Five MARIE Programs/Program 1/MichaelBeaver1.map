@@ -1,0 +1,38 @@
+ -----------------
+ Symbol | Location
+ -------+---------
+ Base   |   141
+ Btween |   115
+ Ctr1   |   148
+ Ctr2   |   149
+ DEnd   |   185
+ DLoop  |   17F
+ Div2   |   17C
+ ELoop1 |   120
+ ELoop2 |   12A
+ EOne   |   13B
+ EZero  |   138
+ End    |   13E
+ EvnExp |   136
+ Expnt  |   142
+ GetAbs |   16C
+ GetExp |   107
+ GoZero |   170
+ Here   |   10D
+ MLoop  |   150
+ MNEnd  |   169
+ MulNeg |   15B
+ Mult   |   14C
+ NLoop  |   161
+ NegBs  |   127
+ OddExp |   135
+ One    |   14A
+ Result |   143
+ Start  |   100
+ Temp   |   144
+ Temp2  |   145
+ Temp3  |   146
+ Temp4  |   147
+ There  |   118
+ Two    |   14B
+

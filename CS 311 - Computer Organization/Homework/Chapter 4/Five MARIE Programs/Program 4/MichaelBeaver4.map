@@ -1,0 +1,17 @@
+ -----------------
+ Symbol | Location
+ -------+---------
+ Ctr1   |   11C
+ Ctr2   |   11D
+ End    |   113
+ MLoop  |   122
+ Mult   |   11E
+ N      |   116
+ One    |   118
+ Prod   |   11A
+ SLoop  |   106
+ Start  |   100
+ Sum    |   11B
+ Ten    |   117
+ Two    |   119
+

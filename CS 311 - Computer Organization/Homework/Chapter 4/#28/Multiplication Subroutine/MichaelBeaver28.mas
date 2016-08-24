@@ -1,0 +1,71 @@
+/
+/Michael Beaver
+/CS 311 - Fall 2013
+/p. 264, #28: A X B + C X D => (A X B) + (C X D) by PEMDAS
+/The final answer is located in the Accumulator.
+/Assuming A = 5, B = 2, C = 8, D = 3	
+/Multiplication is performed by a subroutine.
+/
+	ORG	100
+/
+/ Calculate A X B
+/
+Start,	LOAD	B	/Load value of B
+	STORE	TempN	/Store B into TempN
+	LOAD	A	/Load value of A
+	STORE	TempM	/Store A to temp for multiplication
+	LOAD	Prod1	/Load value of Prod1
+	STORE	TempQ	/Store Prod1 to temp for multiplication
+	JNS	Mult	/Perform multiplication
+	LOAD	TempQ	/Load product of multiplication
+	STORE	Prod1	/Store to Prod1
+/	
+/ Calculate C X D
+/
+	LOAD	D	/Load value of D
+	STORE	TempN	/Store D into TempN
+	LOAD	C	/Load value of C
+	STORE	TempM	/Store C to temp for multiplication
+	LOAD	Prod2	/Load value of Prod2
+	STORE	TempQ	/Store Prod2 to temp for multiplication
+	JNS	Mult	/Perform multiplication
+	LOAD	TempQ	/Load product of multiplication
+	STORE	Prod2	/Store to Prod2
+/
+/ Calculate A X B + C X D, or (A X B) + (C X D)
+/
+	LOAD	Prod1	/Load product A X B
+	ADD	Prod2	/Add product C X D => AC holds A X B + C X D
+	HALT
+/
+/ Memory declarations
+/
+TempN,	DEC	0	/Temp multiplier
+TempM,	DEC	0	/Temp multiplier
+TempQ,	DEC	0	/Temp quotient
+Prod1,	DEC	0	/Product A X B
+Prod2,	DEC	0	/Product C X D
+Ctr,	DEC	0	/Loop counter
+One,	DEC	1	
+A,	DEC	5
+B,	DEC	2
+C,	DEC	8
+D,	DEC	3
+/
+/ Multiplication Subroutine:
+/ M X N is defined as M + M, N-times
+/
+Mult,	HEX	0	/Store return address to caller
+	LOAD	TempN	/Load TempN as loop counter
+	SUBT	One	/Decrement Counter
+	STORE	Ctr	/Store this value into loop counter
+Loop,	LOAD	TempQ	/Load value of TempQ into AC
+	ADD	TempM	/Add TempM to TempQ
+	STORE	TempQ	/Store product
+	LOAD	Ctr	/Load counter
+	SUBT	One	/Decrement Counter
+	STORE	Ctr	/Store loop counter
+	SKIPCOND 000	/If loop counter < 0, exit loop
+	JUMP	Loop	/Jump to top of Loop
+	JUMPI	Mult	/Return to caller
+	END

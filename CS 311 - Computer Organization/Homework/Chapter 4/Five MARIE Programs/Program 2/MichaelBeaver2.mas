@@ -1,0 +1,35 @@
+/	Michael Beaver
+/	CS 311 - Fall 2013
+/
+/	This program sums numbers 1 + 2 + 3 + . . . + N, where the
+/	user specifies N. The result is stored in Sum, which is
+/	printed to the output region.
+/
+/
+	ORG	100
+	INPUT
+	STORE	N
+	SKIPCOND 800		/Skip the summation if N <= 0
+	JUMP	End
+/
+Loop,	LOAD	Ctr		/Perform summation
+	ADD	One
+	STORE	Ctr
+	CLEAR
+	LOAD	Sum
+	ADD 	Ctr
+	STORE	Sum
+	LOAD	N
+	SUBT	Ctr
+	SKIPCOND 400
+	JUMP	Loop
+/
+End,	LOAD	Sum
+	OUTPUT
+	HALT
+/
+/
+N,	DEC	0
+Ctr,	DEC	0
+Sum,	DEC	0
+One,	DEC	1
