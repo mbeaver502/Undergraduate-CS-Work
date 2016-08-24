@@ -1,0 +1,142 @@
+         TITLE 'PROGRAM PROLOGUE'
+**********************************************************************
+*  MICHAEL BEAVER                                                    *
+*  CS 310, SPRING 2013	                                   *
+*  PROGRAM 4                                                         *
+*  DUE: APRIL 3, 2013                                                *
+*			                                   *
+*  DESCRIPTION:                                                      *
+*    
+*                                                                    *
+*  INTERNAL SUBROUTINES:                                             *
+*    
+*                                                                    *
+*  REGISTER KEY:                                                     *
+*    
+**********************************************************************
+	TITLE 'MAIN PROGRAM'
+MBPROG4  START
+	STM	14,12,12(13)	   	BEGINNING HOUSEKEEPING
+	BALR	12,0
+	USING	SAVING,12
+SAVING	ST	13,SAVEAREA+4
+	LA	13,SAVEAREA
+	SPACE 2
+*
+* 
+*
+         BAL   11,READDATA
+*
+*
+*
+	SPACE 2
+	L	13,SAVEAREA+4	   	ENDING HOUSEKEEPING
+	LM	14,12,12(13)
+	BR	14
+	SPACE 2 
+SAVEAREA	DS	18F
+REGSAVE	DS	16F
+CARD	DS	CL50
+CARRIAGE	DC	C' '
+OUTLINE	DS	CL50
+	TITLE 'NAME LINE TEST'
+READDATA STM   0,15,REGSAVE
+READTOP  XREAD	CARD,50
+         BC    B'0100',READEND
+*
+* LAST, FIRST MI.
+*
+	BAL	11,CASCBLNK
+         LA    2,CARD
+         BAL   11,FINDBLNK
+         LR    6,2                      FIRST NAME START @ REG6
+         LA	7,1(2)                   MIDDLE INITIAL @ REG7
+	LR	2,7
+	BAL   11,FINDBLNK
+         LA    8,1(2)                   LAST NAME START @ REG8
+         LR    2,8
+	BAL	11,FINDBLNK
+	LR	9,2		 FINAL LETTER IN LAST NAME
+	LA	2,1                      STEP SIZE
+	LR	3,9                      TERMINAL VALUE
+	BCTR	3,0
+	LA	4,OUTLINE
+TEST	MVC	0(1,4),0(8)             FIRST NAME
+	LA	4,1(4)
+	BXLE  8,2,TEST
+         MVI   0(4),C','
+	MVI	1(4),C' '
+	LA	4,2(4)
+	LA	8,CARD
+	LR	3,6
+TEST2	MVC	0(1,4),0(8)             MIDDLE INITIAL
+	LA	4,1(4)
+	BXLE  8,2,TEST2
+	MVI	0(4),C' '
+         MVC   0(1,4),0(7)
+	MVI   1(4),C'.'
+	XPRNT CARRIAGE,51
+*
+* STREET ADDRESS
+*
+	BAL	11,CASCBLNK
+         XREAD OUTLINE,50
+         XPRNT CARRIAGE,51
+*
+* CITY, ST  ZIP
+*
+         BAL	11,CASCBLNK
+	XREAD CARD,50		GET CITY
+	LA	4,CARD+50
+	L	2,=F'-1'
+	LA	3,CARD-1	
+TEST3    CLI   0(4),C' '
+         BC    B'0010',NOBLANK
+         BXH   4,2,TEST3
+NOBLANK  LR	3,4
+	LA	4,CARD
+	LA	2,1
+	LA	5,OUTLINE
+TEST4    MVC   0(1,5),0(4)
+	LA	5,1(5)
+	BXLE	4,2,TEST4
+	XREAD	CARD,50		GET STATE
+	MVI	0(5),C','
+	MVC   2(2,5),CARD
+	XREAD	CARD,50		GET ZIP
+	MVC	6(5,5),CARD
+	XPRNT	CARRIAGE,51
+*
+* 3 BLANK LINE SEPARATOR
+*
+         XPRNT CARRIAGE,1
+	XPRNT CARRIAGE,1
+         XPRNT CARRIAGE,1 
+	B     READTOP
+READEND	LM    0,15,REGSAVE
+         BR    11
+	TITLE 'FIND BLANK'
+FINDBLNK STM   3,1,REGSAVE
+SRCHTOP  CLI   0(2),C' '
+         BC    B'1000',FOUND
+         LA    2,1(2)
+         B     SRCHTOP
+FOUND    LM    3,1,REGSAVE
+         BR    11
+         TITLE 'FIRST NAME'
+FRSTNAME LA    2,CARD
+         BAL   11,FINDBLNK
+         LR    3,2                     TERMINAL VALUE
+         LA    2,1                     STEP SIZE
+         LA    4,CARD                  SOURCE
+         LA    5,OUTLINE               DESTINATION
+TOPCOPY  MVC   0(1,5),0(4)
+         LA    5,1(5)
+         BXLE  4,2,TOPCOPY
+         BR    11
+CASCBLNK MVI   OUTLINE,C' '
+         MVC   OUTLINE+1(49),OUTLINE
+	BR    11
+	END	MBPROG4
+$ENTRY DATA2.TXT
+

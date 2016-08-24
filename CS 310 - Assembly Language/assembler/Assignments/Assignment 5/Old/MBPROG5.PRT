@@ -1,0 +1,474 @@
+
+ASSIST/I Version 2.03, Copyright 1984, BDM Software.                          GRADE RUN FOR: 
+
+
+PROGRAM PROLOGUE                                                                                                            PAGE 1
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                      2 **********************************************************************
+                                      3 *  MICHAEL BEAVER                                                    *
+                                      4 *  CS 310, SPRING 2013                                               *
+                                      5 *  PROGRAM 5                                                         *
+                                      6 *  DUE: APRIL 17, 2013                                               *
+                                      7 *                                                                    *
+                                      8 *  DESCRIPTION:                                                      *
+                                      9 *
+                                     10 *                                                                    *
+                                     11 *  INTERNAL SUBROUTINES:                                             *
+                                     12 *
+                                     13 **********************************************************************
+
+MAIN PROGRAM                                                                                                                PAGE 2
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                     15 **********************************************************************
+                                     16 *  REGISTER KEY:                                                     *
+                                     17 *
+                                     18 **********************************************************************
+000000                               19 MBPROG5  START
+000000 90EC D00C            0000C    20          STM   14,12,12(13)              BEGINNING HOUSEKEEPING
+000004 05C0                          21          BALR  12,0
+000006                               22          USING SAVING,12
+000006 50D0 C02A            00030    23 SAVING   ST    13,SAVEAREA+4
+00000A 41D0 C026            0002C    24          LA    13,SAVEAREA
+
+
+                                     26 *
+                                     27 * STUFF GOES HERE
+                                     28 *
+00000E E020 C13A 0034 00140          29          XPRNT HEADER1,52
+000014 E020 C16E 0034 00174          30          XPRNT HEADER2,52
+
+00001A 4590 C3CC            003D2    32          BAL   9,INITMEM
+00001E 45B0 C342            00348    33          BAL   11,READDATA
+                                     34 *
+                                     35 *
+                                     36 *
+
+
+000022 58D0 C02A            00030    38          L     13,SAVEAREA+4             ENDING HOUSEKEEPING
+000026 98EC D00C            0000C    39          LM    14,12,12(13)
+00002A 07FE                          40          BR    14
+
+
+00002C                               42 SAVEAREA DS    18F
+000074                               43 REGSAVE  DS    16F
+0000B4                               44 TRANCODE DS    CL1
+0000B5                               45 NUMDEP   DS    PL2
+0000B7                               46 NUMWDRWL DS    PL2
+0000B9                               47 TOTALDEP DS    PL6
+0000BF                               48 TOTALWDR DS    PL6
+0000C5                               49 CURRBAL  DS    PL6
+0000CB                               50 MINBAL   DS    PL6
+0000D1                               51 RATE     DS    PL2
+0000D3                               52 PRODUCT  DS    PL8
+0000DB                               53 DIVISION DS    0PL8
+0000DB                               54 QUOTIENT DS    PL5
+0000E0                               55 REMAINDR DS    PL3
+0000E3                               56 TEMP     DS    PL5
+0000E8                               57 CARD     DS    CL10
+0000F2 40                            58 CARRIAGE DC    C' '
+0000F3                               59 OUTLINE  DS    XL17
+000104                               60 OUTLINE2 DS    XL13
+000111                               61 OUTLINE3 DS    XL4
+000115                               62 OUTLINE4 DS    XL5
+00011A 402020206B202020              63 PATTERN  DC    X'402020206B2020206B2021204B202060'
+00012A 40206B2020206B20              64 PATTERN2 DC    X'40206B2020206B2021204B2020'
+
+MAIN PROGRAM                                                                                                                PAGE 3
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000137 40202120                      65 PATTERN3 DC    X'40202120'
+00013B 40214B2020                    66 PATTERN4 DC    X'40214B2020'
+000140 4040404040404040              67 HEADER1  DC    C'              SAVINGS  ACCOUNT  REPORT              '
+000174 40E3D9C1D54B40C3              68 HEADER2  DC    C' TRAN. CODE     AMOUNT     RATE     CURRENT BALANCE '
+0001A8 40404040404040D5              69 HEADER3  DC    C'       NUMBER OF DEPOSITS  =                        '
+0001DC 40E3D6E3C1D340C1              70 HEADER4  DC    C' TOTAL AMOUNT OF DEPOSITS  =                        '
+000210 4040C1E5C74B40C1              71 HEADER5  DC    C'  AVG. AMOUNT PER DEPOSIT  =                        '
+000244 40404040404040D5              72 HEADER6  DC    C'       NUMBER OF WITHDRAWALS  =                     '
+000278 40E3D6E3C1D340C1              73 HEADER7  DC    C' TOTAL AMOUNT OF WITHDRAWALS  =                     '
+0002AC 4040C1E5C74B40C1              74 HEADER8  DC    C'  AVG. AMOUNT PER WITHDRAWAL  =                     '
+0002E0 4040404040404040              75 HEADER9  DC    C'             CURRENT BALANCE  =                     '
+000314                               76 LINE     DS    CL52
+
+                                                                                                                            PAGE 4
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                     78 **********************************************************************
+                                     79 *  REGISTER KEY:                                                     *
+                                     80 *
+                                     81 **********************************************************************
+000348 900F C06E            00074    82 READDATA STM   0,15,REGSAVE
+
+00034C E000 C0E2 000A 000E8          84 READTOP  XREAD CARD,10                  READ UNTIL EOF
+000352 4740 C3C2            003C8    85          BC    B'0100',READEND
+
+
+                                     87 *
+                                     88 * STUFF GOES HERE
+                                     89 *
+000356 D210 C0ED C114 000F3 0011A    90          MVC   OUTLINE(17),PATTERN
+00035C D20C C0FE C124 00104 0012A    91          MVC   OUTLINE2(13),PATTERN2
+000362 D203 C10B C131 00111 00137    92          MVC   OUTLINE3(4),PATTERN3
+000368 9240 C30E      00314          93          MVI   LINE,C' '
+00036C D232 C30F C30E 00315 00314    94          MVC   LINE+1(51),LINE
+
+000372 D200 C0AE C0E2 000B4 000E8    96          MVC   TRANCODE(1),CARD
+000378 D200 C313 C0AE 00319 000B4    97          MVC   LINE+5(1),TRANCODE
+
+00037E 95F0 C0AE      000B4          99          CLI   TRANCODE,C'0'             SET INITIAL BALANCE
+000382 4770 C388            0038E   100          BC    B'0111',NOTINIT
+000386 45A0 C3FE            00404   101          BAL   10,INITBAL
+00038A 47F0 C3B8            003BE   102          B     PRNTLINE
+
+00038E 95F1 C0AE      000B4         104 NOTINIT  CLI   TRANCODE,C'1'             MAKE A DEPOSIT
+000392 4770 C398            0039E   105          BC    B'0111',NOTDEP
+000396 45A0 C428            0042E   106          BAL   10,DEPOSIT
+00039A 47F0 C3B8            003BE   107          B     PRNTLINE
+
+00039E 95F2 C0AE      000B4         109 NOTDEP   CLI   TRANCODE,C'2'             MAKE A WITHDRAWAL
+0003A2 4770 C3A8            003AE   110          BC    B'0111',NOTWDRWL
+0003A6 45A0 C466            0046C   111          BAL   10,WITHDRAW
+0003AA 47F0 C3B8            003BE   112          B     PRNTLINE
+
+0003AE 95F3 C0AE      000B4         114 NOTWDRWL CLI   TRANCODE,C'3'             CALCULATE INTEREST
+0003B2 4770 C3BE            003C4   115          BC    B'0111',READBOTM
+0003B6 45A0 C4C8            004CE   116          BAL   10,INTEREST
+0003BA 47F0 C3B8            003BE   117          B     PRNTLINE
+
+0003BE E020 C30E 0034 00314         119 PRNTLINE XPRNT LINE,52                   PRINT RESULTS
+                                    120 *
+                                    121 *
+                                    122 *
+
+
+0003C4 47F0 C346            0034C   124 READBOTM B     READTOP
+
+
+0003C8 45A0 C550            00556   126 READEND  BAL   10,PRNTSTAT
+
+
+                                                                                                                            PAGE 5
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+
+0003CC 980F C06E            00074   128          LM    0,15,REGSAVE
+0003D0 07FB                         129          BR    11
+
+INITIALIZE MEMORY                                                                                                           PAGE 6
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    131 *********************************************************************
+                                    132 *  REGISTER KEY:                                                    *
+                                    133 *
+                                    134 *********************************************************************
+0003D2 F810 C0AF C746 000B5 0074C   135 INITMEM  ZAP   NUMDEP(2),=P'0'
+0003D8 F810 C0B1 C746 000B7 0074C   136          ZAP   NUMWDRWL(2),=P'0'
+0003DE F850 C0B3 C746 000B9 0074C   137          ZAP   TOTALDEP(6),=P'0'
+0003E4 F850 C0B9 C746 000BF 0074C   138          ZAP   TOTALWDR(6),=P'0'
+0003EA F850 C0BF C746 000C5 0074C   139          ZAP   CURRBAL(6),=P'0'
+0003F0 F850 C0C5 C746 000CB 0074C   140          ZAP   MINBAL(6),=P'0'
+0003F6 F850 C0D5 C746 000DB 0074C   141          ZAP   DIVISION(6),=P'0'
+0003FC F840 C0DD C746 000E3 0074C   142          ZAP   TEMP(5),=P'0'
+000402 07F9                         143          BR    9
+
+INITIAL CARD BALANCE                                                                                                        PAGE 7
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    145 *********************************************************************
+                                    146 *  REGISTER KEY:                                                    *
+                                    147 *
+                                    148 *********************************************************************
+000404 4590 C3CC            003D2   149 INITBAL  BAL   9,INITMEM                 FIRST, INITIALIZE MEMORY
+000408 F248 C0DD C0E3 000E3 000E9   150          PACK  TEMP(5),CARD+1(9)
+00040E F854 C0BF C0DD 000C5 000E3   151          ZAP   CURRBAL(6),TEMP(5)
+000414 F855 C0C5 C0BF 000CB 000C5   152          ZAP   MINBAL(6),CURRBAL(6)
+00041A DE10 C0ED C0BF 000F3 000C5   153          ED    OUTLINE(17),CURRBAL
+000420 D210 C318 C0ED 0031E 000F3   154          MVC   LINE+10(17),OUTLINE
+000426 D210 C331 C0ED 00337 000F3   155          MVC   LINE+35(17),OUTLINE
+00042C 07FA                         156          BR    10
+
+DEPOSIT CARD                                                                                                                PAGE 8
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    158 *********************************************************************
+                                    159 *  REGISTER KEY:                                                    *
+                                    160 *
+                                    161 *********************************************************************
+00042E F248 C0DD C0E3 000E3 000E9   162 DEPOSIT  PACK  TEMP(5),CARD+1(9)
+000434 FA54 C0BF C0DD 000C5 000E3   163          AP    CURRBAL(6),TEMP(5)
+00043A D20C C0FE C124 00104 0012A   164          MVC   OUTLINE2(13),PATTERN2
+000440 D210 C0ED C114 000F3 0011A   165          MVC   OUTLINE(17),PATTERN
+000446 DE0C C0FE C0DD 00104 000E3   166          ED    OUTLINE2(13),TEMP
+00044C DE10 C0ED C0BF 000F3 000C5   167          ED    OUTLINE(17),CURRBAL
+000452 D20C C31A C0FE 00320 00104   168          MVC   LINE+12(13),OUTLINE2
+000458 D210 C331 C0ED 00337 000F3   169          MVC   LINE+35(17),OUTLINE
+00045E FA10 C0AF C747 000B5 0074D   170          AP    NUMDEP(2),=P'1'
+000464 FA54 C0B3 C0DD 000B9 000E3   171          AP    TOTALDEP(6),TEMP(5)
+00046A 07FA                         172          BR    10
+
+WITHDRAWAL CARD                                                                                                             PAGE 9
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    174 *********************************************************************
+                                    175 *  REGISTER KEY:                                                *
+                                    176 *
+                                    177 *********************************************************************
+00046C F950 C0BF C746 000C5 0074C   178 WITHDRAW CP    CURRBAL(6),=P'0'
+000472 47D0 C4B0            004B6   179          BC    B'1101',WDRAWERR          DO NOT W'DRAW FROM <= 0 BAL
+000476 F248 C0DD C0E3 000E3 000E9   180          PACK  TEMP(5),CARD+1(9)
+00047C FB54 C0BF C0DD 000C5 000E3   181          SP    CURRBAL(6),TEMP(5)
+000482 D210 C0ED C114 000F3 0011A   182          MVC   OUTLINE(17),PATTERN
+000488 D20C C0FE C124 00104 0012A   183          MVC   OUTLINE2(13),PATTERN2
+00048E DE10 C0ED C0BF 000F3 000C5   184          ED    OUTLINE(17),CURRBAL
+000494 DE0C C0FE C0DD 00104 000E3   185          ED    OUTLINE2(13),TEMP
+00049A D20C C31A C0FE 00320 00104   186          MVC   LINE+12(13),OUTLINE2
+0004A0 D210 C331 C0ED 00337 000F3   187          MVC   LINE+35(17),OUTLINE
+0004A6 FA10 C0B1 C747 000B7 0074D   188          AP    NUMWDRWL(2),=P'1'
+0004AC FA54 C0B9 C0DD 000BF 000E3   189          AP    TOTALWDR(6),TEMP(5)
+0004B2 47F0 C4B6            004BC   190          B     SWAPMIN
+0004B6 D213 C31A C6FA 00320 00700   191 WDRAWERR MVC   LINE+12(20),=C'ERR: INVALID BALANCE'
+0004BC F955 C0C5 C0BF 000CB 000C5   192 SWAPMIN  CP    MINBAL(6),CURRBAL(6)       CHANGE MINIMUM BALANCE
+0004C2 47D0 C4C6            004CC   193          BC    B'1101',ENDWDRWL
+0004C6 F855 C0C5 C0BF 000CB 000C5   194          ZAP   MINBAL(6),CURRBAL(6)
+0004CC 07FA                         195 ENDWDRWL BR    10
+
+INTEREST CALCULATION CARD                                                                                                   PAGE 10
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    197 *********************************************************************
+                                    198 *  REGISTER KEY:                                                *
+                                    199 *
+                                    200 *********************************************************************
+0004CE F950 C0C5 C746 000CB 0074C   201 INTEREST CP    MINBAL(6),=P'0'
+0004D4 47D0 C538            0053E   202          BC    B'1101',INTERR1       NEGATIVE MINIMUM BALANCE
+0004D8 F212 C0CB C0E3 000D1 000E9   203          PACK  RATE(2),CARD+1(3)
+0004DE F910 C0CB C746 000D1 0074C   204          CP    RATE(2),=P'0'
+0004E4 47D0 C542            00548   205          BC    B'1101',INTERR2
+0004E8 D204 C10F C135 00115 0013B   206          MVC   OUTLINE4(5),PATTERN4
+0004EE DE04 C10F C0CB 00115 000D1   207          ED    OUTLINE4(5),RATE
+0004F4 D204 C328 C10F 0032E 00115   208          MVC   LINE+26(5),OUTLINE4
+0004FA F875 C0CD C0C5 000D3 000CB   209          ZAP   PRODUCT(8),MINBAL(6)
+000500 FC71 C0CD C0CB 000D3 000D1   210          MP    PRODUCT(8),RATE(2)
+000506 F877 C0D5 C0CD 000DB 000D3   211          ZAP   DIVISION(8),PRODUCT(8)
+00050C FD72 C0D5 C748 000DB 0074E   212          DP    DIVISION(8),=P'10000'
+000512 F921 C0DA C72A 000E0 00730   213          CP    REMAINDR(3),=P'500'
+000518 4740 C51C            00522   214          BC    B'0100',NOROUND           CHECK FOR ROUNDING CENTS
+00051C FA40 C0D5 C747 000DB 0074D   215          AP    QUOTIENT(5),=P'1'
+000522 FA54 C0BF C0D5 000C5 000DB   216 NOROUND  AP    CURRBAL(6),QUOTIENT(5)
+000528 D210 C0ED C114 000F3 0011A   217          MVC   OUTLINE(17),PATTERN
+00052E DE10 C0ED C0BF 000F3 000C5   218          ED    OUTLINE(17),CURRBAL
+000534 D210 C331 C0ED 00337 000F3   219          MVC   LINE+35(17),OUTLINE
+                                    220 *
+                                    221 *
+                                    222 *
+00053A 47F0 C548            0054E   223          B     ENDINT
+00053E D21B C31A C70E 00320 00714   224 INTERR1  MVC   LINE+12(28),=C'ERR: INVALID MINIMUM BALANCE'
+000544 47F0 C548            0054E   225          B     ENDINT
+000548 D219 C31A C72C 00320 00732   226 INTERR2  MVC   LINE+12(26),=C'ERR: INVALID INTEREST RATE'
+00054E F855 C0C5 C0BF 000CB 000C5   227 ENDINT   ZAP   MINBAL(6),CURRBAL(6)
+000554 07FA                         228          BR    10
+
+PRINT ALL ACCOUNT STATISTICS                                                                                                PAGE 11
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    230 *********************************************************************
+                                    231 *  REGISTER KEY:                                                    *
+                                    232 *
+                                    233 *********************************************************************
+000556 E020 C0EC 0001 000F2         234 PRNTSTAT XPRNT CARRIAGE,1
+00055C E020 C0EC 0001 000F2         235          XPRNT CARRIAGE,1
+
+000562 4590 C592            00598   237          BAL   9,PRNTNDEP                PRINT NUMBER OF DEPOSITS
+000566 4590 C5AC            005B2   238          BAL   9,PRNTTDEP            PRINT TOTAL AMT OF DEPOSITS
+00056A 4590 C5D0            005D6   239          BAL   9,PRNTDAVG            PRINT DEPOSIT AVERAGE
+
+00056E E020 C0EC 0001 000F2         241          XPRNT CARRIAGE,1
+000574 E020 C0EC 0001 000F2         242          XPRNT CARRIAGE,1
+
+00057A 4590 C634            0063A   244          BAL   9,PRNTNWDR                PRINT NUMBER OF W'DRAWALS
+00057E 4590 C64E            00654   245          BAL   9,PRNTTWDR            PRINT TOTAL AMT OF W'DRAWALS
+000582 4590 C672            00678   246          BAL   9,PRNTWAVG            PRINT W'DRAWAL AVERAGE
+
+000586 E020 C0EC 0001 000F2         248          XPRNT CARRIAGE,1
+00058C E020 C0EC 0001 000F2         249          XPRNT CARRIAGE,1
+
+000592 4590 C6D6            006DC   251          BAL   9,PRNTCBAL            PRINT THE CURRENT BALANCE
+
+000596 07FA                         253          BR    10
+
+PRINT NUMBER OF DEPOSITS                                                                                                    PAGE 12
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    255 *********************************************************************
+                                    256 *  REGISTER KEY:                                                    *
+                                    257 *
+                                    258 *********************************************************************
+000598 D203 C10B C131 00111 00137   259 PRNTNDEP MVC   OUTLINE3(4),PATTERN3
+00059E DE03 C10B C0AF 00111 000B5   260          ED    OUTLINE3(4),NUMDEP
+0005A4 D203 C1CB C10B 001D1 00111   261          MVC   HEADER3+41(4),OUTLINE3
+0005AA E020 C1A2 0034 001A8         262          XPRNT HEADER3,52
+0005B0 07F9                         263          BR    9
+
+PRINT TOTAL AMOUNT OF DEPOSITS                                                                                              PAGE 13
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    265 *********************************************************************
+                                    266 *  REGISTER KEY:                                                    *
+                                    267 *
+                                    268 *********************************************************************
+0005B2 D210 C0ED C114 000F3 0011A   269 PRNTTDEP MVC   OUTLINE(17),PATTERN
+0005B8 4110 C0F8            000FE   270          LA    1,OUTLINE+11
+0005BC DF10 C0ED C0B3 000F3 000B9   271          EDMK  OUTLINE(17),TOTALDEP
+0005C2 0610                         272          BCTR  1,0
+0005C4 925B 1000      00000         273          MVI   0(1),C'$'
+0005C8 D210 C1F4 C0ED 001FA 000F3   274          MVC   HEADER4+30(17),OUTLINE
+0005CE E020 C1D6 0034 001DC         275          XPRNT HEADER4,52
+0005D4 07F9                         276          BR    9
+
+PRINT DEPOSIT AVERAGE                                                                                                       PAGE 14
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    278 *********************************************************************
+                                    279 *  REGISTER KEY:                                                *
+                                    280 *
+                                    281 *********************************************************************
+0005D6 F910 C0AF C746 000B5 0074C   282 PRNTDAVG CP    NUMDEP(2),=P'0'
+0005DC 4780 C5EA            005F0   283          BC    B'1000',NODEPDIV
+0005E0 F875 C0D5 C0B3 000DB 000B9   284          ZAP   DIVISION(8),TOTALDEP(6)
+0005E6 FD71 C0D5 C0AF 000DB 000B5   285          DP    DIVISION(8),NUMDEP(2)
+0005EC 47F0 C610            00616   286          B     DNOTZERO
+0005F0 F840 C0D5 C746 000DB 0074C   287 NODEPDIV ZAP   QUOTIENT(5),=P'0'
+0005F6 D20C C0FE C124 00104 0012A   288          MVC   OUTLINE2(13),PATTERN2
+0005FC 4110 C107            0010D   289          LA    1,OUTLINE2+9
+000600 DF0C C0FE C0D5 00104 000DB   290          EDMK  OUTLINE2(13),QUOTIENT
+000606 0610                         291          BCTR  1,0
+000608 925B 1000      00000         292          MVI   0(1),C'$'
+00060C D20C C22A C0FE 00230 00104   293          MVC   HEADER5+32(13),OUTLINE2
+000612 47F0 C62C            00632   294          B     DAVGEND
+000616 D210 C0ED C114 000F3 0011A   295 DNOTZERO MVC   OUTLINE(17),PATTERN
+00061C 4110 C0F8            000FE   296          LA    1,OUTLINE+11
+000620 DF10 C0ED C0D5 000F3 000DB   297          EDMK  OUTLINE(17),QUOTIENT
+000626 0610                         298          BCTR  1,0
+000628 925B 1000      00000         299          MVI   0(1),C'$'
+00062C D210 C228 C0ED 0022E 000F3   300          MVC   HEADER5+30(17),OUTLINE
+000632 E020 C20A 0034 00210         301 DAVGEND  XPRNT HEADER5,52
+000638 07F9                         302          BR    9
+
+PRINT THE NUMBER OF WITHDRAWALS                                                                                             PAGE 15
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    304 *********************************************************************
+                                    305 *  REGISTER KEY:                                                *
+                                    306 *
+                                    307 *********************************************************************
+00063A D203 C10B C131 00111 00137   308 PRNTNWDR MVC   OUTLINE3(4),PATTERN3
+000640 DE03 C10B C0B1 00111 000B7   309          ED    OUTLINE3(4),NUMWDRWL
+000646 D203 C26A C10B 00270 00111   310          MVC   HEADER6+44(4),OUTLINE3
+00064C E020 C23E 0034 00244         311          XPRNT HEADER6,52
+000652 07F9                         312          BR    9
+
+PRINT THE TOTAL AMOUNT OF WITHDRAWALS                                                                                       PAGE 16
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    314 *********************************************************************
+                                    315 *  REGISTER KEY:                                                    *
+                                    316 *
+                                    317 *********************************************************************
+000654 D210 C0ED C114 000F3 0011A   318 PRNTTWDR MVC   OUTLINE(17),PATTERN
+00065A 4110 C0F8            000FE   319          LA    1,OUTLINE+11
+00065E DF10 C0ED C0B9 000F3 000BF   320          EDMK  OUTLINE(17),TOTALWDR
+000664 0610                         321          BCTR  1,0
+000666 925B 1000      00000         322          MVI   0(1),C'$'
+00066A D210 C293 C0ED 00299 000F3   323          MVC   HEADER7+33(17),OUTLINE
+000670 E020 C272 0034 00278         324          XPRNT HEADER7
+000676 07F9                         325          BR    9
+
+PRINT THE WITHDRAWAL AVERAGE                                                                                                PAGE 17
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    327 *********************************************************************
+                                    328 *  REGISTER KEY:                                                    *
+                                    329 *
+                                    330 *********************************************************************
+000678 F910 C0B1 C746 000B7 0074C   331 PRNTWAVG CP    NUMWDRWL(2),=P'0'
+00067E 4780 C68C            00692   332          BC    B'1000',NOWDRDIV
+000682 F875 C0D5 C0B9 000DB 000BF   333          ZAP   DIVISION(8),TOTALWDR(6)
+000688 FD71 C0D5 C0B1 000DB 000B7   334          DP    DIVISION(8),NUMWDRWL(2)
+00068E 47F0 C6B2            006B8   335          B     WNOTZERO
+000692 F840 C0D5 C746 000DB 0074C   336 NOWDRDIV ZAP   QUOTIENT(5),=P'0'
+000698 D20C C0FE C124 00104 0012A   337          MVC   OUTLINE2(13),PATTERN2
+00069E 4110 C107            0010D   338          LA    1,OUTLINE2+9
+0006A2 DF0C C0FE C0D5 00104 000DB   339          EDMK  OUTLINE2(13),QUOTIENT
+0006A8 0610                         340          BCTR  1,0
+0006AA 925B 1000      00000         341          MVI   0(1),C'$'
+0006AE D20C C2C9 C0FE 002CF 00104   342          MVC   HEADER8+35(13),OUTLINE2
+0006B4 47F0 C6CE            006D4   343          B     WAVGEND
+0006B8 D210 C0ED C114 000F3 0011A   344 WNOTZERO MVC   OUTLINE(17),PATTERN
+0006BE 4110 C0F8            000FE   345          LA    1,OUTLINE+11
+0006C2 DF10 C0ED C0D5 000F3 000DB   346          EDMK  OUTLINE(17),QUOTIENT
+0006C8 0610                         347          BCTR  1,0
+0006CA 925B 1000      00000         348          MVI   0(1),C'$'
+0006CE D210 C2C7 C0ED 002CD 000F3   349          MVC   HEADER8+33(17),OUTLINE
+0006D4 E020 C2A6 0034 002AC         350 WAVGEND  XPRNT HEADER8,52
+0006DA 07F9                         351          BR    9
+
+PRINT THE CURRENT BALANCE                                                                                                   PAGE 18
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    353 *********************************************************************
+                                    354 *  REGISTER KEY:                                                    *
+                                    355 *
+                                    356 *********************************************************************
+0006DC D210 C0ED C114 000F3 0011A   357 PRNTCBAL MVC   OUTLINE(17),PATTERN
+0006E2 4110 C0F8            000FE   358          LA    1,OUTLINE+11
+0006E6 DF10 C0ED C0BF 000F3 000C5   359          EDMK  OUTLINE(17),CURRBAL
+0006EC 0610                         360          BCTR  1,0
+0006EE 925B 1000      00000         361          MVI   0(1),C'$'
+0006F2 D210 C2FB C0ED 00301 000F3   362          MVC   HEADER9+33(17),OUTLINE
+0006F8 E020 C2DA 0034 002E0         363          XPRNT HEADER9,52
+0006FE 07F9                         364          BR    9
+                                    365          END   MBPROG5
+000700 C5D9D97A40C9D5E5                          =C'ERR: INVALID BALANCE'
+000714 C5D9D97A40C9D5E5                          =C'ERR: INVALID MINIMUM BALANCE'
+000730 500C                                      =P'500'
+000732 C5D9D97A40C9D5E5                          =C'ERR: INVALID INTEREST RATE'
+00074C 0C                                        =P'0'
+00074D 1C                                        =P'1'
+00074E 10000C                                    =P'10000'
+
+***   0 STATEMENTS FLAGGED - 0 WARNINGS, 0 ERRORS
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+             SAVINGS  ACCOUNT  REPORT              
+TRAN. CODE     AMOUNT     RATE     CURRENT BALANCE 
+    0             212.14                   212.14  
+    1             110.00                   322.14  
+    2              42.00                   280.14  
+    3                     4.00             288.63  
+    3                     5.50             304.51  
+    1             252.36                   556.87  
+    2               3.50                   553.37  
+    2              10.00                   543.37  
+    1              20.00                   563.37  
+    3                     2.55             571.14  
+    1              30.00                   601.14  
+    3                     9.00             652.55  
+
+
+      NUMBER OF DEPOSITS  =                4       
+TOTAL AMOUNT OF DEPOSITS  =          $412.36       
+ AVG. AMOUNT PER DEPOSIT  =          $103.09       
+
+
+      NUMBER OF WITHDRAWALS  =                3    
+TOTAL AMOUNT OF WITHDRAWALS  =           $55.50    
+ AVG. AMOUNT PER WITHDRAWAL  =           $18.50    
+
+
+            CURRENT BALANCE  =          $652.55    
+
+*** EXECUTION COMPLETED ***
+

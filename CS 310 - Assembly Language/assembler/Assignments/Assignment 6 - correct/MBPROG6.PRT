@@ -1,0 +1,267 @@
+
+ASSIST/I Version 2.03, Copyright 1984, BDM Software.                          GRADE RUN FOR: 
+
+
+PROGRAM PROLOGUE                                                                                                            PAGE 1
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                      2 **********************************************************************
+                                      3 *  MICHAEL BEAVER                                                    *
+                                      4 *  CS 310, SPRING 2013                                               *
+                                      5 *  PROGRAM 6                                                         *
+                                      6 *  DUE: APRIL 22,2013                                                *
+                                      7 *                                                                    *
+                                      8 *  DESCRIPTION:                                                      *
+                                      9 *    THIS PROGRAM EXPECTS AS INPUT A FILE CONTAINING ANYWHERE BETWEEN*
+                                     10 *    1 AND 30 (INCLUSIVE) DATA LINES. EACH DATA LINE SHOULD CONTAIN  *
+                                     11 *    ONE GRADE (INTEGER) PER LINE. EACH GRADE SHOULD BE BETWEEN      *
+                                     12 *    0 TO 100 (INCLUSIVE). INVALID VALUES ARE IGNORED. THE PROGRAM   *
+                                     13 *    DISPLAYS THE DATA IN THE ORDER IN WHICH IT WAS ORIGINALLY READ. *
+                                     14 *    THEN THE PROGRAM SORTS THE DATA IN DESCENDING ORDER. FINALLY,   *
+                                     15 *    THE PROGRAM PRINTS THE SORTED DATA.                             *
+                                     16 *                                                                    *
+                                     17 *  SUBROUTINES:                                                      *
+                                     18 *    DATAREAD: READS DATA FROM FILE AND STORES INTO DATA TABLE       *
+                                     19 *    PRINTTAB: PRINTS THE DATA TABLE                                 *
+                                     20 *    SORTDATA: SORTS THE DATA IN THE TABLE (DESCENDING ORDER)        *
+                                     21 **********************************************************************
+
+MAIN PROGRAM                                                                                                                PAGE 2
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                     23 **********************************************************************
+                                     24 *  REGISTER KEY:                                                     *
+                                     25 *     REG1: USED TO PASS PARAMETER LIST TO SUBROUTINES               *
+                                     26 *    REG14: USED TO BRANCH TO SUBROUTINES                            *
+                                     27 *    REG15: PROVIDES ADDRESS OF SUBROUTINES TO BE BRANCHED TO        *
+                                     28 **********************************************************************
+000000                               29 MBPROG6  START
+000000 90EC D00C            0000C    30          STM   14,12,12(13)            BEGINNING HOUSEKEEPING
+000004 05C0                          31          BALR  12,0
+000006                               32          USING MAINHERE,12
+000006 50D0 C042            00048    33 MAINHERE ST    13,MAINSAVE+4
+00000A 41D0 C03E            00044    34          LA    13,MAINSAVE
+
+
+00000E 4110 C112            00118    36          LA    1,PARMLIST
+000012 58F0 C122            00128    37          L     15,=V(DATAREAD)         READ DATA FROM FILE INTO TABLE
+000016 05EF                          38          BALR  14,15
+
+000018 4110 C112            00118    40          LA    1,PARMLIST
+00001C 58F0 C126            0012C    41          L     15,=V(PRINTTAB)         PRINT THE TABLE
+000020 05EF                          42          BALR  14,15
+
+000022 4110 C112            00118    44          LA    1,PARMLIST
+000026 58F0 C12A            00130    45          L     15,=V(SORTDATA)         SORT THE DATA IN THE TABLE
+00002A 05EF                          46          BALR  14,15
+
+00002C 4110 C112            00118    48          LA    1,PARMLIST
+000030 58F0 C126            0012C    49          L     15,=V(PRINTTAB)         PRINT THE TABLE--BIZARRE ERROR
+000034 41FF 0000            00000    50          LA    15,0(15)                 IN ASSIST/I IF LA IS NOT USED
+000038 05EF                          51          BALR  14,15
+
+
+00003A 58D0 C042            00048    53          L     13,MAINSAVE+4           ENDING HOUSEKEEPING
+00003E 98EC D00C            0000C    54          LM    14,12,12(13)
+000042 07FE                          55          BR    14
+000044                               56 MAINSAVE DS    18F
+00008C                               57 DATATAB  DS    30F
+000104                               58 LASTVAL  DS    1F
+000108 40                            59 CARRIAGE DC    C' '
+000109                               60 OUTLINE  DS    CL12
+000118 0000008C                      61 PARMLIST DC    A(DATATAB)
+00011C 00000104                      62          DC    A(LASTVAL)
+000120 00000108                      63          DC    A(CARRIAGE)
+                                     64          LTORG
+000128 00000000                                  =V(DATAREAD)
+00012C 00000000                                  =V(PRINTTAB)
+000130 00000000                                  =V(SORTDATA)
+
+DATAREAD: READ DATA INTO TABLE                                                                                              PAGE 3
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                     66 **********************************************************************
+                                     67 *  REGISTER KEY:                                                     *
+                                     68 *     REG1: USED TO OBTAIN PARAMETERS FROM MAIN                      *
+                                     69 *     REG2: LOOP TABLE INDEX POINTER (FOR TRAVERSAL)                 *
+                                     70 *     REG3: DATA GRABBED ON LINE FROM DATA FILE                      *
+                                     71 *     REG4: POINTER TO LAST FILLED SPOT IN TABLE                     *
+                                     72 *     REG5: LOWER GRADE BOUND                                        *
+                                     73 *     REG6: UPPER GRADE BOUND                                        *
+                                     74 *     REG8: LOOP STEP SIZE                                           *
+                                     75 *     REG9: TERMINAL VALUE FOR LOOP                                  *
+                                     76 *    REG14: USED TO RETURN TO CALLER                                 *
+                                     77 **********************************************************************
+000134                               78 DATAREAD CSECT
+000138 90EC D00C            0000C    79          STM   14,12,12(13)            BEGINNING HOUSEKEEPING
+00013C 05C0                          80          BALR  12,0
+00013E                               81          USING READHERE,12
+00013E 50D0 C062            001A0    82 READHERE ST    13,READSAVE+4
+000142 41D0 C05E            0019C    83          LA    13,READSAVE
+
+
+000146 4150 0000            00000    85          LA    5,0
+00014A 4160 0064            00064    86          LA    6,100
+
+00014E 5841 0004            00004    88          L     4,4(1)                  LAST SPOT IN TABLE
+000152 5821 0000            00000    89          L     2,0(1)                  TOP OF THE TABLE
+000156 4180 0004            00004    90          LA    8,4
+00015A 4192 0074            00074    91          LA    9,116(2)                BOTTOM OF THE TABLE
+
+00015E E000 C0A6 0050 001E4          93 READTOP  XREAD CARD,80                 LOOP THRU FILE & STORE DATA
+000164 4740 C04A            00188    94          BC    B'0100',ENDSUB1         EOF=> EXIT LOOP
+000168 5330 C0A6            001E4    95          XDECI 3,CARD
+
+00016C 1935                          97          CR    3,5                     CHECK LOWER BOUND
+00016E 4740 C03A            00178    98          BL    KEEPSLOT
+000172 1936                          99          CR    3,6                     CHECK UPPER BOUND
+000174 47D0 C042            00180   100          BNH   STOREVAL
+000178 5B20 C0FA            00238   101 KEEPSLOT S     2,=F'4'                 DO NOT LEAVE EMPTY TABLE SLOTS
+00017C 47F0 C046            00184   102          B     ENDREAD
+000180 5032 0000            00000   103 STOREVAL ST    3,0(2)
+
+000184 8728 C020            0015E   105 ENDREAD  BXLE  2,8,READTOP
+
+
+000188 5B20 C0FA            00238   107 ENDSUB1  S     2,=F'4'                 LOC OF LAST VALUE IN TABLE
+00018C 5024 0000            00000   108          ST    2,0(4)
+000190 58D0 C062            001A0   109          L     13,READSAVE+4           ENDING HOUSEKEEPING
+000194 98EC D00C            0000C   110          LM    14,12,12(13)
+000198 07FE                         111          BR    14
+00019C                              112 READSAVE DS    18F
+0001E4                              113 CARD     DS    CL80
+                                    114          LTORG
+000238 00000004                                  =F'4'
+
+PRINTTAB: PRINT THE TABLE DATA                                                                                              PAGE 4
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    116 **********************************************************************
+                                    117 *  REGISTER KEY:                                                     *
+                                    118 *     REG1: USED TO GRAB PARAMETERS FROM MAIN                        *
+                                    119 *     REG2: TABLE INDEX POINTER USED IN LOOP TRAVERSAL               *
+                                    120 *     REG3: HOLDS VALUE LOADED FROM TABLE                            *
+                                    121 *     REG8: STEP SIZE FOR LOOP                                       *
+                                    122 *     REG9: TERMINAL VALUE FOR LOOP (ADDR OF LAST VALUE IN TABLE)    *
+                                    123 *    REG14: USED TO BRANCH BACK TO CALLER                            *
+                                    124 **********************************************************************
+00023C                              125 PRINTTAB CSECT
+000240 90EC D00C            0000C   126          STM   14,12,12(13)            BEGINNING HOUSEKEEPING
+000244 05C0                         127          BALR  12,0
+000246                              128          USING PRNTHERE,12
+000246 50D0 C04A            00290   129 PRNTHERE ST    13,PRNTSAVE+4
+00024A 41D0 C046            0028C   130          LA    13,PRNTSAVE
+
+
+00024E E020 C08E 001A 002D4         132          XPRNT PRNTSTRT,26
+
+000254 41A1 0008            00008   134          LA    10,8(1)                 POINTER TO CARRIAGE CONTROL
+
+000258 5821 0000            00000   136          L     2,0(1)                  TOP OF THE TABLE
+00025C 4180 0004            00004   137          LA    8,4
+000260 5891 0004            00004   138          L     9,4(1)                  LAST VALUE IN THE TABLE
+000264 5899 0000            00000   139          L     9,0(9)
+
+000268 5832 0000            00000   141 TOPPRNT  L     3,0(2)                  LOOP & PRINT THE TABLE DATA
+00026C 523A 0001            00001   142          XDECO 3,1(10)
+000270 E02A 0000 000D 00000         143          XPRNT 0(10),13
+
+000276 8728 C022            00268   145          BXLE  2,8,TOPPRNT
+
+00027A E020 C0A8 001F 002EE         147          XPRNT PRNTEND,31
+
+
+000280 58D0 C04A            00290   149          L     13,PRNTSAVE+4           ENDING HOUSEKEEPING
+000284 98EC D00C            0000C   150          LM    14,12,12(13)
+000288 07FE                         151          BR    14
+00028C                              152 PRNTSAVE DS    18F
+0002D4 F1D7D9C9D5E3C9D5             153 PRNTSTRT DC    C'1PRINTING DATA FROM TABLE:'
+0002EE 40C4D6D5C540D7D9             154 PRNTEND  DC    C' DONE PRINTING DATA FROM TABLE.'
+                                    155          LTORG
+
+SORTDATA: SORT THE DATA IN THE TABLE IN DESC. ORDER                                                                         PAGE 5
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    157 **********************************************************************
+                                    158 *  REGISTER KEY:                                                     *
+                                    159 *     REG1: USED TO GRAB PARAMETERS FROM MAIN                        *
+                                    160 *     REG3: TEMPORARY STORAGE FOR DATA VALUE SWAP IN OUTER LOOP      *
+                                    161 *     REG4: STEP SIZE FOR BOTH INNER AND OUTER LOOPS                 *
+                                    162 *     REG5: LOCATION OF LAST VALUE IN TABLE (LOOP TERMINAL VALUES)   *
+                                    163 *     REG6: VALUE AT INDEX (TO BE COMPARED)                          *
+                                    164 *     REG7: LARGEST FOUND VALUE                                      *
+                                    165 *     REG8: 'TOP OF SEARCH' POINTER                                  *
+                                    166 *     REG9: SEARCH POINTER                                           *
+                                    167 *    REG10: POINTER TO LARGEST FOUND VALUE                           *
+                                    168 *    REG14: USED TO BRANCH BACK TO CALLER                            *
+                                    169 **********************************************************************
+000310                              170 SORTDATA CSECT
+000310 90EC D00C            0000C   171          STM   14,12,12(13)            BEGINNING HOUSEKEEPING
+000314 05C0                         172          BALR  12,0
+000316                              173          USING SORTHERE,12
+000316 50D0 C052            00368   174 SORTHERE ST    13,SORTSAVE+4
+00031A 41D0 C04E            00364   175          LA    13,SORTSAVE
+
+
+00031E 58A1 0000            00000   177          L     10,0(1)                 TOP OF TABLE
+000322 4140 0004            00004   178          LA    4,4
+000326 5851 0004            00004   179          L     5,4(1)                  TERMINAL LOCATION IN TABLE
+00032A 5855 0000            00000   180          L     5,0(5)
+00032E 188A                         181          LR    8,10
+
+
+000330 1898                         183 OLOOPTOP LR    9,8                     RESET SEARCH PTR
+000332 18A8                         184          LR    10,8                    RESET 'LARGEST FOUND' PTR
+000334 587A 0000            00000   185          L     7,0(10)                 SET INITIAL LARGEST VALUE
+
+000338 5869 0000            00000   187 ILOOPTOP L     6,0(9)                  FIND LARGEST VALUE
+00033C 1967                         188          CR    6,7
+00033E 47C0 C030            00346   189          BC    B'1100',ILOOPEND
+000342 1876                         190          LR    7,6                     COPY NEW LARGEST VALUE
+000344 18A9                         191          LR    10,9                    MOVE 'LARGEST FOUND' PTR
+000346 8794 C022            00338   192 ILOOPEND BXLE  9,4,ILOOPTOP
+
+00034A 5838 0000            00000   194 SWAPVALS L     3,0(8)                  ORIGINAL VALUE
+00034E 503A 0000            00000   195          ST    3,0(10)                 SAVE ORIGINAL VALUE TO NEW LOC
+000352 5078 0000            00000   196          ST    7,0(8)                  OVERWRITE WITH LARGEST VALUE
+
+000356 8784 C01A            00330   198 OLOOPEND BXLE  8,4,OLOOPTOP
+
+
+00035A 58D0 C052            00368   200          L     13,SORTSAVE+4           ENDING HOUSEKEEPING
+00035E 98EC D00C            0000C   201          LM    14,12,12(13)
+000362 07FE                         202          BR    14
+000364                              203 SORTSAVE DS    18F
+                                    204          LTORG
+                                    205          END   MBPROG6
+
+***   0 STATEMENTS FLAGGED - 0 WARNINGS, 0 ERRORS
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+PRINTING DATA FROM TABLE:
+          37
+          49
+          92
+          36
+          68
+          18
+         100
+          10
+          79
+DONE PRINTING DATA FROM TABLE.
+PRINTING DATA FROM TABLE:
+         100
+          92
+          79
+          68
+          49
+          37
+          36
+          18
+          10
+DONE PRINTING DATA FROM TABLE.
+
+*** EXECUTION COMPLETED ***
+

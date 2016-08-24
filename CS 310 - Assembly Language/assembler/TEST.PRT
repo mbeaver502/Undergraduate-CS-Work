@@ -1,0 +1,42 @@
+
+ASSIST/I Version 2.03, Copyright 1984, BDM Software.                             
+
+
+                                                                                                                            PAGE 1
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000000                                1 PROG1    START
+000000 90EC D00C            0000C     2          STM   14,12,12(13)
+000004 05C0                           3          BALR  12,0
+000006                                4          USING HERE,12
+000006 50D0 C02E            00034     5 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C02A            00030     6          LA    13,SAVEAREA
+                                      7 *        LA    4,4
+                                      8 *        LA    1,0
+                                      9 *        DR    4,1
+00000E DE03 C078 C072 0007E 00078    10          ED    PATT(4),MYPACK
+000014 E020 C077 0005 0007D          11          XPRNT CC,5
+00001A DE03 C078 C075 0007E 0007B    12          ED    PATT(4),MYPACK2
+000020 E020 C077 0005 0007D          13          XPRNT CC,5
+                                     14 *        MVI   BYTE,C' '
+000026 58D0 C02E            00034    15          L     13,SAVEAREA+4
+00002A 98EC D00C            0000C    16          LM    14,12,12(13)
+00002E 07FE                          17          BR    14
+000030                               18 SAVEAREA DS    18F
+000078 123C                          19 MYPACK   DC    P'123'
+00007A                               20 FFFF     DS    FL1
+00007B 456C                          21 MYPACK2  DC    P'456'
+00007D 40                            22 CC       DC    C' '
+00007E 40202020                      23 PATT     DC    X'40202020'
+                                     24          END   PROG1
+
+***   0 STATEMENTS FLAGGED - 0 WARNINGS, 0 ERRORS
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+ 123
+    
+
+*** EXECUTION COMPLETED ***
+

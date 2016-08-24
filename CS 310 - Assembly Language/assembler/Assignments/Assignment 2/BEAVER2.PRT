@@ -1,0 +1,190 @@
+
+ASSIST/I Version 2.03, Copyright 1984, BDM Software.                          GRADE RUN FOR: 
+
+
+PROGRAM PROLOGUE                                                                                                            PAGE 1
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                      2 ************************************************************************
+                                        *                                                                      *
+                                        *
+                                      3 *  CS 310, SPRING 2013                                                 *
+                                        *  PROGRAM 2                                                           *
+                                        *  DUE: MARCH 11, 2013                                                 *
+                                      4 *                                                                      *
+                                        *  DESCRIPTION:                                                        *
+                                        *    THIS PROGRAM EXPECTS AS INPUT A DATA FILE CONTAINING 20 LINES OF  *
+                                      5 *    INTEGER DATA (ONE INTEGER PER LINE). THE PROGRAM WILL READ IN THE *
+                                        *    DATA FROM THE FILE AND STORE IT INTO A TABLE. NEXT, THE PROGRAM   *
+                                        *    WILL PRINT THE DATA FROM THE TABLE FROM FIRST-TO-LAST (IN THE     *
+                                      6 *    ORDER THE DATA WAS ORIGINALLY READ). NEXT, THE PROGRAM WILL PRINT *
+                                        *    THE DATA FROM THE TABLE FROM LAST-TO-FIRST (IN THE OPPOSITE ORDER *
+                                        *    THE DATA WAS ORIGINALLY READ). FINALLY, THE PROGRAM TERMINATES.   *
+                                      7 *                                                                      *
+                                        *  REGISTER KEY:                                                       *
+                                        *    REG 2: INDEX POINTER FOR SUBROUTINES' LOOP-BASED TABLE OPERATIONS *
+                                      8 *    REG 3: DATA VALUE HOLDER FOR SUBROUTINES' OPERATIONS              *
+                                        *    REG 8: STEP-SIZE HOLDER FOR SUBROUTINES' LOOPS                    *
+                                        *    REG 9: TERMINAL VALUE HOLDER FOR SUBROUTINES' LOOPS               *
+                                      9 *    REG11: SUBROUTINE BRANCHING (BREAD CRUMBS)                        *
+                                        *                                                                      *
+                                        ************************************************************************
+
+MAIN PROGRAM: START AND BEGINNING HOUSEKEEPING                                                                              PAGE 2
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000000                               11 BEAVER2  START
+
+
+000000 90EC D00C            0000C    13          STM   14,12,12(13)             BEGINNING HOUSEKEEPING
+000004 05C0                          14          BALR  12,0
+000006                               15          USING SAVING,12
+000006 50D0 C022            00028    16 SAVING   ST    13,SAVEAREA+4
+00000A 41D0 C01E            00024    17          LA    13,SAVEAREA
+
+MAIN PROGRAM: MAIN BODY                                                                                                     PAGE 3
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+00000E 45B0 C114            0011A    19          BAL   11,DATAREAD         READ IN DATA
+
+
+000012 45B0 C15E            00164    21          BAL   11,PRINTFTL         PRINT TABLE FIRST-TO-LAST
+
+
+000016 45B0 C1D0            001D6    23          BAL   11,PRINTLTF         PRINT TABLE LAST-TO-FIRST
+
+
+
+
+
+MAIN PROGRAM: ENDING HOUSEKEEPING                                                                                           PAGE 4
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+00001A 58D0 C022            00028    26          L     13,SAVEAREA+4            ENDING HOUSEKEEPING
+00001E 98EC D00C            0000C    27          LM    14,12,12(13)
+000022 07FE                          28          BR    14
+
+MAIN PROGRAM: DECLARE STORAGE AND CONSTANTS                                                                                 PAGE 5
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000024                               30 SAVEAREA DS    18F
+00006C                               31 DATATAB  DS    20F
+0000BC                               32 CARD     DS    CL80
+00010C 40                            33 CARRIAGE DC    C' '
+00010D                               34 OUTLINE  DS    CL12
+
+SUBROUTINE: READ DATA INTO TABLE                                                                                            PAGE 6
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+00011A E020 C140 0017 00146          36 DATAREAD XPRNT READSTRT,23
+
+
+000120 4120 C066            0006C    38          LA    2,DATATAB
+000124 4180 0004            00004    39          LA    8,4
+000128 4190 C0B2            000B8    40          LA    9,DATATAB+76
+00012C E000 C0B6 0050 000BC          41 TOPREAD  XREAD CARD,80             LOOP THRU DATA & STORE IN TABLE
+000132 5330 C0B6            000BC    42          XDECI 3,CARD
+000136 5032 0000            00000    43          ST    3,0(2)
+00013A 8728 C126            0012C    44          BXLE  2,8,TOPREAD
+
+
+00013E E020 C157 0006 0015D          46          XPRNT READEND,6
+000144 07FB                          47          BR    11                  END DATAREAD SUBROUTINE
+000146 F1D9C5C1C4C9D5C7              48 READSTRT DC    C'1READING IN DATA . . . '
+00015D 4EC4D6D5C54B                  49 READEND  DC    C'+DONE.'
+
+SUBROUTINE: PRINT TABLE FIRST-TO-LAST                                                                                       PAGE 7
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000164 E020 C18A 0029 00190          51 PRINTFTL XPRNT PFTLSTRT,41
+
+
+00016A 4120 C066            0006C    53          LA    2,DATATAB
+00016E 4180 0004            00004    54          LA    8,4
+000172 4190 C0B2            000B8    55          LA    9,DATATAB+76
+000176 5832 0000            00000    56 TOPPFTL  L     3,0(2)              LOOP & PRINT TABLE FIRST-TO-LAST
+00017A 5230 C107            0010D    57          XDECO 3,OUTLINE
+00017E E020 C106 000D 0010C          58          XPRNT CARRIAGE,13
+000184 8728 C170            00176    59          BXLE  2,8,TOPPFTL
+
+
+000188 E020 C1B3 001D 001B9          61          XPRNT PFTLEND,29
+00018E 07FB                          62          BR    11                  END PRINTFTL SUBROUTINE
+000190 F1D7D9C9D5E3C9D5              63 PFTLSTRT DC    C'1PRINTING TABLE FROM FIRST-TO-LAST VALUE:'
+0001B9 40C4D6D5C540D7D9              64 PFTLEND  DC    C' DONE PRINTING FIRST-TO-LAST.'
+
+SUBROUTINE: PRINT TABLE LAST-TO-FIRST                                                                                       PAGE 8
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+0001D6 E020 C1FC 0029 00202          66 PRINTLTF XPRNT PLTFSTRT,41
+
+
+0001DC 4120 C0B2            000B8    68          LA    2,DATATAB+76
+0001E0 5880 C242            00248    69          L     8,=F'-4'
+0001E4 4190 C062            00068    70          LA    9,DATATAB-4
+0001E8 5832 0000            00000    71 TOPPLTF  L     3,0(2)              LOOP & PRINT TABLE LAST-TO-FIRST
+0001EC 5230 C107            0010D    72          XDECO 3,OUTLINE
+0001F0 E020 C106 000D 0010C          73          XPRNT CARRIAGE,13
+0001F6 8628 C1E2            001E8    74          BXH   2,8,TOPPLTF
+
+
+0001FA E020 C225 001D 0022B          76          XPRNT PLTFEND,29
+000200 07FB                          77          BR    11                  END PRINTLTF SUBROUTINE
+000202 F1D7D9C9D5E3C9D5              78 PLTFSTRT DC    C'1PRINTING TABLE FROM LAST-TO-FIRST VALUE:'
+00022B 40C4D6D5C540D7D9              79 PLTFEND  DC    C' DONE PRINTING LAST-TO-FIRST.'
+                                     80          END   BEAVER2
+000248 FFFFFFFC                                  =F'-4'
+
+***   0 STATEMENTS FLAGGED - 0 WARNINGS, 0 ERRORS
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+READING IN DATA . . . DONE.
+PRINTING TABLE FROM FIRST-TO-LAST VALUE:
+        1620
+       -1946
+        2338
+        1713
+        3538
+       -3050
+        4094
+       -4853
+        3907
+       -2097
+        3368
+        2472
+       -4212
+        -583
+        3084
+         200
+       -4780
+        4315
+        2097
+       -2545
+DONE PRINTING FIRST-TO-LAST.
+PRINTING TABLE FROM LAST-TO-FIRST VALUE:
+       -2545
+        2097
+        4315
+       -4780
+         200
+        3084
+        -583
+       -4212
+        2472
+        3368
+       -2097
+        3907
+       -4853
+        4094
+       -3050
+        3538
+        1713
+        2338
+       -1946
+        1620
+DONE PRINTING LAST-TO-FIRST.
+
+*** EXECUTION COMPLETED ***
+

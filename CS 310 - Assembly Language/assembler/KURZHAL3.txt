@@ -1,0 +1,130 @@
+KURZHAL3 START
+*---------------
+* KYLE KURZHAL
+* 3/5/14
+* ASSIGNMENT #3
+*---------------
+*
+*--------------------------------------------------------------------
+* INPUT: 25 LINES, 2 VALUES EACH LINE.
+*
+* ACTIONS: READ IN VALUES, STORE FIRST VALUE IN FIRST TABLE, STORE
+*          SECOND VALUE IN SECOND TABLE.
+*
+* OUTPUT: PRINT OUT ALL VALUES IN EACH TABLE WITH TABLE HEADERS.
+*--------------------------------------------------------------------
+*
+*--------------------------------------------------------------------
+*                            | REGISTER KEY |
+*                            ****************
+*
+*          REG            VARIABLE
+*         =====          ==========
+*           2   ------->  POINTER TO STORAGE LOOP, TABLE 1 PRINTING
+*                         LOOP, TABLE 2 PRINTING LOOP
+*           3   ------->  STORE LOOP COUNT
+*           6   ------->  STORE EACH NUMBER READ IN/PRINTING OUT
+*           9   ------->  POINTER TO TABLES
+*--------------------------------------------------------------------
+*
+*                       BEGIN HOUSEKEEPING
+*                      --------------------
+         STM   14,12,12(13)
+         BALR  12,0
+         USING HERE,12
+HERE     ST    13,SAVEAREA+4
+         LA    13,SAVEAREA
+*
+*                      ----------------
+*                      | MAIN PROGRAM |
+*                      ----------------
+*
+*                          READ/STORE LOOP VALUES
+*                         ------------------------
+         LA    2,STORLOOP  POINT TO THE STORE TO TABLE LOOP
+         LA    3,25        SET THE LOOP COUNT TO 25
+         LA    9,TABLE1    POINT TO THE FIRST TABLE FOR INSERTIONS
+*
+STORLOOP XREAD CARD,80     TOP OF LOOP, READ IN EACH LINE
+*
+         XDECI 6,CARD      GET FIRST VALUE
+         ST    6,0(9)      STORE VALUE IN TABLE 1
+         XDECI 6,CARD      GET SECOND VALUE
+         ST    6,100(9)    STORE VALUE IN TABLE 2
+         LA    9,4(9)      MOVE THE TABLE POINTER TO THE NEXT INDEX
+         BCTR  3,2         LOOP IF THERE ARE STILL MORE ITERATIONS
+*
+*                           PRINT TABLE 1
+*                          ---------------
+         LA    2,PRNTTBL1   POINT TO THE TOP OF PRINT TABLE 1 LOOP
+         LA    3,25         SET THE LOOP COUNT TO 25
+         LA    9,TABLE1     POINT TO THE BEGINNING OF TABLE 1
+         XPRNT HEADING1,12  PRINT TABLE 1 HEADING
+         XPRNT SUBHEAD1,12  PRINT TABLE 1 SUBHEADING
+*
+PRNTTBL1 L     6,0(9)       BEGIN INNER LOOP, GET TABLE VALUE
+         XDECO 6,PRNTTABL   PREPARE TO PRINT TABLE VALUE
+         XPRNT PRNTTABL,12  PRINT TABLE VALUE
+         LA    9,4(9)       POINT TO THE NEXT VALUE
+         BCTR  3,2          END OF PRINT TABLE 1 LOOP
+*
+*                          PRINT TABLE 2
+*                         ---------------
+         LA    3,25          SET THE LOOP COUNT TO 25
+         LA    2,PRNTTBL2    POINT TO THE TOP OF PRINT TABLE 2 LOOP
+         XPRNT HEADING2,12   PRINT THE HEADING FOR TABLE 2
+         XPRNT SUBHEAD2,12   PRINT THE SUBHEADING FOR TABLE 2
+*
+PRNTTBL2 L     6,0(9)        BEGIN INNER LOOP, GET TABLE VALUE
+         XDECO 6,PRNTTABL    PREPARE TO PRINT TABLE VALUE
+         XPRNT PRNTTABL,12   PRINT TABLE VALUE
+         LA    9,4(9)        POINT TO THE NEXT TABLE VALUE
+         BCTR  3,2           END OF PRINT TABLE 2 LOOP
+*
+*                          ---------------------
+*                          |  END MAIN PROGRAM |
+*                          ---------------------
+*
+*                             END HOUSEKEEPING
+*                            ------------------
+         L     13,SAVEAREA+4
+         LM    14,12,12(13)
+         BR    14
+SAVEAREA DS    18F
+*                       DECLARE STORAGE AND CONSTANTS
+*                      -------------------------------
+CARD     DS    CL80
+PRNTTABL DS    CL12
+TABLE1   DS    25F
+TABLE2   DS    25F
+HEADING1 DC    C'     TABLE 1'
+SUBHEAD1 DC    C'     -------'
+HEADING2 DC    C'0    TABLE 2'
+SUBHEAD2 DC    C'     -------'
+         END   KURZHAL3
+$ENTRY
+1 1
+2 2
+3 10
+4 4
+5 5
+6 6
+7 7
+8 8
+9 9
+10 10
+11 11
+12 12
+13 13
+14 14
+15 15
+16 16
+17 17
+18 18
+19 19
+20 20
+21 21
+22 22
+23 23
+24 24
+25 25

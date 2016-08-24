@@ -1,0 +1,266 @@
+
+ASSIST/I Version 2.03, Copyright 1984, BDM Software.                          GRADE RUN FOR: 
+
+
+PROGRAM PROLOGUE                                                                                                            PAGE 1
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                      2 **********************************************************************
+                                      3 *  MICHAEL BEAVER                                                    *
+                                      4 *  CS 310, SPRING 2013                                               *
+                                      5 *  PROGRAM 4                                                         *
+                                      6 *  DUE: APRIL 3, 2013                                                *
+                                      7 *                                                                    *
+                                      8 *  DESCRIPTION:                                                      *
+                                      9 *    THIS PROGRAM EXPECTS AS INPUT A DATA FILE WITH AN UNKNOWN NUMBER*
+                                     10 *    OF DATA LINES. THE DATA FOLLOWS A SPECIFIC FORMAT WHERE EACH    *
+                                     11 *    GROUP OF FIVE LINES REPRESENTS A PERSON'S DATA: FIRST, MIDDLE,  *
+                                     12 *    AND LAST NAMES; STREET ADDRESS; CITY; STATE ABBREVIATION; AND,  *
+                                     13 *    ZIP CODE. THE PROGRAM CONVERTS THIS 5-LINE FORMAT INTO A 3-LINE *
+                                     14 *    FORMAT AND PRINTS THE RESULT. EACH 3-LINE DATA GROUP IS         *
+                                     15 *    SEPARATED BY A GROUP OF THREE BLANK LINES. THE PROGRAM THEN     *
+                                     16 *    TERMINATES AFTER REACHING THE END OF THE DATA FILE.             *
+                                     17 *                                                                    *
+                                     18 *  INTERNAL SUBROUTINES:                                             *
+                                     19 *    READDATA: MAIN SUBROUTINE CALLS THE FOLLOWING SUBROUTINES TO    *
+                                     20 *              READ IN AND FORMAT DATA FOR OUTPUT                    *
+                                     21 *    MAKENAME: FORMATS THE NAME LINE: LAST, FIRST M.                 *
+                                     22 *     STRADDR: SIMPLY PRINTS THE ADDRESS LINE FROM THE DATA FILE     *
+                                     23 *    CTYSTZIP: FORMATS THE CITY, STATE, AND ZIP CODE: CITY, ST  ZIP  *
+                                     24 *    FINDBLNK: FINDS THE FIRST BLANK IN A MEMORY LOCATION (POINTED   *
+                                     25 *              TO BY REG2)--THE RESULT IS RETURNED IN REG2           *
+                                     26 *    CASCBLNK: CASCADES BLANK CHARACTERS INTO THE OUTLINE MEMORY     *
+                                     27 **********************************************************************
+
+MAIN PROGRAM                                                                                                                PAGE 2
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                     29 **********************************************************************
+                                     30 *  REGISTER KEY:                                                     *
+                                     31 *    REG11: USED TO CALL READDATA SUBROUTINE                         *
+                                     32 **********************************************************************
+000000                               33 MBPROG4  START
+000000 90EC D00C            0000C    34          STM   14,12,12(13)              BEGINNING HOUSEKEEPING
+000004 05C0                          35          BALR  12,0
+000006                               36          USING SAVING,12
+000006 50D0 C01A            00020    37 SAVING   ST    13,SAVEAREA+4
+00000A 41D0 C016            0001C    38          LA    13,SAVEAREA
+
+
+00000E 45B0 C104            0010A    40          BAL   11,READDATA              ALL ACTION BEGINS HERE
+
+
+000012 58D0 C01A            00020    42          L     13,SAVEAREA+4             ENDING HOUSEKEEPING
+000016 98EC D00C            0000C    43          LM    14,12,12(13)
+00001A 07FE                          44          BR    14
+
+
+00001C                               46 SAVEAREA DS    18F
+000064                               47 REGSAVE  DS    16F
+0000A4                               48 CARD     DS    CL50
+0000D6 40                            49 CARRIAGE DC    C' '
+0000D7                               50 OUTLINE  DS    CL50
+
+READDATA: CONVERT FROM 5-LINE FORMAT TO 3-LINE FORMAT                                                                       PAGE 3
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                     52 **********************************************************************
+                                     53 *  REGISTER KEY:                                                     *
+                                     54 *    REG11: USED TO CALL OTHER SUBROUTINES AND BRANCH BACK TO MAIN   *
+                                     55 **********************************************************************
+00010A 900F C05E            00064    56 READDATA STM   0,15,REGSAVE
+
+00010E E000 C09E 0032 000A4          58 READTOP  XREAD CARD,50                  READ UNTIL EOF
+000114 4740 C134            0013A    59          BC    B'0100',READEND
+
+
+000118 45B0 C13A            00140    61          BAL   11,MAKENAME              CONVERT FROM 5-LINE TO 3-LINE
+00011C 45B0 C1A4            001AA    62          BAL   11,STRADDR
+000120 45B0 C1B6            001BC    63          BAL   11,CTYSTZIP
+
+
+000124 E020 C0D0 0001 000D6          65          XPRNT CARRIAGE,1               3-LINE SEPARATOR (BLANKS)
+00012A E020 C0D0 0001 000D6          66          XPRNT CARRIAGE,1
+000130 E020 C0D0 0001 000D6          67          XPRNT CARRIAGE,1
+
+
+000136 47F0 C108            0010E    69          B     READTOP
+
+00013A 980F C05E            00064    71 READEND  LM    0,15,REGSAVE
+00013E 07FB                          72          BR    11
+
+FORMAT NAME: LAST, FIRST M.                                                                                                 PAGE 4
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                     74 *********************************************************************
+                                     75 *  REGISTER KEY:                                                    *
+                                     76 *     REG2: POINTER TO CARD MEMORY AREA TO FIND INITIAL BLANKS;     *
+                                     77 *           STEP SIZE (1) FOR LOOPS                                 *
+                                     78 *     REG3: TERMINAL VALUE (BLANK LOCATION) FOR LOOPS               *
+                                     79 *     REG4: POINTER TO OUTLINE MEMORY AREA                          *
+                                     80 *     REG6: POINTER TO THE END OF THE FIRST NAME                    *
+                                     81 *     REG7: POINTER TO THE MIDDLE NAME                              *
+                                     82 *     REG8: POINTER TO THE BEGINNING OF THE LAST NAME; POINTER      *
+                                     83 *           TO MEMORY TO BE COPIED INTO OUTLINE MEMORY (VIA LOOPS)  *
+                                     84 *    REG10: USED TO CALL OTHER SUBROUTINES                          *
+                                     85 *    REG11: USED TO RETURN TO CALLING SUBROUTINE                    *
+                                     86 *********************************************************************
+000140 45A0 C232            00238    87 MAKENAME BAL   10,CASCBLNK
+
+000144 4120 C09E            000A4    89          LA    2,CARD                   FIND BLANK AFTER FIRST NAME
+000148 45A0 C218            0021E    90          BAL   10,FINDBLNK
+00014C 1862                          91          LR    6,2                      FIRST NAME ENDS AT REG6 LOC
+
+
+00014E 4172 0001            00001    93          LA    7,1(2)                   MIDDLE INITIAL AT REG7 LOC
+000152 1827                          94          LR    2,7                      FIND BLANK AFTER MIDDLE NAME
+000154 45A0 C218            0021E    95          BAL   10,FINDBLNK
+
+
+000158 4182 0001            00001    97          LA    8,1(2)                   LAST NAME STARTS AT REG8 LOC
+00015C 1828                          98          LR    2,8                      FIND BLANK ENDING LAST NAME
+00015E 45A0 C218            0021E    99          BAL   10,FINDBLNK
+
+
+000162 1832                         101          LR    3,2                      TERMINAL BLANK IN FULL NAME
+000164 0630                         102          BCTR  3,0                      LAST CHARACTER IN FULL NAME
+000166 4120 0001            00001   103          LA    2,1
+00016A 4140 C0D1            000D7   104          LA    4,OUTLINE
+00016E D200 4000 8000 00000 00000   105 LASTNAME MVC   0(1,4),0(8)              COPY LAST NAME TO OUTLINE
+000174 4144 0001            00001   106          LA    4,1(4)
+000178 8782 C168            0016E   107          BXLE  8,2,LASTNAME
+00017C 926B 4000      00000         108          MVI   0(4),C','
+
+FORMAT NAME: LAST, FIRST M.                                                                                                 PAGE 5
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000180 1836                         110          LR    3,6
+000182 4144 0002            00002   111          LA    4,2(4)                   LOCATION TO COPY TO IN OUTLINE
+000186 4180 C09E            000A4   112          LA    8,CARD
+00018A D200 4000 8000 00000 00000   113 FRSTNAME MVC   0(1,4),0(8)              COPY FIRST NAME TO OUTLINE
+000190 4144 0001            00001   114          LA    4,1(4)
+000194 8782 C184            0018A   115          BXLE  8,2,FRSTNAME
+
+000198 D200 4000 7000 00000 00000   117 MIDINIT  MVC   0(1,4),0(7)              COPY MIDDLE INITIAL TO OUTLINE
+00019E 924B 4001      00001         118          MVI   1(4),C'.'
+
+
+0001A2 E020 C0D0 0033 000D6         120          XPRNT CARRIAGE,51
+0001A8 07FB                         121          BR    11
+
+FORMAT STREET ADDRESS: JUST COPY STREET ADDRESS                                                                             PAGE 6
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    123 *********************************************************************
+                                    124 *  REGISTER KEY:                                                    *
+                                    125 *    REG10: USED TO CALL OTHER SUBROUTINES                          *
+                                    126 *    REG11: USED TO RETURN TO CALLING SUBROUTINE                    *
+                                    127 *********************************************************************
+0001AA 45A0 C232            00238   128 STRADDR  BAL   10,CASCBLNK
+
+0001AE E000 C0D1 0032 000D7         130          XREAD OUTLINE,50
+0001B4 E020 C0D0 0033 000D6         131          XPRNT CARRIAGE,51
+
+0001BA 07FB                         133          BR    11
+
+FORMAT CITY, STATE, AND ZIP: CITY, ST  ZIP                                                                                  PAGE 7
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    135 *********************************************************************
+                                    136 *  REGISTER KEY:                                                    *
+                                    137 *     REG2: STEP SIZE FOR LOOPS                                     *
+                                    138 *     REG3: TERMINAL VALUE FOR LOOPS                                *
+                                    139 *     REG4: POINTER TO CARD MEMORY AREA                             *
+                                    140 *     REG5: POINTER TO OUTLINE MEMORY AREA                          *
+                                    141 *    REG10: USED TO CALL OTHER SUBROUTINES                          *
+                                    142 *    REG11: USED TO RETURN TO CALLING SUBROUTINE                    *
+                                    143 *********************************************************************
+0001BC 45A0 C232            00238   144 CTYSTZIP BAL   10,CASCBLNK
+
+0001C0 E000 C09E 0032 000A4         146          XREAD CARD,50                  GET CITY DATA LINE
+0001C6 4140 C0D0            000D6   147          LA    4,CARD+50                START AT THE END OF THE LINE
+0001CA 5820 C242            00248   148          L     2,=F'-1'
+0001CE 4130 C09D            000A3   149          LA    3,CARD-1
+0001D2 9540 4000      00000         150 FINDCITY CLI   0(4),C' '                FIND WHERE THE CITY NAME ENDS
+0001D6 4720 C1D8            001DE   151          BC    B'0010',NOTBLANK
+0001DA 8642 C1CC            001D2   152          BXH   4,2,FINDCITY
+
+
+0001DE 4120 0001            00001   154 NOTBLANK LA    2,1
+0001E2 1834                         155          LR    3,4                      REASSIGN FOR NEW TERMINAL LOC
+0001E4 4140 C09E            000A4   156          LA    4,CARD
+0001E8 4150 C0D1            000D7   157          LA    5,OUTLINE
+0001EC D200 5000 4000 00000 00000   158 COPYCITY MVC   0(1,5),0(4)              COPY CITY FROM CARD TO OUTLINE
+0001F2 4155 0001            00001   159          LA    5,1(5)
+0001F6 8742 C1E6            001EC   160          BXLE  4,2,COPYCITY
+
+
+0001FA E000 C09E 0032 000A4         162          XREAD CARD,50                  GET STATE DATA LINE
+000200 926B 5000      00000         163          MVI   0(5),C','
+000204 D201 5002 C09E 00002 000A4   164 COPYST   MVC   2(2,5),CARD              COPY STATE INITIALS TO OUTLINE
+
+
+00020A E000 C09E 0032 000A4         166          XREAD CARD,50                  GET ZIP CODE DATA LINE
+000210 D204 5006 C09E 00006 000A4   167 COPYZIP  MVC   6(5,5),CARD              COPY ZIP CODE TO OUTLINE
+
+000216 E020 C0D0 0033 000D6         169          XPRNT CARRIAGE,51
+00021C 07FB                         170          BR    11
+
+FIND BLANK                                                                                                                  PAGE 8
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    172 *********************************************************************
+                                    173 *  REGISTER KEY:                                                    *
+                                    174 *     REG2: POINTER TO LOCATION IN WHICH TO FIND FIRST BLANK; RETURN*
+                                    175 *           POINTER LOCATION TO BLANK                               *
+                                    176 *    REG10: USED TO RETURN TO CALLING SUBROUTINE                    *
+                                    177 *********************************************************************
+00021E 9031 C05E            00064   178 FINDBLNK STM   3,1,REGSAVE
+
+000222 9540 2000      00000         180 SRCHTOP  CLI   0(2),C' '                FIND THE FIRST BLANK
+000226 4780 C22C            00232   181          BC    B'1000',FOUND
+00022A 4122 0001            00001   182          LA    2,1(2)
+00022E 47F0 C21C            00222   183          B     SRCHTOP
+
+000232 9831 C05E            00064   185 FOUND    LM    3,1,REGSAVE              POINTER RETURNED IN REG2
+000236 07FA                         186          BR    10
+
+CASCADE BLANKS INTO OUTLINE                                                                                                 PAGE 9
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    188 *********************************************************************
+                                    189 *  REGISTER KEY:                                                    *
+                                    190 *    REG10: USED TO RETURN TO CALLING SUBROUTINE                    *
+                                    191 *********************************************************************
+000238 9240 C0D1      000D7         192 CASCBLNK MVI   OUTLINE,C' '
+00023C D230 C0D2 C0D1 000D8 000D7   193          MVC   OUTLINE+1(49),OUTLINE
+000242 07FA                         194          BR    10
+                                    195          END   MBPROG4
+000248 FFFFFFFF                                  =F'-1'
+
+***   0 STATEMENTS FLAGGED - 0 WARNINGS, 0 ERRORS
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+JONES, MARY J.                                    
+123 E. MAIN STREET                                
+NEW YORK, NY  12345                               
+
+
+
+BEAVER, JAMES M.                                  
+24526 CRAFT ROAD                                  
+ATHENS, AL  35613                                 
+
+
+
+GIBBS, LEEROY J.                                  
+123 N. WASHINGTON BOULEVARD                       
+NORFOLK, VA  23501                                
+
+
+
+
+*** EXECUTION COMPLETED ***
+

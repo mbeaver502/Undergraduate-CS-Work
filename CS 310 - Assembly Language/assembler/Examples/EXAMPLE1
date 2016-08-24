@@ -1,0 +1,28 @@
+EXAMPLE1 START
+         STM   14,12,12(13)                BEGINNING HOUSEKEEPING
+         BALR  12,0                        BEGINNING HOUSEKEEPING
+         USING HERE,12                     BEGINNING HOUSEKEEPING
+HERE     ST    13,SAVEAREA+4               BEGINNING HOUSEKEEPING
+         LA    13,SAVEAREA                 BEGINNING HOUSEKEEPING
+         LA    9,FIRST
+         LA    10,33
+         XREAD CARD,80
+         XDECI 5,CARD 
+         L     2,FIRST
+         L     3,SECOND
+         AR    2,3
+         XDECO 2,OUT
+         XPRNT CC,13
+         L     13,SAVEAREA+4               END HOUSEKEEPING
+         LM    14,12,12(13)                END HOUSEKEEPING
+         BR    14                          END HOUSEKEEPING
+SAVEAREA DS    18F                         END HOUSEKEEPING
+         DS    CL1
+CARD     DS    CL80
+FIRST    DC    F'10'
+SECOND   DC    F'9'
+CC       DC    C'0'
+OUT      DS    CL12
+         END   EXAMPLE1
+$ENTRY
+

@@ -1,0 +1,142 @@
+*************************************
+*			  *
+*  MICHAEL BEAVER	  *
+*  CS 310, SPRING 2013	  *
+*  PROGRAM 1                        *
+*  DUE: FEBRUARY 20, 2013           *
+*			  *
+*  DESCRIPTION:                     *
+*    THIS PROGRAM EXPECTS AS INPUT  *
+*    AN UNKNOWN NUMBER OF DATA      *
+*    LINES. EACH DATA LINE CONTAINS *
+*    THREE INTEGERS (SEPARATED      *
+*    BY ONE OR MORE BLANKS). THE    *
+*    PROGRAM THEN DETERMINES THE    *
+*    LARGEST VALUE ON EACH LINE AND *
+*    PRINTS THE VALUE. THE PROGRAM  *
+*    ALSO SUMS UP THE LARGEST       *
+*    VALUES. THE SUM IS PRINTED.    *
+*                                   *
+*  NOTE:                            *
+*    COMPLETELY BLANK DATA LINES    *
+*    ARE TREATED AS HAVING THE      *
+*    SAME DATA AS THE PREVIOUS      *
+*    DATA LINE.                     * 
+*			  *	
+*  REGISTER KEY:	  *
+*    REG2 -> 1ST VALUE ON LINE      *
+*    REG3 -> 2ND VALUE ON LINE      *
+*    REG4 -> 3RD VALUE ON LINE      *
+*    REG5 -> LARGEST VALUE ON LINE  *
+*    REG6 -> SUM OF LARGEST VALUES  *
+*			  *
+*************************************
+	SPACE
+BEAVER1 	START
+	SPACE
+*************************************
+*		                     *
+*	BEGINNING HOUSEKEEPING	  *
+*			  *
+*************************************
+	STM	14,12,12(13)
+	BALR	12,0
+	USING	SAVING,12
+SAVING	ST	13,SAVEAREA+4
+	LA	13,SAVEAREA
+	SPACE
+*************************************	
+*			  *
+*          MAIN PROGRAM BODY        *
+*			  *
+*************************************
+	SR	6,6                     ZERO-OUT REG6 FOR ACCUMULATOR
+         SPACE
+*
+*  READ UNTIL EOF	
+*
+TOPREAD	XREAD	CARD,80
+	BC	B'0100',ENDREAD         EOF => EXIT THE LOOP
+	SPACE
+*
+*  RETRIEVE THE THREE VALUES
+*
+	XDECI	2,CARD                  RETRIEVE 1ST NUMBER ON LINE
+	XDECI	3,0(1)                  RETRIEVE 2ND NUMBER ON LINE
+	XDECI	4,0(1)                  RETRIEVE 3RD NUMBER ON LINE
+	SPACE					
+*
+*  COMPARE NUMBERS
+*
+IF	CR	2,3		
+	BC	B'1010',THEN            1ST NUMBER >= 2ND NUMBER
+	BC	B'0100',ELSE            1ST NUMBER <  2ND NUMBER
+THEN	CR	2,4
+	BC	B'1010',SAVE1           1ST NUMBER IS LARGEST
+ELSE	CR	3,4
+	BC	B'1010',SAVE2           2ND NUMBER IS LARGEST
+	BC	B'0100',SAVE3           3RD NUMBER IS LARGEST
+	SPACE
+*
+*  1ST NUMBER IS LARGEST, SO SAVE IT	
+*
+SAVE1	LR	5,2				
+	BC	B'1111',PRINT
+	SPACE
+*
+*  2ND NUMBER IS LARGEST, SO SAVE IT
+*
+SAVE2	LR	5,3				
+	BC	B'1111',PRINT
+	SPACE
+*
+*  3RD NUMBER IS LARGEST, SO SAVE IT
+*
+SAVE3	LR	5,4				
+	SPACE
+*	
+*  OUTPUT LARGEST NUMBER
+*
+PRINT	XDECO	5,OUTLINE
+	XPRNT	LRGHEAD,23
+	XPRNT	CARRIAGE,13
+	SPACE
+	AR	6,5                     ADD LARGEST VALUE TO SUM
+	BC	B'1111',TOPREAD
+	SPACE
+*
+*  OUTPUT SUM OF LARGEST VALUES
+*
+ENDREAD  XDECO 6,OUTLINE	
+	XPRNT	SUMHEAD,23
+	XPRNT CARRIAGE,13
+	SPACE
+*************************************
+*	 		  *
+*	ENDING HOUSEKEEPING	  *
+*			  *
+*************************************	
+	L	13,SAVEAREA+4
+	LM	14,12,12(13)
+	BR	14
+	SPACE
+*************************************
+*			  *
+*   DECLARE STORAGE AND CONSTANTS	  *
+*			  *
+*************************************	
+SAVEAREA	DS	18F
+CARD	DS	CL80
+CARRIAGE	DC	C'+'
+OUTLINE	DS	CL12
+LRGHEAD	DC	C' THE LARGEST VALUE IS: '
+SUMHEAD	DC	C'0          THE SUM IS: '
+	SPACE
+*************************************
+*			  *
+* END, DATA ENTRY, AND LITERAL POOL *
+*			  *
+*************************************
+	END	BEAVER1
+$ENTRY
+

@@ -1,0 +1,159 @@
+
+ASSIST/I Version 2.03, Copyright 1984, BDM Software.                          GRADE RUN FOR: 
+
+
+                                                                                                                            PAGE 1
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000000                                1 KURZHAL2 START
+                                      2 *-----------------
+                                      3 * KYLE KURZHAL
+                                      4 * 2/27/14
+                                      5 * ASSIGNMENT #2
+                                      6 *-----------------
+                                      7 *
+                                      8 *----------------------------------------------------------------
+                                      9 * INPUT: 2 VALUES PER LINE.  1ST VALUE IS THE QUANTITY OF ITEMS
+                                     10 *        PURCHASED.  2ND VALUE IS THE COST OF THE ITEM (IN CENTS)
+                                     11 *
+                                     12 * ACTIONS: COLLECT DATA FROM EACH LINE. FIND THE TOTAL COST OF
+                                     13 *          THE QUNATITY OF A PURCHASED ITEM.  FIND THE AVERAGE
+                                     14 *          COST OF EACH ITEM PURCHASED.  FIND THE AVERAGE
+                                     15 *          QUANTITY OF ITEMS PURCHASED.
+                                     16 *
+                                     17 * OUTPUT: PRINT THE QUANTITY, COST, AND TOTAL COST OF EACH ITEM.
+                                     18 *         PRINT THE AVERAGE QUANTITY AND COST OF ITEMS PURCHASED.
+                                     19 *----------------------------------------------------------------
+                                     20 *
+                                     21 *----------------------------------------------------------------
+                                     22 *                          | REGISTER KEY |
+                                     23 *                          ****************
+                                     24 *
+                                     25 *            REG          VARIABLE
+                                     26 *           =====        ==========
+                                     27 *             2  -------> (EMPTY) EVEN REGISTER OF EVEN-ODD PAIR
+                                     28 *             3  -------> QUANTITY OF EACH ITEM
+                                     29 *             4  -------> AVERAGE QUANTITY CALCULATION REMAINDER
+                                     30 *             5  -------> TOTAL # OF ITEMS PURCHASED; AVERAGE QUANTITY
+                                     31 *             6  -------> LOOP COUNTER/NUMBER OF DIFFERENT ITEMS
+                                     32 *             8  -------> COST OF EACH ITEM; AVERAGE COST CALCULATION
+                                     33 *                         REMAINDER
+                                     34 *             9  -------> TOTAL COST OF ALL ITEMS IN PURCHASE;
+                                     35 *                         AVERAGE COST
+                                     36 *----------------------------------------------------------------
+                                     37 *
+                                     38 *                        BEGIN HOUSEKEEPING
+                                     39 *                       --------------------
+000000 90EC D00C            0000C    40          STM   14,12,12(13)
+000004 05C0                          41          BALR  12,0
+000006                               42          USING HERE,12
+000006 50D0 C0AA            000B0    43 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C0A6            000AC    44          LA    13,SAVEAREA
+                                     45 *
+                                     46 *                       BEGIN MAIN PROGRAM
+                                     47 *                      --------------------
+00000E E000 C0EE 0050 000F4          48          XREAD CARD,80            READ IN THE FIRST LINE TO CARD
+000014 4740 C09C            000A2    49          BC    B'0100',SKIPPGRM   SKIP TO THE END IF UNSUCCESSFUL READ
+000018 1B55                          50          SR    5,5                RESET OVERALL/AVERAGE QUANTITY TO 0
+00001A 1B99                          51          SR    9,9                RESET OVERALL/AVERAGE COST TO 0
+
+                                                                                                                            PAGE 2
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+00001C 1B66                          52          SR    6,6                RESET # OF DIFFERENT ITEMS TO 0
+                                     53 *
+00001E E020 C166 0027 0016C          54          XPRNT MESSAGE1,39       PRINT HEADERS
+000024 E020 C13F 0027 00145          55          XPRNT SUBMSSG1,39
+00002A E020 C18D 0027 00193          56          XPRNT LINE1,39
+                                     57 *
+                                     58 *                         BEGIN MAIN LOOP
+                                     59 *                        -----------------
+000030 5330 C0EE            000F4    60 LOOPTOP  XDECI 3,CARD     CONVERT QUANTITY TO BINARY VALUE
+000034 5381 0000            00000    61          XDECI 8,0(1)     CONVERT COST TO BINARY VALUE
+                                     62 *
+000038 5230 C13F            00145    63          XDECO 3,PRNTDATA+1    PREPARE TO PRINT ITEM QUANTITY
+00003C 5280 C14C            00152    64          XDECO 8,PRNTDATA+14   PREPARE TO PRINT ITEM COST
+                                     65 *
+000040 1A53                          66          AR    5,3        STORE OVERALL ITEM QUANTITIES
+000042 1C28                          67          MR    2,8        MULTIPLY QUANTITY AND COST FOR TOTAL COST
+000044 1A93                          68          AR    9,3        STORE OVERALL TOTAL COSTS
+                                     69 *
+000046 5230 C159            0015F    70          XDECO 3,PRNTDATA+27   PREPARE TO PRINT ITEM TOTAL
+00004A E020 C13E 0027 00144          71          XPRNT PRNTDATA,39     PRINT ITEM DATA
+000050 4166 0001            00001    72          LA    6,1(6)          ADD 1 TO # OF ITEMS (LOOP COUNT)
+                                     73 *
+                                     74 *
+                                     75 *                             END MAIN LOOP
+                                     76 *                            ---------------
+000054 E000 C0EE 0050 000F4          77          XREAD CARD,80          READ IN NEXT LINE
+00005A 4780 C02A            00030    78          BC    B'1000',LOOPTOP  MOVE TO TOP OF LOOP IF A LINE IS LEFT
+                                     79 *
+                                     80 *
+                                     81 *                            CALCULATE AVERAGES
+                                     82 *                           --------------------
+00005E 5C80 C222            00228    83          M     8,=F'1'     CASCADE FOR SAFE DIVISION
+000062 1D85                          84          DR    8,5         DIVIDE TOTAL COST BY TOTAL QUANTITY
+000064 1A88                          85          AR    8,8         DOUBLE THE REMAINDER
+000066 1985                          86          CR    8,5         COMPARE THE DOUBLED REMAINDER AND DIVISOR
+000068 4740 C06A            00070    87          BC    B'0100',NOROUNDQ   IF REMAINDER < DIVISOR, NO ROUND UP
+00006C 4199 0001            00001    88          LA    9,1(9)      ROUND THE QUOTIENT UP (AVERAGE COST)
+                                     89 *
+000070 5C40 C222            00228    90 NOROUNDQ M     4,=F'1'     CASCADE FOR SAFE DIVISION
+000074 1D46                          91          DR    4,6         DIVIDE TOTAL QUANTITY BY # OF ITEMS
+000076 1A44                          92          AR    4,4         DOUBLE THE REMAINDER
+000078 1946                          93          CR    4,6         COMPARE THE DOUBLED REMAINDER AND DIVISOR
+00007A 4740 C07C            00082    94          BC    B'0100',NOROUNDC   IF REMAINDER < DIVISOR, NO ROUND UP
+00007E 4155 0001            00001    95          LA    5,1(5)      ROUND THE QUOTIENT UP (AVERAGE QUANTITY)
+                                     96 *
+000082 E020 C1D7 0023 001DD          97 NOROUNDC XPRNT MESSAGE2,35    PRINT HEADERS
+000088 E020 C1B4 0023 001BA          98          XPRNT SUBMSSG2,35
+00008E E020 C1FA 0023 00200          99          XPRNT LINE2,35
+                                    100 *
+000094 5250 C148            0014E   101          XDECO 5,PRNTDATA+10    PREPARE TO PRINT AVERAGE QUANTITY
+000098 5290 C155            0015B   102          XDECO 9,PRNTDATA+23    PREPARE TO PRINT AVERAGE COST
+00009C E020 C13E 0023 00144         103          XPRNT PRNTDATA,35      PRINT AVERAGE QUANTITY AND COST
+                                    104 *
+
+                                                                                                                            PAGE 3
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    105 *                         END HOUSEKEEPING
+                                    106 *                        ------------------
+0000A2 58D0 C0AA            000B0   107 SKIPPGRM L     13,SAVEAREA+4
+0000A6 98EC D00C            0000C   108          LM    14,12,12(13)
+0000AA 07FE                         109          BR    14
+0000AC                              110 SAVEAREA DS    18F
+                                    111 *
+                                    112 *                     DECLARE COSNTANTS AND STORAGE
+                                    113 *                    -------------------------------
+0000F4                              114 CARD     DS    CL80
+000144 40                           115 PRNTDATA DC    C' '
+000145 4040404040404040             116 SUBMSSG1 DC    C'                   (CENTS)      (CENTS)'
+00016C F040404040D8E4C1             117 MESSAGE1 DC    C'0    QUANTITY        COST        TOTAL '
+000193 4040404040606060             118 LINE1    DC    C'     --------       ------      -------'
+0001BA 4040404040404040             119 SUBMSSG2 DC    C'             (CENTS)        (CENTS)'
+0001DD F040404040404040             120 MESSAGE2 DC    C'0         AVG QUANTITY     AVG COST'
+000200 4040404040404040             121 LINE2    DC    C'          ------------     --------'
+                                    122          END   KURZHAL2
+000228 00000001                                  =F'1'
+
+***   0 STATEMENTS FLAGGED - 0 WARNINGS, 0 ERRORS
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+    QUANTITY        COST        TOTAL 
+                  (CENTS)      (CENTS)
+    --------       ------      -------
+          20          360)        7200
+          60           30)        1800
+           5         1000)        5000
+
+         AVG QUANTITY     AVG COST
+            (CENTS)        (CENTS)
+         ------------     --------
+                   281         165
+
+*** EXECUTION COMPLETED ***
+

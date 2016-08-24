@@ -1,0 +1,366 @@
+         TITLE 'PROGRAM PROLOGUE'
+**********************************************************************
+*  MICHAEL BEAVER                                                    *
+*  CS 310, SPRING 2013	                                   *
+*  PROGRAM 5                                                         *
+*  DUE: APRIL 17, 2013                                               *
+*			                                   *
+*  DESCRIPTION:                                                      *
+*    
+*                                                                    *
+*  INTERNAL SUBROUTINES:                                             *
+*    
+**********************************************************************
+	TITLE 'MAIN PROGRAM'
+**********************************************************************
+*  REGISTER KEY:                                                     *
+*    
+**********************************************************************
+MBPROG5  START
+	STM	14,12,12(13)	   	 BEGINNING HOUSEKEEPING
+	BALR	12,0
+	USING	SAVING,12
+SAVING	ST	13,SAVEAREA+4
+	LA	13,SAVEAREA
+	SPACE 2
+*
+* STUFF GOES HERE
+*
+         XPRNT	HEADER1,52
+	XPRNT	HEADER2,52
+	SPACE
+	BAL	9,INITMEM
+         BAL   11,READDATA
+*
+*
+*
+	SPACE 2
+	L	13,SAVEAREA+4	   	 ENDING HOUSEKEEPING
+	LM	14,12,12(13)
+	BR	14
+	SPACE 2 
+SAVEAREA	DS	18F
+REGSAVE	DS	16F
+TRANCODE DS    CL1
+NUMDEP	DS	PL2
+NUMWDRWL	DS	PL2
+TOTALDEP	DS	PL6
+TOTALWDR	DS	PL6
+CURRBAL  DS    PL6
+MINBAL   DS    PL6
+RATE	DS	PL2
+PRODUCT	DS	PL8
+DIVISION DS	0PL8
+QUOTIENT	DS    PL5
+REMAINDR DS	PL3
+TEMP     DS    PL5
+CARD	DS	CL10
+CARRIAGE	DC	C' '
+OUTLINE  DS    XL17
+OUTLINE2	DS	XL13
+OUTLINE3 DS    XL4
+OUTLINE4 DS	XL5
+PATTERN	DC    X'402020206B2020206B2021204B202060'
+PATTERN2	DC	X'40206B2020206B2021204B2020'
+PATTERN3 DC    X'40202120'
+PATTERN4 DC	X'40214B2020'
+HEADER1  DC    C'              SAVINGS  ACCOUNT  REPORT              '
+HEADER2  DC    C' TRAN. CODE     AMOUNT     RATE     CURRENT BALANCE '
+HEADER3  DC	C'       NUMBER OF DEPOSITS  =                        '
+HEADER4	DC	C' TOTAL AMOUNT OF DEPOSITS  =                        '
+HEADER5  DC	C'  AVG. AMOUNT PER DEPOSIT  =                        '
+HEADER6  DC	C'       NUMBER OF WITHDRAWALS  =                     '
+HEADER7  DC    C' TOTAL AMOUNT OF WITHDRAWALS  =                     '
+HEADER8  DC    C'  AVG. AMOUNT PER WITHDRAWAL  =                     '
+HEADER9  DC    C'             CURRENT BALANCE  =                     '
+LINE     DS	CL52
+	TITLE ' '
+**********************************************************************
+*  REGISTER KEY:                                                     *
+*  
+**********************************************************************
+READDATA STM   0,15,REGSAVE
+         SPACE
+READTOP  XREAD	CARD,10                  READ UNTIL EOF
+         BC    B'0100',READEND
+         SPACE 2
+*
+* STUFF GOES HERE
+*
+	MVC	OUTLINE(17),PATTERN
+	MVC	OUTLINE2(13),PATTERN2
+	MVC	OUTLINE3(4),PATTERN3
+	MVI	LINE,C' '
+	MVC	LINE+1(51),LINE
+	SPACE
+         MVC	TRANCODE(1),CARD
+         MVC   LINE+5(1),TRANCODE
+	SPACE
+	CLI	TRANCODE,C'0'             SET INITIAL BALANCE
+	BC	B'0111',NOTINIT
+	BAL	10,INITBAL
+	B	PRNTLINE
+	SPACE
+NOTINIT	CLI	TRANCODE,C'1'             MAKE A DEPOSIT
+	BC	B'0111',NOTDEP
+	BAL	10,DEPOSIT
+	B	PRNTLINE
+	SPACE
+NOTDEP	CLI	TRANCODE,C'2'             MAKE A WITHDRAWAL
+	BC	B'0111',NOTWDRWL
+	BAL	10,WITHDRAW
+	B	PRNTLINE
+	SPACE
+NOTWDRWL CLI   TRANCODE,C'3'             CALCULATE INTEREST
+         BC    B'0111',READBOTM
+	BAL	10,INTEREST
+	B	PRNTLINE
+	SPACE
+PRNTLINE	XPRNT	LINE,52                   PRINT RESULTS
+*
+*
+*
+	SPACE 2
+READBOTM	B	READTOP
+         SPACE 2
+READEND  BAL	10,PRNTSTAT
+	SPACE 2
+	LM	0,15,REGSAVE
+	BR	11
+	TITLE 'INITIALIZE MEMORY'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*
+*********************************************************************
+INITMEM  ZAP   NUMDEP(2),=P'0'
+	ZAP	NUMWDRWL(2),=P'0'
+	ZAP	TOTALDEP(6),=P'0'
+	ZAP	TOTALWDR(6),=P'0'
+	ZAP	CURRBAL(6),=P'0'
+	ZAP	MINBAL(6),=P'0'
+	ZAP	DIVISION(6),=P'0'
+	ZAP	TEMP(5),=P'0'
+	BR	9	
+	TITLE 'INITIAL CARD BALANCE'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*
+*********************************************************************
+INITBAL  BAL	9,INITMEM                 FIRST, INITIALIZE MEMORY
+	PACK	TEMP(5),CARD+1(9)
+	ZAP	CURRBAL(6),TEMP(5)
+	ZAP	MINBAL(6),CURRBAL(6)
+	ED	OUTLINE(17),CURRBAL
+	MVC	LINE+10(17),OUTLINE
+	MVC	LINE+35(17),OUTLINE
+	BR	10
+	TITLE	'DEPOSIT CARD'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*
+*********************************************************************
+DEPOSIT  PACK	TEMP(5),CARD+1(9)
+         AP    CURRBAL(6),TEMP(5)
+	MVC	OUTLINE2(13),PATTERN2
+	MVC	OUTLINE(17),PATTERN
+	ED	OUTLINE2(13),TEMP
+	ED	OUTLINE(17),CURRBAL
+	MVC	LINE+12(13),OUTLINE2
+	MVC	LINE+35(17),OUTLINE
+	AP	NUMDEP(2),=P'1'
+	AP	TOTALDEP(6),TEMP(5)
+	BR    10
+	TITLE	'WITHDRAWAL CARD'
+*********************************************************************
+*  REGISTER KEY:							    *
+*
+*********************************************************************
+WITHDRAW CP	CURRBAL(6),=P'0'
+	BC	B'1101',WDRAWERR          DO NOT W'DRAW FROM <= 0 BAL
+	PACK	TEMP(5),CARD+1(9)
+	SP	CURRBAL(6),TEMP(5)
+	MVC	OUTLINE(17),PATTERN
+	MVC	OUTLINE2(13),PATTERN2
+	ED	OUTLINE(17),CURRBAL
+	ED	OUTLINE2(13),TEMP
+	MVC	LINE+12(13),OUTLINE2
+	MVC	LINE+35(17),OUTLINE
+	AP	NUMWDRWL(2),=P'1'
+	AP	TOTALWDR(6),TEMP(5)
+	B	SWAPMIN
+WDRAWERR	MVC	LINE+12(20),=C'ERR: INVALID BALANCE'
+SWAPMIN	CP	MINBAL(6),CURRBAL(6)	  CHANGE MINIMUM BALANCE
+	BC	B'1101',ENDWDRWL
+	ZAP	MINBAL(6),CURRBAL(6)
+ENDWDRWL	BR	10
+	TITLE	'INTEREST CALCULATION CARD'
+*********************************************************************
+*  REGISTER KEY:							    *
+*
+*********************************************************************
+INTEREST	CP	MINBAL(6),=P'0'
+	BC	B'1101',INTERR1		  NEGATIVE MINIMUM BALANCE
+	PACK	RATE(2),CARD+1(3)
+	CP	RATE(2),=P'0'
+	BC	B'1101',INTERR2
+	MVC	OUTLINE4(5),PATTERN4
+	ED	OUTLINE4(5),RATE
+	MVC	LINE+26(5),OUTLINE4
+	ZAP	PRODUCT(8),MINBAL(6)
+	MP	PRODUCT(8),RATE(2)
+	ZAP	DIVISION(8),PRODUCT(8)
+	DP	DIVISION(8),=P'10000'
+	CP	REMAINDR(3),=P'500'
+	BC	B'0100',NOROUND           CHECK FOR ROUNDING CENTS
+	AP	QUOTIENT(5),=P'1'
+NOROUND	AP	CURRBAL(6),QUOTIENT(5)
+	MVC	OUTLINE(17),PATTERN
+	ED	OUTLINE(17),CURRBAL
+	MVC	LINE+35(17),OUTLINE
+*
+*
+*
+	B	ENDINT
+INTERR1	MVC	LINE+12(28),=C'ERR: INVALID MINIMUM BALANCE'
+	B	ENDINT
+INTERR2	MVC	LINE+12(26),=C'ERR: INVALID INTEREST RATE'
+ENDINT	ZAP	MINBAL(6),CURRBAL(6)
+	BR	10
+	TITLE 'PRINT ALL ACCOUNT STATISTICS'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*
+*********************************************************************
+PRNTSTAT XPRNT CARRIAGE,1
+	XPRNT CARRIAGE,1
+	SPACE
+	BAL	9,PRNTNDEP	       PRINT NUMBER OF DEPOSITS
+	BAL	9,PRNTTDEP		  PRINT TOTAL AMT OF DEPOSITS
+	BAL	9,PRNTDAVG		  PRINT DEPOSIT AVERAGE
+	SPACE
+	XPRNT	CARRIAGE,1
+	XPRNT	CARRIAGE,1
+	SPACE
+	BAL	9,PRNTNWDR	       PRINT NUMBER OF W'DRAWALS
+	BAL	9,PRNTTWDR		  PRINT TOTAL AMT OF W'DRAWALS
+	BAL	9,PRNTWAVG		  PRINT W'DRAWAL AVERAGE
+	SPACE
+	XPRNT	CARRIAGE,1
+	XPRNT	CARRIAGE,1
+	SPACE
+	BAL	9,PRNTCBAL		  PRINT THE CURRENT BALANCE
+	SPACE
+	BR	10
+	TITLE	'PRINT NUMBER OF DEPOSITS'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*
+*********************************************************************
+PRNTNDEP	MVC	OUTLINE3(4),PATTERN3
+	ED	OUTLINE3(4),NUMDEP
+	MVC	HEADER3+41(4),OUTLINE3
+	XPRNT	HEADER3,52
+	BR	9
+	TITLE	'PRINT TOTAL AMOUNT OF DEPOSITS'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*
+*********************************************************************
+PRNTTDEP MVC	OUTLINE(17),PATTERN
+	LA	1,OUTLINE+11
+	EDMK	OUTLINE(17),TOTALDEP
+	BCTR	1,0
+	MVI	0(1),C'$'
+	MVC	HEADER4+30(17),OUTLINE
+	XPRNT	HEADER4,52
+	BR	9
+	TITLE	'PRINT DEPOSIT AVERAGE'
+*********************************************************************
+*  REGISTER KEY:							    *
+*
+*********************************************************************
+PRNTDAVG	CP	NUMDEP(2),=P'0'
+	BC	B'1000',NODEPDIV
+	ZAP	DIVISION(8),TOTALDEP(6)
+	DP	DIVISION(8),NUMDEP(2)
+	B	DNOTZERO
+NODEPDIV	ZAP	QUOTIENT(5),=P'0'
+	MVC   OUTLINE2(13),PATTERN2
+	LA	1,OUTLINE2+9
+	EDMK	OUTLINE2(13),QUOTIENT
+	BCTR	1,0
+	MVI	0(1),C'$'
+	MVC	HEADER5+32(13),OUTLINE2
+	B	DAVGEND
+DNOTZERO	MVC	OUTLINE(17),PATTERN
+	LA	1,OUTLINE+11
+	EDMK	OUTLINE(17),QUOTIENT	
+	BCTR	1,0
+	MVI	0(1),C'$'
+	MVC	HEADER5+30(17),OUTLINE
+DAVGEND	XPRNT	HEADER5,52
+	BR	9
+	TITLE	'PRINT THE NUMBER OF WITHDRAWALS'
+*********************************************************************
+*  REGISTER KEY:							    *
+*
+*********************************************************************
+PRNTNWDR MVC	OUTLINE3(4),PATTERN3
+	ED	OUTLINE3(4),NUMWDRWL
+	MVC	HEADER6+44(4),OUTLINE3
+	XPRNT	HEADER6,52
+	BR	9
+	TITLE 'PRINT THE TOTAL AMOUNT OF WITHDRAWALS'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*
+*********************************************************************
+PRNTTWDR	MVC	OUTLINE(17),PATTERN
+	LA	1,OUTLINE+11
+	EDMK	OUTLINE(17),TOTALWDR
+	BCTR	1,0
+	MVI	0(1),C'$'
+	MVC	HEADER7+33(17),OUTLINE
+	XPRNT	HEADER7
+	BR	9
+	TITLE	'PRINT THE WITHDRAWAL AVERAGE'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*
+*********************************************************************
+PRNTWAVG	CP	NUMWDRWL(2),=P'0'
+	BC	B'1000',NOWDRDIV
+	ZAP	DIVISION(8),TOTALWDR(6)
+	DP	DIVISION(8),NUMWDRWL(2)
+	B	WNOTZERO
+NOWDRDIV	ZAP	QUOTIENT(5),=P'0'
+	MVC	OUTLINE2(13),PATTERN2
+	LA	1,OUTLINE2+9
+	EDMK	OUTLINE2(13),QUOTIENT
+	BCTR	1,0
+	MVI	0(1),C'$'
+	MVC	HEADER8+35(13),OUTLINE2
+	B	WAVGEND
+WNOTZERO MVC	OUTLINE(17),PATTERN
+	LA	1,OUTLINE+11
+	EDMK	OUTLINE(17),QUOTIENT
+	BCTR	1,0
+	MVI	0(1),C'$'
+	MVC	HEADER8+33(17),OUTLINE
+WAVGEND	XPRNT	HEADER8,52
+	BR	9
+	TITLE	'PRINT THE CURRENT BALANCE'
+*********************************************************************
+*  REGISTER KEY:                                                    *
+*
+*********************************************************************
+PRNTCBAL MVC	OUTLINE(17),PATTERN
+	LA	1,OUTLINE+11
+	EDMK	OUTLINE(17),CURRBAL
+	BCTR	1,0
+	MVI	0(1),C'$'
+	MVC   HEADER9+33(17),OUTLINE
+	XPRNT	HEADER9,52
+	BR    9
+	END	MBPROG5
+$ENTRY DATA2.TXT

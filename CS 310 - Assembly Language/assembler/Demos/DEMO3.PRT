@@ -1,0 +1,109 @@
+
+ASSIST/I Version 2.03, Copyright 1984, BDM Software.                             
+
+
+                                                                                                                            PAGE 1
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                      1 **********************************************************************
+                                      2 *                                                                    *
+                                      3 *  THIS PROGRAM READS A SET OF INPUT LINES, EACH CONTAINING A THE    *
+                                      4 *  QUANTITY AND PRICE OF AN ITEM BEING ORDERED.  THE PROGRAM THEN:   *
+                                      5 *                                                                    *
+                                      6 *        1.  FINDS THE TOTAL COST OF THE ORDER                       *
+                                      7 *        2.  CUMPUTES THE AVERAGE NUMBER OF ITEMS PURCHASED          *
+                                      8 *        3.  FINDS THE AVERAGE COST PER ITEM FOR THE ORDER           *
+                                      9 *                                                                    *
+                                     10 *  INPUT IS TAKEN FROM AN IN-STREAM SET OF DATA.  IT IS ASSUMED THAT *
+                                     11 *  THE QUANTITY APPEARS BEFORE THE PRICE, BOTH NUMBERS APPEAR ON THE *
+                                     12 *  SAME LINE, AND THAT AT LEAST ONE BLANK SEPARATES THE TWO NUMBERS. *
+                                     13 *                                                                    *
+                                     14 **********************************************************************
+
+000000                               16 GROCERY  CSECT
+000000                               17          USING GROCERY,15
+
+000000                               19 R0       EQU   0
+000001                               20 R1       EQU   1
+000002                               21 R2       EQU   2
+000003                               22 R3       EQU   3
+000004                               23 R4       EQU   4
+000005                               24 R5       EQU   5
+000006                               25 R6       EQU   6
+000007                               26 R7       EQU   7
+000008                               27 R8       EQU   8
+000009                               28 R9       EQU   9
+00000A                               29 R10      EQU   10
+00000B                               30 R11      EQU   11
+00000C                               31 R12      EQU   12
+00000D                               32 R13      EQU   13
+00000E                               33 R14      EQU   14
+00000F                               34 R15      EQU   15
+
+000000 1B33                          36          SR    R3,R3              CLEAR LINE COUNTER
+000002 1B44                          37          SR    R4,R4              CLEAR RUNNING TOTAL ITEMS
+000004 1B55                          38          SR    R5,R5              CLEAR RUNNING TOTAL COST
+
+000006 E020 F120 0001 00120          40          XPRNT EJECT,1            START AT TOP OF PAGE
+00000C E020 F122 0029 00122          41          XPRNT HEADER,41          PRINT THE HEADER
+000012 E020 F14B 0029 0014B          42          XPRNT SUBHEAD1,41
+000018 E020 F174 002A 00174          43          XPRNT SUBHEAD2,42
+00001E E020 F121 0001 00121          44          XPRNT SKIP,1             SPACE THE HEADER FROM DETAIL LINES
+
+000024 E000 F080 0050 00080          46 MORE     XREAD CARD,80            READ A LINE
+00002A 4740 F058            00058    47          BC    B'0100',FIGURE     GO DO CALCS ON EOF
+
+00002E 5390 F080            00080    49          XDECI R9,CARD            GET QUANTITY
+000032 5381 0000            00000    50          XDECI R8,0(R1)           GET THE PRICE
+000036 1878                          51          LR    R7,R8
+
+                                                                                                                            PAGE 2
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000038 1C69                          52          MR    R6,R9              CALCULATE COST FOR THE ITEM
+
+00003A 5290 F0D1            000D1    54          XDECO R9,PLINE+1         PUT QUANTITY INTO PRINT BUFFER
+00003E 5280 F0DF            000DF    55          XDECO R8,PLINE+15        PUT PRICE TO PLINE
+000042 5270 F0ED            000ED    56          XDECO R7,PLINE+29        PUT COST INTO PLINE
+000046 E020 F0D0 0029 000D0          57          XPRNT PLINE,41           PRINT QTY, PRICE AND COST
+
+00004C 4133 0001            00001    59          LA    R3,1(R3)           INCREMENT ITEM TOTAL
+000050 1A49                          60          AR    R4,R9              ADD QUANTITY TO TOTAL OF ITEMS
+000052 1A57                          61          AR    R5,R7              ADD COST TO RUNNING TOTAL
+000054 47F0 F024            00024    62          BC    B'1111',MORE       LOOP FOR MORE
+
+000058 1BAA                          64 FIGURE   SR    R10,R10            CALCULATE THE AVERAGE NUMBER ITEMS
+00005A 18B4                          65          LR    R11,R4
+00005C 1DA3                          66          DR    R10,R3
+
+00005E 1BCC                          68          SR    R12,R12            CALCULATE THE AVERAGE COST PER ITEM
+000060 18D5                          69          LR    R13,R5
+000062 1DC4                          70          DR    R12,R4
+
+000064 52B0 F1C7            001C7    72          XDECO R11,NUM$LABL+41    PLACE AVERAGE NUMBER IN PRINT LINE
+000068 E020 F19E 0035 0019E          73          XPRNT NUM$LABL,53         AND PRINT IT
+00006E 52D0 F1F0            001F0    74          XDECO R13,COST$LAB+29    PLACE AVERAGE COST IN PRINT LINE
+000072 E020 F1D3 0030 001D3          75          XPRNT COST$LAB,48         AND PRINT IT
+000078 E020 F120 0001 00120          76          XPRNT EJECT,1            CLEAR THE LISTING
+
+00007E 07FE                          78          BCR   B'1111',R14        EXIT PROGRAM
+
+000080                               80 CARD     DS    CL80               INPUT LINE BUFFER
+0000D0 4040404040404040              81 PLINE    DC    CL80' '            PRINT LINE BUFFER
+000120 F1                            82 EJECT    DC    C'1'               CARRIAGE CTRL TO GO TO TOP OF PAGE
+000121 40                            83 SKIP     DC    C' '               CARRIAGE CTRL TO PRINT BLANK LINE
+000122 F040404040404040              84 HEADER   DC    CL41'0                PRICE EACH    TOTAL COST'
+00014B 4040404040D8E4C1              85 SUBHEAD1 DC    CL41'     QUANTITY    (IN CENTS)    (IN CENTS)'
+000174 404040407E7E7E7E              86 SUBHEAD2 DC    CL42'    ==========  ============  ============'
+00019E 6040E3C8C540C1E5              87 NUM$LABL DC    CL53'- THE AVERAGE NUMBER OF ITEMS PURCHASED ='
+0001D3 F040E3C8C540C1E5              88 COST$LAB DC    CL48'0 THE AVERAGE COST PER ITEM =             CENTS.'
+                                     89          END GROCERY
+
+***   0 STATEMENTS FLAGGED - 0 WARNINGS, 0 ERRORS
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+*** EXECUTION COMPLETED ***
+

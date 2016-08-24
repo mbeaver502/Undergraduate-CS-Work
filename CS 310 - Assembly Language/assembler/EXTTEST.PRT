@@ -1,0 +1,86 @@
+
+ASSIST/I Version 2.03, Copyright 1984, BDM Software.                          GRADE RUN FOR: 
+
+
+                                                                                                                            PAGE 1
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000000                                1 HOUSE    START
+000000 90EC D00C            0000C     2          STM   14,12,12(13)
+000004 05C0                           3          BALR  12,0
+000006                                4          USING HERE,12
+000006 50D0 C02A            00030     5 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C026            0002C     6          LA    13,SAVEAREA
+00000E 58F0 C072            00078     7          L     15,=V(TEST1)
+000012 05EF                           8          BALR  14,15
+000014 58F0 C076            0007C     9          L     15,=V(TEST2)
+000018 05EF                          10          BALR  14,15
+00001A 58F0 C07A            00080    11          L     15,=V(TEST3)
+00001E 05EF                          12          BALR  14,15
+000020 58D0 C02A            00030    13          L     13,SAVEAREA+4
+000024 98EC D00C            0000C    14          LM    14,12,12(13)
+000028 07FE                          15          BR    14
+00002C                               16 SAVEAREA DS    18F
+000074 00000064                      17 HUNDRED  DC    F'100'
+                                     18          LTORG
+000078 00000000                                  =V(TEST1)
+00007C 00000000                                  =V(TEST2)
+000080 00000000                                  =V(TEST3)
+000084                               19 TEST1    CSECT
+000088 90EC D00C            0000C    20          STM   14,12,12(13)
+00008C 05C0                          21          BALR  12,0
+00008E                               22          USING HERE2,12
+00008E 50D0 C01E            000AC    23 HERE2    ST    13,SAVE2+4
+000092 41D0 C01A            000A8    24          LA    13,SAVE2
+000096 E020 C062 000B 000F0          25          XPRNT =C'0TEST SUB 1',11
+00009C 58D0 C01E            000AC    26          L     13,SAVE2+4
+0000A0 98EC D00C            0000C    27          LM    14,12,12(13)
+0000A4 07FE                          28          BR    14
+0000A8                               29 SAVE2    DS    18F
+                                     30          LTORG
+0000F0 F0E3C5E2E340E2E4                          =C'0TEST SUB 1'
+0000FB                               31 TEST2    CSECT
+000100 90EC D00C            0000C    32          STM   14,12,12(13)
+000104 05C0                          33          BALR  12,0
+000106                               34          USING HERE3,12
+000106 50D0 C01E            00124    35 HERE3    ST    13,SAVE3+4
+00010A 41D0 C01A            00120    36          LA    13,SAVE3
+00010E E020 C062 000B 00168          37          XPRNT =C'0TEST SUB 2',11
+000114 58D0 C01E            00124    38          L     13,SAVE3+4
+000118 98EC D00C            0000C    39          LM    14,12,12(13)
+00011C 07FE                          40          BR    14
+000120                               41 SAVE3    DS    18F
+                                     42          LTORG
+000168 F0E3C5E2E340E2E4                          =C'0TEST SUB 2'
+000173                               43 TEST3    CSECT
+000178 90EC D00C            0000C    44          STM   14,12,12(13)
+00017C 05C0                          45          BALR  12,0
+00017E                               46          USING HERE4,12
+
+                                                                                                                            PAGE 2
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+00017E 50D0 C01E            0019C    47 HERE4    ST    13,SAVE4+4
+000182 41D0 C01A            00198    48          LA    13,SAVE4
+000186 E020 C062 000B 001E0          49          XPRNT =C'0TEST SUB 3',11
+00018C 58D0 C01E            0019C    50          L     13,SAVE4+4
+000190 98EC D00C            0000C    51          LM    14,12,12(13)
+000194 07FE                          52          BR    14
+000198                               53 SAVE4    DS    18F
+                                     54          END   HOUSE
+0001E0 F0E3C5E2E340E2E4                          =C'0TEST SUB 3'
+
+***   0 STATEMENTS FLAGGED - 0 WARNINGS, 0 ERRORS
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+TEST SUB 1
+
+TEST SUB 2
+
+TEST SUB 3
+
+*** EXECUTION COMPLETED ***
+

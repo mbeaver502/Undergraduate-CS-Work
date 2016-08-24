@@ -1,0 +1,125 @@
+KURZHAL1 START
+*---------------
+* KYLE KURZHAL
+* 2/18/14
+* ASSIGNMENT #1
+*---------------
+*
+*--------------------------------------------------------------------
+* INPUT: 3 GRADES (0-100) SEPARATED BY SPACE ON ONE LINE;
+*        UKNOWN NUMBER OF LINES TO BE INPUT.
+*
+* ACTIONS: THE NUMERIC GRADES WILL BE ADDED TOGETHER, AND THEN THE
+*          SUM WILL BE REPEATEDLY SUBTRACTED BY 3, ADDING A COUNT OF 1
+*          EACH TIME, UNTIL A QUOTIENT AND REMAINDER ARE LEFT.  THE
+*          QUOTIENT WILL THEN BE ROUNDED UP OR LEFT AS IS DEPENDING
+*          ON THE REMAINDER.  LASTLY, THE LETTER GRADE CORRESPONDING
+*          TO THE QUOTIENT WILL BE PRINTED.
+*
+* OUTPUT: PRINT OUT THE LETTER GRADE CORRESPONDING TO THE
+*         NUMERIC GRADE.
+*--------------------------------------------------------------------
+*
+         STM   14,12,12(13)              BEGINNING HOUSEKEEPING
+         BALR  12,0                      BEGINNING HOUSEKEEPING
+         USING HERE,12                   BEGINNING HOUSEKEEPING
+HERE     ST    13,SAVEAREA+4             BEGINNING HOUSEKEEPING
+         LA    13,SAVEAREA               BEGINNING HOUSEKEEPING
+*
+*
+         XREAD CARD,80    READ AND CHECK THE FIRST LINE INTO "CARD"
+         SR    9,9        SET REGISTER 9 AS LOOP COUNTER
+*
+*                            BEGIN MAIN LOOP
+*                            ---------------
+TOP      LA    9,1(9)     INCREMENT LOOP COUNT BY 1
+         SR    2,2        MAKE SURE THAT ALL USED REGISTERS ARE CLEAN
+         SR    3,3
+         SR    4,4
+         XDECI 2,CARD     READ THE THREE VALUES INTO REGISTERS
+         XDECI 3,0(1)
+         XDECI 4,0(1)
+*
+         AR    2,3        ADD ALL THREE NUMERIC GRADES TOGETHER,
+         AR    2,4        AND STORE THE TOTAL IN REGISTER 2
+*
+         SR    3,3        RESET REGISTER 3 FOR LATER STORING QUOTIENT
+*
+*         XDECO 2,OUT      (DEBUG)
+*         XPRNT OUT,12
+*         XDECO 3,OUT
+*         XPRNT OUT,12
+*
+*     LOOP TO FIND WHOLE NUMBER QUOTIENT (REG 3) AND REMAINDER (REG 2)
+*     ----------------------------------------------------------------
+AVERAGE  C     2,GRADENUM               COMPARE REG 2 WITH DIVISOR
+         BC    B'0100',EXITAVG
+         LA    3,1(3)                   ADD 1 TO THE QUOTIENT
+         S     2,GRADENUM
+         BC    B'1110',AVERAGE
+*
+*EXITAVG  XDECO 2,OUT      (DEBUG)
+*         XPRNT OUT,12
+*         XDECO 3,OUT
+*         XPRNT OUT,12
+*
+*                   ROUND TO APPROPRIATE WHOLE NUMBER
+*                   ---------------------------------
+EXITAVG  AR    2,2              DOUBLE THE VALUE IN REGISTER 2
+         C     2,GRADENUM       COMPARE THE NEW REG 2 WITH DIVISOR
+         BC    B'0100',NOROUND  IF REMAINDER < DIVSOR, DON'T ROUND UP
+         LA    3,1(3)
+*
+*NOROUND  XDECO 2,OUT      (DEBUG)
+*         XPRNT OUT,12
+*         XDECO 3,OUT
+*         XPRNT OUT,12
+*
+*                       PRINT APPROPRIATE GRADE
+*                       -----------------------
+NOROUND  XDECO 9,GRADESET+15   PRINT TEXT FOR USERS
+         XPRNT GRADESET,27
+         XPRNT =C'+ = ',4
+*
+*                         1) COMPARE THE QUOTIENT (Q) TO RUBRIC (R)
+*                         2) CHECK FOR LOWER GRADE IF Q < R
+*                         3) IF Q >= R, THEN PRINT MATCHING GRADE
+*                         4) SKIP THE REST OF THE COMPARISONS
+*
+         C     3,A               STEP 1
+         BC    B'0100',CHECKB    STEP 2
+         XPRNT =C'+A',2          STEP 3
+         BC    B'1010',DONE      STEP 4
+CHECKB   C     3,B                ...
+         BC    B'0100',CHECKC     ...
+         XPRNT =C'+B',2           ...
+         BC    B'1010',DONE       ...
+CHECKC   C     3,C
+         BC    B'0100',CHECKU
+         XPRNT =C'+C',2           
+         BC    B'1010',DONE
+CHECKU   XPRNT =C'+U',2
+         BC    B'1110',DONE
+*
+*                       READ AND CHECK FOR NEXT LINE
+*                       ----------------------------
+DONE     XREAD CARD,80
+         BC    B'1000',TOP
+*
+         L     13,SAVEAREA+4                END HOUSEKEEPING
+         LM    14,12,12(13)                 END HOUSEKEEPING
+         BR    14                           END HOUSEKEEPING
+SAVEAREA DS    18F                          END HOUSEKEEPING
+*
+*
+*                      DECLARING STORAGE AND CONSTANTS
+A        DC    F'93'
+B        DC    F'84'
+C        DC    F'75'
+GRADENUM DC    F'3'
+GRADESET DC    C'0    GRADE SET'
+CARD     DS    CL80
+OUT      DS    CL12
+*
+         END   KURZHAL1
+$ENTRY PROG1.DAT

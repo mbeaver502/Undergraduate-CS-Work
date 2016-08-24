@@ -1,0 +1,544 @@
+
+ASSIST/I Version 2.03, Copyright 1984, BDM Software.                          GRADE RUN FOR: 
+
+
+                                                                                                                            PAGE 1
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000000                                1 KURZHAL6 START
+                                      2 *----------------
+                                      3 * KYLE KURZHAL  |
+                                      4 * 4/22/14       |
+                                      5 * ASSIGNMENT #6 |
+                                      6 *--------------------------------------------------------------------
+                                      7 * INPUT: AN UNKNOWN NUMBER OF LINES CONSISTING OF 3 POSSIBLE CARDS:
+                                      8 *        0 - INITIAL BALANCE
+                                      9 *        1 - DEPOSIT
+                                     10 *        2 - WITHDRAWAL
+                                     11 *        3 - INTEREST
+                                     12 *
+                                     13 * OUTPUT: A LIST OF ALL THE CARDS AND APPROPRIATE AMOUNTS WERE TO
+                                     14 *         BE PRINTED.  A LIST OF THE NUBMER OF DEPOSITS/WITHDRAWALS,
+                                     15 *         THE TOTAL OF EACH, AND THE AVERAGE OF EACH WERE TO BE
+                                     16 *         PRINTED.
+                                     17 *
+                                     18 * ACTIONS: KEEP TRACK OF AND CALCULATE BALANCE, WITHDRAWALS,
+                                     19 *          DEPOSITS, AND INTEREST.  CALCULATE THE AVG OF
+                                     20 *          WITHDRAWALS/DEPOSITS.
+                                     21 *--------------------------------------------------------------------
+                                     22 *             | REG |       | PURPOSE |
+                                     23 *             *******       ***********
+                                     24 *                11  ======> CALL EACH MAIN SUBROUTINE AS NECESSARY.
+                                     25 *--------------------------------------------------------------------
+                                     26 *
+                                     27 *                         BEGINNING HOUSEKEEPING
+                                     28 *                        ------------------------
+000000 90EC D00C            0000C    29          STM   14,12,12(13)
+000004 05C0                          30          BALR  12,0
+000006                               31          USING HERE,12
+000006 50D0 C06A            00070    32 HERE     ST    13,SAVEAREA+4
+00000A 41D0 C066            0006C    33          LA    13,SAVEAREA
+                                     34 *
+                                     35 *                            MAIN PROGRAM
+                                     36 *                           --------------
+                                     37 *         ZAP   DEPSTOTL(5),=P'0'   CLEAR ALL MEMORY TO BE USED
+                                     38 *         ZAP   WITHTOTL(5),=P'0'   THIS WAS DONE DUE TO ODD ISSUES
+00000E E000 C0AE 0050 000B4          39          XREAD CARD,80                 READ THE FIRST LINE
+                                     40 *         XPRNT PRGMNAME,35             PRINT THE PROGRAM HEADERS
+                                     41 *         XPRNT HEADER,48
+000014 9240 C0FE      00104          42 MAINLOOP MVI   AMOUNTLN,C' '           CLEAR THE LINE FOR NEW OUTPUT
+000018 D24E C0FF C0FE 00105 00104    43          MVC   AMOUNTLN+1(79),AMOUNTLN
+00001E 95F1 C0AE      000B4          44          CLI   CARD,C'1'               CHECK FOR THE ACTION TYPE
+000022 47A0 C028            0002E    45          BC    B'1010',SKIPINIT
+000026 4590 C220            00226    46          BAL   9,INITIALB          SET THE INITIAL BALANCE
+00002A 47F0 C048            0004E    47          BC    B'1111',PRNTBLNC
+00002E 4730 C034            0003A    48 SKIPINIT BC    B'0011',SKIPDEPS
+000032 45B0 C256            0025C    49          BAL   11,DEPOSIT          CALL THE DEPOSIT SUBROUTINE
+000036 47F0 C048            0004E    50          BC    B'1111',PRNTBLNC
+00003A 95F2 C0AE      000B4          51 SKIPDEPS CLI   CARD,C'2'           CHECK IF CARD IS WITHDRAW/INTEREST
+
+                                                                                                                            PAGE 2
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+00003E 4730 C044            0004A    52          BC    B'0011',SKIPWITH    CALL INTEREST SUB IF NOT WITHDRAW
+000042 45B0 C28A            00290    53          BAL   11,WITHDRAW         CALL THE WITHDRAW SUBROUTINE
+000046 47F0 C048            0004E    54          BC    B'1111',PRNTBLNC
+00004A 45B0 C2C0            002C6    55 SKIPWITH BAL   11,INTEREST         CALL THE INTEREST SUBROUTINE
+00004E E020 C0FE 0050 00104          56 PRNTBLNC XPRNT AMOUNTLN,80         PRINT THE CARD AND BALANCE
+000054 E000 C0AE 0050 000B4          57          XREAD CARD,80
+00005A 4780 C00E            00014    58          BC    B'1000',MAINLOOP
+00005E 45B0 C330            00336    59 PRNTFINL BAL   11,LASTINFO         CALL THE LAST DISPLAY
+                                     60 *                          END HOUSEKEEPING
+                                     61 *                         ------------------
+000062 58D0 C06A            00070    62          L     13,SAVEAREA+4
+000066 98EC D00C            0000C    63          LM    14,12,12(13)
+00006A 07FE                          64          BR    14
+00006C                               65 SAVEAREA DS    18F
+                                     66 *
+                                     67 *                    DECLARE STORAGE AND CONSTANTS
+                                     68 *                   -------------------------------
+0000B4                               69 CARD     DS    CL80
+000104                               70 AMOUNTLN DS    CL80
+000154 0C                            71 INTRBLNC DC    P'0'
+000155                               72 NEWAMNT  DS    PL5
+00015A 0C                            73 BALANCE  DC    P'0'
+00015B                               74 DEPSTOTL DS    PL5
+000160                               75 WITHTOTL DS    PL5
+000165 0C                            76 DEPSCNTR DC    P'0'
+000166 0C                            77 WITHCNTR DC    P'0'
+000167 40206B2020206B20              78 PATTERN  DC    X'40206B2020206B2020214B2020'
+000174                               79 AMNTPTRN DS    XL13
+000181 6040404040404040              80 PRGMNAME DC    C'-            SAVINGS ACCOUNT REPORT'
+0001A4 40E3D9C1D54BC3D6              81 HEADER   DC    C' TRAN.CODE     AMOUNT    RATE    CURRENT BALANCE'
+
+FORMATLN SUBROUTINE                                                                                                         PAGE 3
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                     83 *
+                                     84 *                          FORMATLN SUBROUTINE
+                                     85 *--------------------------------------------------------------------
+                                     86 * INPUT: RECEIVES THE BALANCE AND NEW CARD AMOUNT FOR FORMATTING.
+                                     87 *
+                                     88 * OUTPUT: A FORMATED CARD OUTPUT LINE.
+                                     89 *
+                                     90 * ACTIONS: FORMATS THE BALANCE AND NEW CARD AMOUNT FOR PRINTING THE
+                                     91 *          CARD RESULT.
+                                     92 *--------------------------------------------------------------------
+                                     93 *             | REG |       | PURPOSE |
+                                     94 *             *******       ***********
+                                     95 *                10  ======> RETURN FROM THE SUBROUTINE.
+                                     96 *--------------------------------------------------------------------
+0001D4 D200 C103 C0AE 00109 000B4    97 FORMATLN MVC   AMOUNTLN+5(1),CARD      COPY ACTION NUMBER FOR PRNTING
+0001DA D20C C16E C161 00174 00167    98          MVC   AMNTPTRN(13),PATTERN    PREPARE THE PRINTING PATTERN
+0001E0 DE0C C16E C154 00174 0015A    99          ED    AMNTPTRN(13),BALANCE      FORMAT THE BALANCE
+0001E6 D20C C120 C16E 00126 00174   100          MVC   AMOUNTLN+34(13),AMNTPTRN  MOVE FORMATTED BLNC TO PRTLN
+0001EC D20C C16E C161 00174 00167   101          MVC   AMNTPTRN(13),PATTERN    PREPARE THE PRINTING PATTERN
+0001F2 DE0C C16E C14F 00174 00155   102          ED    AMNTPTRN(13),NEWAMNT      FORMAT THE AMOUNT FROM CARD
+0001F8 D20C C107 C16E 0010D 00174   103          MVC   AMOUNTLN+9(13),AMNTPTRN  MOVE AMNT FORMAT TO PRNT LN
+0001FE 07FA                         104          BR    10
+
+CHEKLOWB SUBROUTINE                                                                                                         PAGE 4
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    106 *                          CHEKLOWB SUBROUTINE
+                                    107 *--------------------------------------------------------------------
+                                    108 * INPUT: USES TEH CURRENT BALANCE AND LOWEST BALANCE SINCE LAST
+                                    109 *        INTEREST CALCULATION.
+                                    110 *
+                                    111 * OUTPUT: SETS THE NEW LOWEST BALANCE SINCE LAST INTEREST CALCULATION.
+                                    112 *
+                                    113 * ACTIONS: CHECK IF THE LOWEST INTEREST IS 0, WHICH MEANS THAT IT HAS
+                                    114 *          JUST UNDERGONE A CALCULATION.  SET THE LOWEST BALANCE SINCE
+                                    115 *          LAST INTEREST ACCORDINGLY.
+                                    116 *--------------------------------------------------------------------
+                                    117 *             | REG |       | PURPOSE |
+                                    118 *             *******       ***********
+                                    119 *                10  ======>  RETURN FROM SUBROUTINE.
+                                    120 *--------------------------------------------------------------------
+                                    121 *CHEKLOWB CP    INTRBLNC(7),=P'0'       SET NEW LOW BALANCE IF AT 0
+000200 F900 C14E C4CA 00154 004D0   122 CHEKLOWB CP    INTRBLNC(1),=P'0'
+000206 4720 C20E            00214   123          BC    B'0010',NOSETMIN
+00020A F864 C14E C154 00154 0015A   124          ZAP   INTRBLNC(7),BALANCE(5)
+000210 47F0 C21E            00224   125          BC    B'1111',NOLOWITR
+                                    126 *
+000214 F964 C14E C154 00154 0015A   127 NOSETMIN CP    INTRBLNC(7),BALANCE(5)   COMPARE BALANCE/LOWEST BALNC
+00021A 47C0 C21E            00224   128          BC    B'1100',NOLOWITR         IF BALANCE < LOWEST BALANCE,
+00021E F864 C14E C154 00154 0015A   129          ZAP   INTRBLNC(7),BALANCE(5)   COPY BALANCE TO INTEREST BALC
+000224 07FA                         130 NOLOWITR BR    10
+
+INITIALB SUBROUTINE                                                                                                         PAGE 5
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    132 *                          INITIALB SUBROUTINE
+                                    133 *--------------------------------------------------------------------
+                                    134 * INPUT: RECEIVES NEW AMOUNT FOR STORING AS DEPOSIT.
+                                    135 *
+                                    136 * OUTPUT: A THE BALANCE IS INCREASED BY DEPOSIT, THE TOTAL DEPOSIT IS
+                                    137 *
+                                    138 * ACTIONS: ADD THE DEPOSIT TO BALANCE AND OVERALL DEPOSIT. SET THE
+                                    139 *--------------------------------------------------------------------
+                                    140 *             | REG |       | PURPOSE |
+                                    141 *             *******       ***********
+                                    142 *                9  ======>   RETURN FROM THE SUBROUTINE.
+                                    143 *--------------------------------------------------------------------
+000226 F840 C155 C4CA 0015B 004D0   144 INITIALB ZAP   DEPSTOTL(5),=P'0'   CLEAR ALL MEMORY TO BE USED
+00022C F840 C15A C4CA 00160 004D0   145          ZAP   WITHTOTL(5),=P'0'   THIS WAS DONE DUE TO ODD ISSUES
+000232 F860 C14E C4CA 00154 004D0   146          ZAP   INTRBLNC(7),=P'0'
+000238 F840 C154 C4CA 0015A 004D0   147          ZAP   BALANCE(5),=P'0'
+00023E F810 C15F C4CA 00165 004D0   148          ZAP   DEPSCNTR(2),=P'0'
+000244 F810 C160 C4CA 00166 004D0   149          ZAP   WITHCNTR(2),=P'0'
+00024A E020 C17B 0023 00181         150          XPRNT PRGMNAME,35             PRINT THE PROGRAM HEADERS
+000250 E020 C19E 0030 001A4         151          XPRNT HEADER,48
+000256 45B0 C256            0025C   152          BAL   11,DEPOSIT
+00025A 07F9                         153          BR    9
+
+DEPOSIT SUBROUTINE                                                                                                          PAGE 6
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    155 *                          DEPOSIT SUBROUTINE
+                                    156 *--------------------------------------------------------------------
+                                    157 * INPUT: RECEIVES NEW AMOUNT FOR STORING AS DEPOSIT.
+                                    158 *
+                                    159 * OUTPUT: A THE BALANCE IS INCREASED BY DEPOSIT, THE TOTAL DEPOSIT IS
+                                    160 *         INCREASED, A NEW MINIMUM BALANCE IS SET FOR INTEREST IF
+                                    161 *         NECESSARY.
+                                    162 *
+                                    163 * ACTIONS: ADD THE DEPOSIT TO BALANCE AND OVERALL DEPOSIT. SET THE
+                                    164 *          LOWEST BALANCE SINCE LAST INTEREST CALCULATION, INCREMENT
+                                    165 *          THE NUMBER OF DEPOSITS.
+                                    166 *--------------------------------------------------------------------
+                                    167 *             | REG |       | PURPOSE |
+                                    168 *             *******       ***********
+                                    169 *                11  ======>   RETURN FROM THE SUBROUTINE.
+                                    170 *--------------------------------------------------------------------
+00025C F248 C14F C0AF 00155 000B5   171 DEPOSIT  PACK  NEWAMNT(5),CARD+1(9)    PACK AMOUNT FOR MANIPULATION
+000262 F940 C14F C4CA 00155 004D0   172          CP    NEWAMNT(5),=P'0'        SKIP THE CARD IF DEPOSIT = 0
+000268 4780 C288            0028E   173          BC    B'1000',NODEPCRD
+00026C FA44 C154 C14F 0015A 00155   174          AP    BALANCE(5),NEWAMNT(5)   ADD NEW AMNT TO BALANCE
+000272 45A0 C1FA            00200   175          BAL   10,CHEKLOWB             CALL CHEKLOWB SUBROUTINE
+000276 45A0 C1CE            001D4   176          BAL   10,FORMATLN             CALL FORMATLN SUBROUTINE
+00027A 95F1 C0AE      000B4         177          CLI   CARD,C'1'
+00027E 4770 C288            0028E   178          BC    B'0111',NODEPCRD        IF TRAN.CODE = 0, COUNTER STAY
+000282 FA44 C155 C14F 0015B 00155   179          AP    DEPSTOTL(5),NEWAMNT(5)  ADD TO THE TOTAL DEPOSIT AMNT
+000288 FA00 C15F C4CB 00165 004D1   180          AP    DEPSCNTR,=P'1'          ADD 1 TO DEPOSIT COUNT
+00028E 07FB                         181 NODEPCRD BR    11
+
+WITHDRAW SUBROUTINE                                                                                                         PAGE 7
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    183 *                          WITHDRAW SUBROUTINE
+                                    184 *--------------------------------------------------------------------
+                                    185 * INPUT: RECEIVES NEW AMOUNT FOR REDUCING THE BALANCE.
+                                    186 *
+                                    187 * OUTPUT: A THE BALANCE IS DECREASED BY WITHDRAW, THE TOTAL WITHDRAW
+                                    188 *         IS INCREASED, A NEW MINIMUM BALANCE IS SET FOR INTEREST IF
+                                    189 *         NECESSARY.
+                                    190 *
+                                    191 * ACTIONS: ADD THE DEPOSIT TO BALANCE AND OVERALL DEPOSIT. SET THE
+                                    192 *          LOWEST BALANCE SINCE LAST INTEREST CALCULATION, INCREMENT
+                                    193 *          THE NUMBER OF DEPOSITS.
+                                    194 *--------------------------------------------------------------------
+                                    195 *             | REG |       | PURPOSE |
+                                    196 *             *******       ***********
+                                    197 *                11  ======>   RETURN TO FROM SUBROUTINE.
+                                    198 *--------------------------------------------------------------------
+000290 F248 C14F C0AF 00155 000B5   199 WITHDRAW PACK  NEWAMNT(5),CARD+1(9)    PACK AMOUNT FOR MANIPULATION
+000296 F940 C14F C4CA 00155 004D0   200          CP    NEWAMNT(5),=P'0'        CHECK IF WITHDRAW IS 0
+00029C 4780 C2BE            002C4   201          BC    B'1000',NOWITHCD        IF 0, SKIP ADDING THE CARD
+0002A0 F944 C154 C14F 0015A 00155   202          CP    BALANCE(5),NEWAMNT(5)   CHECK IF BALANCE < NEWAMNT
+0002A6 4740 C2BE            002C4   203          BC    B'0100',NOWITHCD        IF SO, NO CARD TRANSACTION
+0002AA FB44 C154 C14F 0015A 00155   204          SP    BALANCE(5),NEWAMNT(5)   DETRACT FROM BALANCE
+0002B0 FA44 C15A C14F 00160 00155   205          AP    WITHTOTL(5),NEWAMNT(5)  ADD TO WITHDRAW TOTAL
+0002B6 45A0 C1FA            00200   206          BAL   10,CHEKLOWB             CALL CHEKLOWB SUBROUTINE
+0002BA 45A0 C1CE            001D4   207          BAL   10,FORMATLN             CALL FORMATLN SUBROUTINE
+0002BE FA00 C160 C4CB 00166 004D1   208          AP    WITHCNTR,=P'1'          ADD 1 TO WITHDRAW COUNT
+0002C4 07FB                         209 NOWITHCD BR    11
+
+INTEREST SUBROUTINE                                                                                                         PAGE 8
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    211 *                          INTEREST SUBROUTINE
+                                    212 *--------------------------------------------------------------------
+                                    213 * INPUT: LOWEST BALANCE SINCE LAST INTEREST CALCULATION, THE INTEREST
+                                    214 *        APPLIED TO THE BALANCE.
+                                    215 *
+                                    216 * OUTPUT: LINE WITH INTEREST CARD INFORMATION, INCLUDING RESULTING
+                                    217 *         CALCULATED BALANCE.
+                                    218 *
+                                    219 * ACTIONS: GRAB THE INTEREST, MULTIPLY IT BY THE LOWEST BALANCE SINCE
+                                    220 *          LAST INTEREST CALCULATION, PACK AND UNPACK THE VALUES IN
+                                    221 *          ORDER TO GET CORRECTLY PACKED VALUE, FORMAT THE OUTPUT
+                                    222 *          LINE.
+                                    223 *--------------------------------------------------------------------
+                                    224 *             | REG |       | PURPOSE |
+                                    225 *             *******       ***********
+                                    226 *                11  ======>   RETURN FROM THE SUBROUTINE.
+                                    227 *--------------------------------------------------------------------
+0002C6 92F3 C103      00109         228 INTEREST MVI   AMOUNTLN+5,C'3'
+0002CA F212 C30E C0AF 00314 000B5   229          PACK  INTRNUM(2),CARD+1(3)    PACK AMOUNT FOR MANIPULATION
+0002D0 FC61 C14E C30E 00154 00314   230          MP    INTRBLNC(7),INTRNUM(2)   MULT LOW BALNC AND INTEREST
+0002D6 F3C6 C323 C14E 00329 00154   231          UNPK  TEMPCNVT(13),INTRBLNC(7) CONVERT THE VALUE FOR GETTING
+0002DC F248 C14E C323 00154 00329   232          PACK  INTRBLNC(5),TEMPCNVT(9)  DECIMALS
+0002E2 FA44 C154 C14E 0015A 00154   233          AP    BALANCE(5),INTRBLNC(5)  ADD INTEREST TO BALANCE
+0002E8 D20C C16E C161 00174 00167   234          MVC   AMNTPTRN(13),PATTERN    PREPARE THE PRINTING PATTERN
+0002EE DE0C C16E C154 00174 0015A   235          ED    AMNTPTRN(13),BALANCE
+0002F4 D20C C120 C16E 00126 00174   236          MVC   AMOUNTLN+34(13),AMNTPTRN
+                                    237 *
+0002FA D204 C315 C310 0031B 00316   238          MVC   COPYPTRN(5),INTRPTRN    PREPARE THE PRINTING PATTERN
+000300 DE04 C315 C30E 0031B 00314   239          ED    COPYPTRN(5),INTRNUM      FORMAT THE INTEREST FROM CARD
+000306 D204 C116 C315 0011C 0031B   240          MVC   AMOUNTLN+24(5),COPYPTRN  MOVE AMNT FORMAT TO PRNT LN
+00030C F860 C14E C4CA 00154 004D0   241          ZAP   INTRBLNC(7),=P'0'        RESETTING THE LOW BALANCE
+000312 07FB                         242          BR    11
+000314                              243 INTRNUM  DS    PL2
+000316 40214B2020                   244 INTRPTRN DC    X'40214B2020'
+00031B                              245 COPYPTRN DS    XL5
+000320                              246 TEMPBLNC DS    ZL9
+000329                              247 TEMPCNVT DS    ZL13
+
+LASTINFO SUBROUTINE                                                                                                         PAGE 9
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    249 *                          LASTINFO SUBROUTINE
+                                    250 *--------------------------------------------------------------------
+                                    251 * INPUT: THE COUNTERS AND TOTAL AMOUNTS OF DEPOSIT/WITHDRAW.
+                                    252 *
+                                    253 * OUTPUT: OUTPUTS NUMBER, TOTAL AMOUNT, AND AVG OF DEPOSITS/WITHDRAWS;
+                                    254 *         OUTPUTS CURRENT BALANCE.
+                                    255 *
+                                    256 * ACTIONS: GET, FORMAT, PRINT THE AMOUNT OF DEPOSITS/WITHDRAWS; GET,
+                                    257 *          FORMAT, PRINT THE TOTAL AMOUNT OF DEPOSITS/WITHDRAWS;
+                                    258 *          CALCULATE, FORMAT, AND PRINT THE AVG DEPOSITS/WITHDRAWS;
+                                    259 *          GET, FORMAT, PRINT THE CURRENT BALANCE.
+                                    260 *--------------------------------------------------------------------
+                                    261 *             | REG |       | PURPOSE |
+                                    262 *             *******       ***********
+                                    263 *                2   ======>  USED AS AN INPUT TO GETAVG SUBROUTINE
+                                    264 *                3   ======>  USED AS AN INPUT TO GETAVG SUBROUTINE
+                                    265 *                5   ======>  USED AS AN INPUT TO GETDOLLR SUBROUTINE
+                                    266 *                9   ======>  RETURN REGISTER FROM GETDOLLR SUBROUTINE
+                                    267 *               10   ======>  RETURN REGISTER FROM GETAVG SUBROUTINE
+                                    268 *--------------------------------------------------------------------
+000336 D203 C3CC C3C8 003D2 003CE   269 LASTINFO MVC   UNPKPTRN(4),TOTALUPK    PREPARE THE COUNTER PATTERN
+00033C DE03 C3CC C15F 003D2 00165   270          ED    UNPKPTRN(4),DEPSCNTR    COPY DEPOSIT COUNTER INTO FORM
+000342 D203 C3DE C3CC 003E4 003D2   271          MVC   PRNTDEPS+14(4),UNPKPTRN    PUT COUNTER IN OUTPUT LINE
+000348 E020 C3D0 0012 003D6         272          XPRNT PRNTDEPS,18
+00034E 4150 C155            0015B   273          LA    5,DEPSTOTL                PREPARE INPUT, CALL GETDOLLR
+000352 4590 C4B2            004B8   274          BAL   9,GETDOLLR
+000356 D20C C3F8 C16E 003FE 00174   275          MVC   PRNTTTLD+26(13),AMNTPTRN   PUT DEPOSIT TOTALS IN OUTPUT
+00035C E020 C3DE 0027 003E4         276          XPRNT PRNTTTLD,39
+                                    277 *
+000362 4120 C155            0015B   278          LA    2,DEPSTOTL            PREPARE DEPOSIT TOTALS AS INPUT
+000366 4130 C15F            00165   279          LA    3,DEPSCNTR            PREPARE DEPOSIT # AS INPUT
+00036A 45A0 C47E            00484   280          BAL   10,GETAVG                    CALL THE GETAVG SUB
+00036E D20C C412 C16E 00418 00174   281          MVC   PRNTAVGD+26(13),AMNTPTRN      PUT DEPOSIT AVG IN OUTPUT
+000374 E020 C3F8 0027 003FE         282          XPRNT PRNTAVGD,39
+                                    283 *
+00037A DE03 C3C8 C160 003CE 00166   284          ED    TOTALUPK(4),WITHCNTR      PREPARE WITHDRAW COUNTER
+000380 D203 C422 C3C8 00428 003CE   285          MVC   PRNTWITH+16(4),TOTALUPK
+000386 E020 C412 0014 00418         286          XPRNT PRNTWITH,20               PRINT WITHDRAW COUNTER
+00038C 4150 C15A            00160   287          LA    5,WITHTOTL                PREPARE WITHDRAW TOTALS INPUT
+000390 4590 C4B2            004B8   288          BAL   9,GETDOLLR                CALL GETDOLLR SUBROUTINE
+000394 D20C C441 C16E 00447 00174   289          MVC   PRNTTTLW+30(13),AMNTPTRN  PUT WITHDRAW TOTALS IN OUTPUT
+00039A E020 C423 002B 00429         290          XPRNT PRNTTTLW,43
+                                    291 *
+0003A0 4120 C15A            00160   292          LA    2,WITHTOTL              PREPARE WITHDRAW TOTALS INPUT
+0003A4 4130 C160            00166   293          LA    3,WITHCNTR              PREPARE WITHDRAW COUNTER INPUT
+0003A8 45A0 C47E            00484   294          BAL   10,GETAVG                  CALL GETAVG SUBROUTINE
+0003AC D20C C45F C16E 00465 00174   295          MVC   PRNTAVGW+30(13),AMNTPTRN   PUT WITHDRAW AVG IN OUTPUT
+0003B2 E020 C441 002B 00447         296          XPRNT PRNTAVGW,43
+                                    297 *
+0003B8 4150 C154            0015A   298          LA    5,BALANCE                 PREPARE CURRENT BALANCE INPUT
+0003BC 4590 C4B2            004B8   299          BAL   9,GETDOLLR                CALL GETDOLLR SUBROUTINE
+0003C0 D20C C47D C16E 00483 00174   300          MVC   PRNTCURR+30(13),AMNTPTRN  PUT CURRENT BALANCE IN OUTPUT
+0003C6 E020 C45F 002B 00465         301          XPRNT PRNTCURR,43               PRINT THE CURRENT BALANCE
+
+LASTINFO SUBROUTINE                                                                                                         PAGE 10
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+0003CC 07FB                         302          BR    11
+0003CE 40202020                     303 TOTALUPK DC    X'40202020'
+0003D2                              304 UNPKPTRN DS    XL4
+0003D6 F07B40C4C5D7D6E2             305 PRNTDEPS DC    C'0# DEPOSITS = '
+0003E4 40E3D6E3C1D340C1             306 PRNTTTLD DC    C' TOTAL AMOUNT OF DEPOSITS='
+0003FE 40C1E5C74B40C1D4             307 PRNTAVGD DC    C' AVG. AMOUNT/DEPOSIT     ='
+000418 F07B40E6C9E3C8C4             308 PRNTWITH DC    C'0# WITHDRAWALS = '
+000429 40E3D6E3C1D340C1             309 PRNTTTLW DC    C' TOTAL AMOUNT OF WITHDRAWALS ='
+000447 40C1E5C74B40C1D4             310 PRNTAVGW DC    C' AVG. AMOUNT/WITHDRAWAL      ='
+000465 F040404040404040             311 PRNTCURR DC    C'0            CURRENT BALANCE ='
+
+GETAVG SUBROUTINE                                                                                                           PAGE 11
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    313 *                            GETAVG SUBROUTINE
+                                    314 *--------------------------------------------------------------------
+                                    315 * INPUT: THE TOTAL TO BE AVERAGED, AND THE NUMBER TO AVERAGE BY.
+                                    316 *
+                                    317 * OUTPUT: RESULTS IN AN AVERAGE OF THE INPUT, FORMATTED FOR PRINTING.
+                                    318 *
+                                    319 * ACTIONS: MOVE THE TOTAL TO A LARGER PACKED DECIMAL FOR DIVIDING,
+                                    320 *          DIVIDE TO GET THE AVERAGE, DETERMINE IF THE AVG NEEDS TO
+                                    321 *          BE ROUNDED UP, CALL THE GETDOLLR ROUTINE TO FORMAT THE
+                                    322 *          RESULT.
+                                    323 *--------------------------------------------------------------------
+                                    324 *             | REG |       | PURPOSE |
+                                    325 *             *******       ***********
+                                    326 *                 5  ======>   A POINTER TO QUOTIENT, USED FOR A
+                                    327 *                              QUICKER ROUNDING, AND PASSING AS INPUT
+                                    328 *                              TO GETDOLLR.
+                                    329 *                 9  ======>   RETURN FROM THE GETDOLLR SUBROUTINE.
+                                    330 *                11  ======>   RETURN FROM THIS SUBROUTINE.
+                                    331 *--------------------------------------------------------------------
+000484 4150 C4AA            004B0   332 GETAVG   LA    5,QUOTIENT
+000488 F864 C4AA 2000 004B0 00000   333          ZAP   LARGTOTL(7),0(5,2)         COPY VALUE TO LARGER DECIMAL
+00048E FD61 C4AA 3000 004B0 00000   334          DP    LARGTOTL(7),0(2,3)         GET THE AVERAGE
+000494 FA11 C4AF C4AF 004B5 004B5   335          AP    REMAINDR(2),REMAINDR(2)    DOUBLE THE REMAINDER
+00049A F911 C4AF 3000 004B5 00000   336          CP    REMAINDR(2),0(2,3)         COMPARE FOR NEEDED ROUNDING
+0004A0 4740 C4A4            004AA   337          BC    B'0100',NOROUND            NO ROUND IF < DIVISOR
+0004A4 FA40 5000 C4CB 00000 004D1   338          AP    0(5,5),=P'1'
+0004AA 4590 C4B2            004B8   339 NOROUND  BAL   9,GETDOLLR                 CALL THE GETDOLLR SUBROUTINE
+0004AE 07FA                         340          BR    10
+0004B0                              341 LARGTOTL DS    0PL7
+0004B0                              342 QUOTIENT DS    PL5
+0004B5                              343 REMAINDR DS    PL2
+
+GETDOLLR SUBROUTINE                                                                                                         PAGE 12
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                    345 *                            GETDOLLR SUBROUTINE
+                                    346 *--------------------------------------------------------------------
+                                    347 * INPUT: A PREDETERMINED FORMAT AND ITEM TO FORMAT.
+                                    348 *
+                                    349 * OUTPUT: RESULTS IN FORMATED NUMBER, WITH A '$' IN FRONT.
+                                    350 *
+                                    351 * ACTIONS: SET REGISTER 1 IN CASE THE SIGNIFICANCE INDICATOR IS NOT
+                                    352 *          TURNED ON WITHOUT FORCE, COPY THE PATTERN TO ANOTHER
+                                    353 *          STORAGE IN ORDER NOT TO LOSE THE FORMAT, ADD THE '$' IN
+                                    354 *          FRONT OF THE FORMATTED NUMBER.
+                                    355 *--------------------------------------------------------------------
+                                    356 *             | REG |       | PURPOSE |
+                                    357 *             *******       ***********
+                                    358 *                1   ======>  USED TO ADD A '$' IN FRONT OF AMOUNTS
+                                    359 *                5   ======>  THE INPUT FOR FORMATTING THE OUTPUT.
+                                    360 *                9   ======>  RETURN FROM THIS SUBROUTINE.
+                                    361 *--------------------------------------------------------------------
+0004B8 4110 C179            0017F   362 GETDOLLR LA    1,AMNTPTRN+11
+0004BC D20C C16E C161 00174 00167   363          MVC   AMNTPTRN(13),PATTERN    PREPARE THE PRINTING PATTERN
+0004C2 DF0C C16E 5000 00174 00000   364          EDMK  AMNTPTRN(13),0(5)
+0004C8 0610                         365          BCTR  1,0
+0004CA 925B 1000      00000         366          MVI   0(1),C'$'
+0004CE 07F9                         367          BR    9
+                                    368          END   KURZHAL6
+0004D0 0C                                        =P'0'
+0004D1 1C                                        =P'1'
+
+***   0 STATEMENTS FLAGGED - 0 WARNINGS, 0 ERRORS
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+
+            SAVINGS ACCOUNT REPORT
+TRAN.CODE     AMOUNT    RATE    CURRENT BALANCE
+
+*** EXECUTION COMPLETED ***
+PSW AT ABEND:  FF000007 EF000206      COMPLETION CODE: 0C7 DATA
+
+** TRACE OF INSTRUCTIONS JUST BEFORE TERMINATION **
+===> PSW bits shown are those before corresponding instruction decoded.
+===> IM = PSW bits 32-39 (ILC,CC,MASK) before instruction executed at LOCATION.
+
+          IM    LOCATION    INSTRUCTION
+          ==    ========    ===============
+          CF     000244     F810 C160 C4CA 
+          CF     00024A     E020 C17B 0023 
+          CF     000250     E020 C19E 0030 
+          CF     000256     45B0 C256 
+          8F     00025C     F248 C14F C0AF 
+          CF     000262     F940 C14F C4CA 
+          EF     000268     4780 C288 
+          AF     00026C     FA44 C154 C14F 
+          EF     000272     45A0 C1FA 
+          AF     000200     F900 C14E C4CA    <-- Last instruction executed.
+
+
+
+** TRACE OF LAST 10 BRANCH INSTRUCTIONS EXECUTED **
+===> PSW bits shown are those before corresponding instruction decoded.
+===> IM = PSW bits 32-39 (ILC,CC,MASK) before instruction executed at LOCATION.
+
+          IM    LOCATION    INSTRUCTION
+          ==    ========    ===============
+          8F     000004     05C0 
+          9F     000022     47A0 C028 
+          9F     000026     4590 C220 
+          CF     000256     45B0 C256 
+          EF     000268     4780 C288 
+          EF     000272     45A0 C1FA 
+
+
+
+R0-7 :F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 F4F4F4F4 
+R8-15:F4F4F4F4 9F00002A AF000276 8F00025A 4F000006 0000006C 0000051C 00000000 
+
+
+USER STORAGE:   CORE ADDRESSES SPECIFIED - 000000 to 000A8C
+
+000000      47ECD00C   05C050D0   C06A41D0   C066E000      *..}..{&}{|.}{.\.*
+000010      C0AE0050   9240C0FE   D24EC0FF   C0FE95F1      *{..&k {.K+{.{.n1*
+000020      C0AE47A0   C0284590   C22047F0   C0484730      *{...{...B..0{...*
+000030      C03445B0   C25647F0   C04895F2   C0AE4730      *{...B..0{.n2{...*
+000040      C04445B0   C28A47F0   C04845B0   C2C0E020      *{...B..0{...B{\.*
+000050      C0FE0050   E000C0AE   00504780   C00E45B0      *{..&\.{..&..{...*
+000060      C33058D0   C06A98EC   D00C07FE   F5F5F5F5      *C..}{|q.}...5555*
+000070      000004D4   F5F5F5F5   F5F5F5F5   F5F5F5F5      *...M555555555555*
+000080      F5F5F5F5   F5F5F5F5   F5F5F5F5   F5F5F5F5      *5555555555555555*
+            LINES:   000080 - 0000A0    ARE IDENTICAL
+0000B0      F5F5F5F5   F0F0F0F0   F1F0F0F0   F0F04040      *55550000100000  *
+0000C0      40404040   40404040   40404040   40404040      *                *
+            LINES:   0000C0 - 000140    ARE IDENTICAL
+000150      40404040   00000100   000F0001   00000C0C      *    ............*
+000160      00000000   0C00000C   206B2020   206B2020      *.........,...,..*
+000170      214B2020   F5F5F5F5   F5F5F5F5   F5F5F5F5      *....555555555555*
+000180      F5604040   40404040   40404040   4040E2C1      *5-            SA*
+000190      E5C9D5C7   E240C1C3   C3D6E4D5   E340D9C5      *VINGS ACCOUNT RE*
+0001A0      D7D6D9E3   40E3D9C1   D54BC3D6   C4C54040      *PORT TRAN.CODE  *
+0001B0      404040C1   D4D6E4D5   E3404040   40D9C1E3      *   AMOUNT    RAT*
+0001C0      C5404040   40C3E4D9   D9C5D5E3   40C2C1D3      *E    CURRENT BAL*
+0001D0      C1D5C3C5   D200C103   C0AED20C   C16EC161      *ANCEK.A.{.K.A>A/*
+0001E0      DE0CC16E   C154D20C   C120C16E   D20CC16E      *..A>A.K.A.A>K.A>*
+0001F0      C161DE0C   C16EC14F   D20CC107   C16E07FA      *A/..A>A.K.A.A>..*
+000200      F900C14E   C4CA4720   C20EF864   C14EC154      *9.A+D...B.8.A+A.*
+000210      47F0C21E   F964C14E   C15447C0   C21EF864      *.0B.9.A+A..{B.8.*
+000220      C14EC154   07FAF840   C155C4CA   F840C15A      *A+A...8 A.D.8 A!*
+000230      C4CAF860   C14EC4CA   F840C154   C4CAF810      *D.8-A+D.8 A.D.8.*
+000240      C15FC4CA   F810C160   C4CAE020   C17B0023      *A.D.8.A-D.\.A#..*
+000250      E020C19E   003045B0   C25607F9   F248C14F      *\.A.....B..92.A.*
+000260      C0AFF940   C14FC4CA   4780C288   FA44C154      *{.9 A.D...Bh..A.*
+000270      C14F45A0   C1FA45A0   C1CE95F1   C0AE4770      *A...A...A.n1{...*
+000280      C288FA44   C155C14F   FA00C15F   C4CB07FB      *Bh..A.A...A.D...*
+000290      F248C14F   C0AFF940   C14FC4CA   4780C2BE      *2.A.{.9 A.D...B.*
+0002A0      F944C154   C14F4740   C2BEFB44   C154C14F      *9.A.A.. B...A.A.*
+0002B0      FA44C15A   C14F45A0   C1FA45A0   C1CEFA00      *..A!A...A...A...*
+0002C0      C160C4CB   07FB92F3   C103F212   C30EC0AF      *A-D...k3A.2.C.{.*
+0002D0      FC61C14E   C30EF3C6   C323C14E   F248C14E      *./A+C.3FC.A+2.A+*
+0002E0      C323FA44   C154C14E   D20CC16E   C161DE0C      *C...A.A+K.A>A/..*
+0002F0      C16EC154   D20CC120   C16ED204   C315C310      *A>A.K.A.A>K.C.C.*
+000300      DE04C315   C30ED204   C116C315   F860C14E      *..C.C.K.A.C.8-A+*
+000310      C4CA07FB   F5F54021   4B2020F5   F5F5F5F5      *D...55 ....55555*
+000320      F5F5F5F5   F5F5F5F5   F5F5F5F5   F5F5F5F5      *5555555555555555*
+000330      F5F5F5F5   F5F5D203   C3CCC3C8   DE03C3CC      *555555K.C.CH..C.*
+000340      C15FD203   C3DEC3CC   E020C3D0   00124150      *A.K.C.C.\.C}...&*
+000350      C1554590   C4B2D20C   C3F8C16E   E020C3DE      *A...D.K.C8A>\.C.*
+000360      00274120   C1554130   C15F45A0   C47ED20C      *....A...A...D=K.*
+000370      C412C16E   E020C3F8   0027DE03   C3C8C160      *D.A>\.C8....CHA-*
+000380      D203C422   C3C8E020   C4120014   4150C15A      *K.D.CH\.D....&A!*
+000390      4590C4B2   D20CC441   C16EE020   C423002B      *..D.K.D.A>\.D...*
+0003A0      4120C15A   4130C160   45A0C47E   D20CC45F      *..A!..A-..D=K.D.*
+0003B0      C16EE020   C441002B   4150C154   4590C4B2      *A>\.D....&A...D.*
+0003C0      D20CC47D   C16EE020   C45F002B   07FB4020      *K.D'A>\.D..... .*
+0003D0      2020F5F5   F5F5F07B   40C4C5D7   D6E2C9E3      *..55550# DEPOSIT*
+0003E0      E2407E40   40E3D6E3   C1D340C1   D4D6E4D5      *S =  TOTAL AMOUN*
+0003F0      E340D6C6   40C4C5D7   D6E2C9E3   E27E40C1      *T OF DEPOSITS= A*
+000400      E5C74B40   C1D4D6E4   D5E300C4   C5D7D6E2      *VG. AMOUNT.DEPOS*
+000410      C9E34040   4040407E   F07B40E6   C9E3C8C4      *IT     =0# WITHD*
+000420      D9C1E6C1   D3E2407E   4040E3D6   E3C1D340      *RAWALS =  TOTAL *
+000430      C1D4D6E4   D5E340D6   C640E6C9   E3C8C4D9      *AMOUNT OF WITHDR*
+000440      C1E6C1D3   E2407E40   C1E5C74B   40C1D4D6      *AWALS = AVG. AMO*
+000450      E4D5E300   E6C9E3C8   C4D9C1E6   C1D34040      *UNT.WITHDRAWAL  *
+000460      40404040   7EF04040   40404040   40404040      *    =0          *
+000470      4040C3E4   D9D9C5D5   E340C2C1   D3C1D5C3      *  CURRENT BALANC*
+000480      C5407EF5   4150C4AA   F864C4AA   2000FD61      *E =5.&D.8.D..../*
+000490      C4AA3000   FA11C4AF   C4AFF911   C4AF3000      *D.....D.D.9.D...*
+0004A0      4740C4A4   FA405000   C4CB4590   C4B207FA      *. Du. &.D...D...*
+0004B0      F5F5F5F5   F5F5F5F5   4110C179   D20CC16E      *55555555..A`K.A>*
+0004C0      C161DF0C   C16E5000   0610925B   100007F9      *A/..A>&...k$...9*
+0004D0      0C1CF5F5   F5F5F5F5   F5F5F5F5   F5F5F5F5      *..55555555555555*
+0004E0      0000051C   00000000   F4F4F4F4   F4F4F4F4      *........44444444*
+0004F0      F4F4F4F4   F4F4F4F4   F4F4F4F4   F4F4F4F4      *4444444444444444*
+            LINES:   0004F0 - 000500    ARE IDENTICAL
+000510      F4F4F4F4   F4F4F4F4   F4F4F4F4   F5F5F5F5      *4444444444445555*
+000520      F5F5F5F5   F5F5F5F5   F5F5F5F5   F5F5F5F5      *5555555555555555*
+            LINES:   000520 - 000A70    ARE IDENTICAL
+
+                 ***  END OF USER MEMORY  ***

@@ -1,0 +1,166 @@
+
+ASSIST/I Version 2.03, Copyright 1984, BDM Software.                          GRADE RUN FOR: 
+
+
+                                                                                                                            PAGE 1
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                      1 *************************************
+                                      2 *                                   *
+                                      3 *  MICHAEL BEAVER                   *
+                                      4 *  CS 310, SPRING 2013              *
+                                      5 *  PROGRAM 1                        *
+                                      6 *  DUE: FEBRUARY 20, 2013           *
+                                      7 *                                   *
+                                      8 *  DESCRIPTION:                     *
+                                      9 *    THIS PROGRAM EXPECTS AS INPUT  *
+                                     10 *    AN UNKNOWN NUMBER OF DATA      *
+                                     11 *    LINES. EACH DATA LINE CONTAINS *
+                                     12 *    THREE INTEGERS (SEPARATED      *
+                                     13 *    BY ONE OR MORE BLANKS). THE    *
+                                     14 *    PROGRAM THEN DETERMINES THE    *
+                                     15 *    LARGEST VALUE ON EACH LINE AND *
+                                     16 *    PRINTS THE VALUE. THE PROGRAM  *
+                                     17 *    ALSO SUMS UP THE LARGEST       *
+                                     18 *    VALUES. THE SUM IS PRINTED.    *
+                                     19 *                                   *
+                                     20 *  NOTE:                            *
+                                     21 *    COMPLETELY BLANK DATA LINES    *
+                                     22 *    ARE TREATED AS HAVING THE      *
+                                     23 *    SAME DATA AS THE PREVIOUS      *
+                                     24 *    DATA LINE.                     *
+                                     25 *                                   *
+                                     26 *  REGISTER KEY:                    *
+                                     27 *    REG2 -> 1ST VALUE ON LINE      *
+                                     28 *    REG3 -> 2ND VALUE ON LINE      *
+                                     29 *    REG4 -> 3RD VALUE ON LINE      *
+                                     30 *    REG5 -> LARGEST VALUE ON LINE  *
+                                     31 *    REG6 -> SUM OF LARGEST VALUES  *
+                                     32 *                                   *
+                                     33 *************************************
+
+000000                               35 BEAVER1  START
+
+                                     37 *************************************
+                                     38 *                                   *
+                                     39 *        BEGINNING HOUSEKEEPING     *
+                                     40 *                                   *
+                                     41 *************************************
+000000 90EC D00C            0000C    42          STM   14,12,12(13)
+000004 05C0                          43          BALR  12,0
+000006                               44          USING SAVING,12
+000006 50D0 C07E            00084    45 SAVING   ST    13,SAVEAREA+4
+00000A 41D0 C07A            00080    46          LA    13,SAVEAREA
+
+                                     48 *************************************
+                                     49 *                                   *
+                                     50 *          MAIN PROGRAM BODY        *
+                                     51 *                                   *
+
+                                                                                                                            PAGE 2
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+                                     52 *************************************
+00000E 1B66                          53          SR    6,6                     ZERO-OUT REG6 FOR ACCUMULATOR
+
+                                     55 *
+                                     56 *  READ UNTIL EOF
+                                     57 *
+000010 E000 C0C2 0050 000C8          58 TOPREAD  XREAD CARD,80
+000016 4740 C05E            00064    59          BC    B'0100',ENDREAD         EOF => EXIT THE LOOP
+
+                                     61 *
+                                     62 *  RETRIEVE THE THREE VALUES
+                                     63 *
+00001A 5320 C0C2            000C8    64          XDECI 2,CARD                  RETRIEVE 1ST NUMBER ON LINE
+00001E 5331 0000            00000    65          XDECI 3,0(1)                  RETRIEVE 2ND NUMBER ON LINE
+000022 5341 0000            00000    66          XDECI 4,0(1)                  RETRIEVE 3RD NUMBER ON LINE
+
+                                     68 *
+                                     69 *  COMPARE NUMBERS
+                                     70 *
+000026 1923                          71 IF       CR    2,3
+000028 47A0 C02A            00030    72          BC    B'1010',THEN            1ST NUMBER >= 2ND NUMBER
+00002C 4740 C030            00036    73          BC    B'0100',ELSE            1ST NUMBER <  2ND NUMBER
+000030 1924                          74 THEN     CR    2,4
+000032 47A0 C03A            00040    75          BC    B'1010',SAVE1           1ST NUMBER IS LARGEST
+000036 1934                          76 ELSE     CR    3,4
+000038 47A0 C040            00046    77          BC    B'1010',SAVE2           2ND NUMBER IS LARGEST
+00003C 4740 C046            0004C    78          BC    B'0100',SAVE3           3RD NUMBER IS LARGEST
+
+                                     80 *
+                                     81 *  1ST NUMBER IS LARGEST, SO SAVE IT
+                                     82 *
+000040 1852                          83 SAVE1    LR    5,2
+000042 47F0 C048            0004E    84          BC    B'1111',PRINT
+
+                                     86 *
+                                     87 *  2ND NUMBER IS LARGEST, SO SAVE IT
+                                     88 *
+000046 1853                          89 SAVE2    LR    5,3
+000048 47F0 C048            0004E    90          BC    B'1111',PRINT
+
+                                     92 *
+                                     93 *  3RD NUMBER IS LARGEST, SO SAVE IT
+                                     94 *
+00004C 1854                          95 SAVE3    LR    5,4
+
+                                     97 *
+                                     98 *  OUTPUT LARGEST NUMBER
+                                     99 *
+00004E 5250 C113            00119   100 PRINT    XDECO 5,OUTLINE
+000052 E020 C11F 0017 00125         101          XPRNT LRGHEAD,23
+000058 E020 C112 000D 00118         102          XPRNT CARRIAGE,13
+
+00005E 1A65                         104          AR    6,5                     ADD LARGEST VALUE TO SUM
+
+                                                                                                                            PAGE 3
+  LOC  OBJECT CODE    ADDR1 ADDR2   STMT    SOURCE STATEMENT
+
+000060 47F0 C00A            00010   105          BC    B'1111',TOPREAD
+
+                                    107 *
+                                    108 *  OUTPUT SUM OF LARGEST VALUES
+                                    109 *
+000064 5260 C113            00119   110 ENDREAD  XDECO 6,OUTLINE
+000068 E020 C136 0017 0013C         111          XPRNT SUMHEAD,23
+00006E E020 C112 000D 00118         112          XPRNT CARRIAGE,13
+
+                                    114 *************************************
+                                    115 *                                   *
+                                    116 *        ENDING HOUSEKEEPING        *
+                                    117 *                                   *
+                                    118 *************************************
+000074 58D0 C07E            00084   119          L     13,SAVEAREA+4
+000078 98EC D00C            0000C   120          LM    14,12,12(13)
+00007C 07FE                         121          BR    14
+
+                                    123 *************************************
+                                    124 *                                   *
+                                    125 *   DECLARE STORAGE AND CONSTANTS   *
+                                    126 *                                   *
+                                    127 *************************************
+000080                              128 SAVEAREA DS    18F
+0000C8                              129 CARD     DS    CL80
+000118 4E                           130 CARRIAGE DC    C'+'
+000119                              131 OUTLINE  DS    CL12
+000125 40E3C8C540D3C1D9             132 LRGHEAD  DC    C' THE LARGEST VALUE IS: '
+00013C F040404040404040             133 SUMHEAD  DC    C'0          THE SUM IS: '
+
+                                    135 *************************************
+                                    136 *                                   *
+                                    137 * END, DATA ENTRY, AND LITERAL POOL *
+                                    138 *                                   *
+                                    139 *************************************
+                                    140          END   BEAVER1
+
+***   0 STATEMENTS FLAGGED - 0 WARNINGS, 0 ERRORS
+
+*** PROGRAM EXECUTION BEGINNING -
+ANY OUTPUT BEFORE EXECUTION COMPLETE MESSAGE IS PRODUCED BY USER PROGRAM ***
+
+
+          THE SUM IS:            0
+
+*** EXECUTION COMPLETED ***
+
