@@ -1,0 +1,15 @@
+(* program to average 100 integers *)     
+program average
+var
+	sum, value, average, i : integer
+begin
+	sum := (0 + 0);
+	average := 0 * 0;
+	for i := 1 to 100 do
+		begin
+			read(value);
+			sum := sum + value;
+		end; 
+	average := sum div 100;
+	write(average);
+end.

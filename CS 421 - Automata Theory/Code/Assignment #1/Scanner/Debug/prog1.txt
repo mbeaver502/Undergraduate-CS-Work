@@ -1,0 +1,19 @@
+(* Program to average 100 integers *)
+(* Multiline
+Comment
+Test
+*)
+PROGRAM AVERAGE
+VAR
+	SUM, VALUE, AVERAGE, I : INTEGER
+BEGIN
+	SUM := 0;
+	AVERAGE := 0;
+	FOR I := 1 TO 100 DO
+		BEGIN
+			READ(VALUE);
+			SUM := SUM + VALUE;
+		END;
+	AVERAGE := SUM DIV 100;
+	WRITE(AVERAGE);
+END.

@@ -1,0 +1,70 @@
+\documentclass[12pt,letter]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+
+\newcommand{\QED}{
+	\begin{flushright}
+		\textit{\textbf{\#QED}}
+	\end{flushright}
+}
+
+\begin{document}
+
+Michael Beaver\\
+CS 421, SP15\\
+20 March 2015 \\
+Lab \#3 
+\hrule
+
+\textbf{\S 4.3 4.} Prove the following languages are not regular.
+
+\textbf{\S 4.3 4a.} $L = \{ a^n b^l a^k : k \geq n + l \}$
+
+Assume $L$ is regular and therefore pumpable. By the Pumping Lemma, we know there exists $m \in \mathbb{N}$ and $w \in L$ such that $|w| \geq m$. We choose $w = a^m b^m a^{2m}$, which is clearly in $L$ with $|w| \geq m$. By the Pumping Lemma, we know we need a decomposition $w = xyz$ with a prefix $xy$ such that $|xy| \leq m$ and $|y| \geq 1$. It is easy to see that we must have $xy = a^p$ for some $p \in [1, m]$. Now consider $i = 2$: $w = xy^2 z = a^{m+p} b^m a^{2m}$. For $w$ to be in $L$, we must have $m + p + m \leq 2m \Rightarrow p \leq 0$. This, however, cannot be true since $p \in [1, m]$. We see that $w \not\in L$. Thus, we have a contradiction in the Pumping Lemma. Since $L$ is not pumpable, it cannot be regular. \QED
+
+\textbf{\S 4.3 4b.} $L = \{ a^n b^l a^k : k \neq n + l \}$
+
+Assume $L$ is regular and therefore pumpable. We have the properties of complementation and intersection for regular languages. Let us say $L_1 = \overline{L} \cap L(a^* b^* a^*)$. Note that $L(a^* b^* a^*)$ is regular because $a^* b^* a^*$ is a regular expression. It is easy to see that $L_1 = \{a^n b^l a^k : k = n + l \}$. Since we have assumed $L$ is regular, $L_1$ must be regular. Let us apply the Pumping Lemma to $L_1$. By the Pumping Lemma, we know there exists $m \in \mathbb{N}$ and $w \in L$ such that $|w| \geq m$. We choose $w = a^m b^m a^{2m}$, which is clearly in $L_1$ with $|w| \geq m$. By the Pumping Lemma, we must have a decomposition $w = xyz$ with $|xy| \leq m$ and $|y| \geq 1$. This forces $xy = a^p$ for some $p \in [1, m]$. We could now consider $i = 0$ and $i = 1$, but these are unhelpful. Consider instead $i = 2$: $w = xy^2 z = a^{m + p} b^m a^{2m}$. For $w$ to be in $L$, we need $m + p + m = 2m \Rightarrow p = 0$. However, this is impossible since $p \in [1, m]$. Thus, we have a contradiction in the Pumping Lemma for $L_1$. Since $L_1$ is not pumpable and therefore not regular, we have contradicted our assumption that $L$ is regular. Therefore, $L$ is not a regular language. \QED
+
+\textbf{\S 4.3 4c.} $L = \{ a^n b^l a^k : n = l $ or $l \neq k \}$
+
+Assume $L$ is regular and therefore pumpable. By the Pumping Lemma, we know there exists $m \in \mathbb{N}$ and $w \in L$ such that $|w| \geq m$. We choose $w = a^m b^m a^m$, which is clearly in $L$ with $|w| \geq m$. By the Pumping Lemma, we need a decomposition $w = xyz$ with $|xy| \leq m$ and $|y| \geq 1$. We see that $xy = a^p$ for some $p \in [1, m]$. Now consider $i = 0$: $w = xy^0 z = a^{m - p} b^m a^m$. For $w$ to be in $L$, we need $m - p = m \Rightarrow p = 0$ or $m \neq m$. It is clear to see that neither condition is true. Thus, we have a contradiction in the Pumping Lemma. Since $L$ is not pumpable, $L$ cannot be regular. \QED
+
+\pagebreak
+
+\textbf{\S 4.3 4d.} $L = \{ a^n b^l : n \leq l \}$
+
+Assume $L$ is regular and therefore pumpable. By the Pumping Lemma, we know there exists $m \in \mathbb{N}$ and $w \in L$ such that $|w| \geq m$. We choose $w = a^m b^{m+1}$, which is clearly in $L$ with $|w| \geq m$. By the Pumping Lemma, we need a decomposition $w = xyz$ with $|xy| \leq m$ and $|y| \geq 1$. It is easy to see that we must have $xy = a^p$ for some $p \in [1, m]$. Consider $i = 2$: $w = xy^2 z = a^{m+p} b^{m+1}$. For $w$ to be in $L$, we must have $m + p \leq m + 1 \Rightarrow p \leq 1$, which is impossible. Thus, we have a contradiction in the Pumping Lemma. Since $L$ cannot be pumped, it cannot be a regular language. \QED
+
+
+\textbf{\S 4.3 4e.} $L = \{ w : n_a (w) \neq n_b (w) \}$
+
+Assume $L$ is regular and therefore pumpable. We have the property of regular languages that $L_1 = \overline{L}$ is regular. We have, then, $L_1 = \{ w : n_a (w) = n_b (w) \}$ is regular, which implies $L_1$ is pumpable. By the Pumping Lemma, we know there exists $m \in \mathbb{N}$ and $w \in L$ such that $|w| \geq m$. We choose $w = a^m b^m$, which is clearly in $L_1$ with $|w| \geq m$. By the Pumping Lemma, we need a decomposition $w = xyz$ with $|xy| \leq m$ and $|y| \geq 1$. We see that we must have $xy = a^p$ for some $p \in [1, m]$. Now consider $i = 0$: $w = xy^0 z = a^{m-p} b^m$. For $w$ to be in $L_1$, we must have $m - p = m \Rightarrow p = 0$, which is impossible. Thus, we have a contradiction in the Pumping Lemma, which implies $L_1$ is not regular. Recall that $L_1 = \overline{L}$. Since $L_1$ is not regular, we must conclude that $L$ is also not regular. \QED
+
+\textbf{\S 4.3 4f.} $L = \{ ww : w \in \{ a,b \}^* \}$
+
+Assume $L$ is regular and therefore pumpable. By the Pumping Lemma, we know there exists $m \in \mathbb{N}$ and $v \in L$ such that $|v| \geq m$. We choose $v = a^m b^m a^m b^m$, which is clearly in $L$ with $|v| \geq m$. By the Pumping Lemma, we need a decomposition $v = xyz$ with $|xy| \leq m$ and $|y| \geq 1$. Clearly we cannot have $xy = a^m b^m$ since $|a^m b^m| = 2m > m$. We are forced, then, to have $xy = a^p$ for some $p \in [1, m]$. Now consider $i = 0$: $v = xy^0 z = a^{m-p} b^m a^m b^m$. For $v$ to be in $L$, we need $m - p = m \Rightarrow p = 0$, which is impossible. Thus, we have a contradiction in the Pumping Lemma, which implies $L$ cannot be regular. \QED
+
+\textbf{\S 4.3 4g.} $L = \{ wwww^R : w \in \{ a,b \}^* \}$
+
+Assume $L$ is regular and therefore pumpable. By the Pumping Lemma, we know there exists $m \in \mathbb{N}$ and $v \in L$ such that $|v| \geq m$. We choose $v = wwww^R$ where $w = a^m b$. We see $v \in L$ and $|v| \geq m$. We also need a decomposition $v = xyz$ with $|xy| \leq m$ and $|y| \geq 1$. Since $|a^m b| > m$, we must consider the substring $a^m$. Thus, to satisfy the Pumping Lemma, we must have $xy = a^p$ for some $p \in [1, m]$. Now consider $i = 2$: $v = xy^2 z = a^{m+p} b a^m b a^m b b a^m$. We have, then, $v = w_1 www^R$, where $w_1 = a^{m+p} b$. For $v$ to be in $L$, we need $w_1 = w$, which means we need $m + p = m \Rightarrow p = 0$. It is clear that $w_1 \neq w$. Thus, we see that $v \not\in L$, which contradicts the Pumping Lemma. We have, then, that $L$ is not pumpable and not regular. \QED
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

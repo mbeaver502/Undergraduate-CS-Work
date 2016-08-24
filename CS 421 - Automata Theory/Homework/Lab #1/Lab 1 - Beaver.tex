@@ -1,0 +1,112 @@
+\documentclass[12pt,letter]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+
+\newcommand{\QED}{
+	\begin{flushright}
+		\textit{\textbf{\#QED}}
+	\end{flushright}
+	\ \\
+}
+
+\begin{document}
+
+Michael Beaver\\
+CS 421, SP15\\
+21 January 2015\\
+Lab \#1
+\hrule
+
+\textbf{2.} Construct a DFA with $\Sigma = \lbrace a,b \rbrace$ that accepts all the sets consisting of:
+
+\textbf{2a.} All strings with exactly one $a$.\\
+\begin{center}
+	\includegraphics{"images/Lab 1 - 2a"}
+\end{center}
+
+\textbf{2b.} All strings with at least one $a$.\\
+\begin{center}
+	\includegraphics{"images/Lab 1 - 2b"}
+\end{center}
+
+\textbf{2c.} All strings with no more than three $a$s ($0 \leq n \leq 3$).\\
+\begin{center}
+	\includegraphics{"images/Lab 1 - 2c"}
+\end{center}
+
+\textbf{2d.} All strings with at least one $a$ and exactly two $b$s.\\
+\begin{center}
+	\includegraphics[scale=0.75]{"images/Lab 1 - 2d"}
+\end{center}
+
+\pagebreak
+
+\textbf{2e.} All strings with exactly two $a$s and more than two $b$s.\\
+\begin{center}
+	\includegraphics[scale=0.80]{"images/Lab 1 - 2e"}
+\end{center}
+This graph was generated from a tree, and only a minimal effort was made to simplify it. No doubt there is a simpler graph.
+
+\textbf{3.} Show that if we change Figure 2.6, making $q_3$ a nonfinal state and making $q_0, q_1, q_2$ final states, the resulting DFA accepts $\overline{L}$. Modified graph:\\
+\begin{center}
+	\includegraphics{"images/Lab 1 - 3"}
+\end{center}
+
+We want to show that the DFA accepting $L$ accepts $\overline{L}$ when certain states are changed. After making the changes, we have the above transition graph. By definition, $\overline{L} = \Sigma^{*} - L$, which means $\overline{L} = \Sigma^{*} - \lbrace awa : w \in \lbrace a,b \rbrace^{*} \rbrace$. (Note that since $\Sigma^{*}$ contains $\lambda$, we must also consider the empty string.) This means that $\overline{L}$ essentially describes a language that contains strings that neither begin with $a$ nor (necessarily) end in $a$. In other words, $\overline{L}$ removes all sentences explicitly of the form $awa$, which are described by $L$. 
+
+Looking at the aforementioned transition graph, we can easily see that the case involving a string of zero length (i.e., $\lambda$) is trivial, as the string is automatically accepted at $q_0$. We also notice that the only other final states are $q_1$ and $q_2$. If we input a string $v$ beginning with $b$, then we have $\delta (q_0, b) \rightarrow q_1$. Since $q_1$ is a trap state, this DFA will accept any input string from $\overline{L}$ beginning with $b$ (and ending in \textit{either} $a$ or $b$). Alternatively, if $v$ begins with $a$, then we have $\delta (q_0, a) \rightarrow q_2$. If at any time we encounter another $a$ (we can disregard $b$ while in $q_2$), then we become trapped in $q_3$. Hence, if $v$ begins with $a$, then the DFA will reject $v$ if it ends in $a$. If we encounter $b$ while in $q_3$, then we have $\delta (q_3, b) \rightarrow q_2$, which will trap all $b$s until another $a$ is encountered. If another $a$ is encountered, the DFA will return to $q_3$, which is a trap state. This will lead to the rejection of $v$. Thus, we have that this DFA accepts $\overline{L}$, which implies the rejection of $L$. \QED
+
+%\ \\
+
+\textbf{4.} Generalize the observation in the previous exercise. Specifically, show that if $M = (Q, \Sigma, \delta, q_0, F)$ and $\widehat{M} = (Q, \Sigma, \delta, q_0, Q - F)$ are two DFAs, then $\overline{L(M)} = L(\widehat{M})$.
+
+We want to show that $\overline{L(M)} = L(\widehat{M})$. Suppose we have two DFAs $M = (Q, \Sigma, \delta, q_0, F)$ and $\widehat{M} = (Q, \Sigma, \delta, q_0, Q - F)$. Since we have a DFA $M$, there exists a language $L$ accepted by $M$ such that $L(M) = \lbrace w \in \Sigma^{*} : \delta^{*}(q_0, w) \in F \rbrace$. If we take the complement of $L$, then we have $\overline{L(M)} = \lbrace w \in \Sigma^{*} : \delta^{*}(q_0, w) \not\in F \rbrace$. In terms of the equivalent transition graph $G$ for $M$, this means we change the final states to nonfinal states and vice versa. In other words, we perform the set operation $F_1 = Q - F$, where $Q$ and $F$ are the finite sets of internal states and final states, respectively, of $M$. Thus, we have a new set of final states $F_1$ (consequently, note that $F_1 \subseteq Q$), which is identical to the finite set of final states of $\widehat{M}$. It is obvious to see, then, that $\widehat{M}$ accepts the language $L(\widehat{M}) = \lbrace w \in \Sigma^{*} : \delta^{*}(q_0, w) \in F_1 \rbrace$, which is equivalent to $L(\widehat{M}) = \lbrace w \in \Sigma^{*} : \delta^{*}(q_0, w) \not\in F \rbrace$. Thus, we see that $\overline{L(M)} = L(\widehat{M})$.  \QED
+
+\pagebreak
+
+\textbf{5.} Give DFAs for the languages:
+
+\textbf{5a.} $L = \lbrace ab^5 wb^2 : w \in \lbrace a,b \rbrace^{*} \rbrace$.
+\begin{center}
+	\includegraphics[scale=0.75]{"images/Lab 1 - 5a"}
+\end{center}
+
+\textbf{5b.} $L = \lbrace ab^n a^m : n \geq 2, m \geq 3 \rbrace$.
+\begin{center}
+	\includegraphics[scale=0.75]{"images/Lab 1 - 5b"}
+\end{center}
+
+\textbf{5c.} $L = \lbrace w_1 ab w_2 : w_1 \in \lbrace a,b \rbrace^{*} , w_2 \in \lbrace a,b \rbrace^{*} \rbrace$.
+\begin{center}
+	\includegraphics{"images/Lab 1 - 5c"}
+\end{center}
+
+\pagebreak
+
+\textbf{5d.} $L = \lbrace ba^n : n \geq 1, n \neq 5 \rbrace$.
+\begin{center}
+	\includegraphics[scale=0.75]{"images/Lab 1 - 5d"}
+\end{center}
+
+%Use math mode to typeset symbols. Math mode is started with a dollar sign and ended with another dollar sign. If you need to typeset a dollar sign, use an escape like this \$.
+%
+%Math mode example: a DFA is $M = (Q, \Sigma, q_0, \delta^*, F)$.
+%
+%Save your JFLAP graphs as either PNG or JPG files and compile with PDFLatex.
+%
+%If your image file is named superprof.jpg, include it like this\\
+%%\includegraphics{superprof}
+%
+%\LaTeX{} will do all your document formatting for you. This frees you up to concentrate on the content of the document. You may need a couple of tricks though. For example, the double backslashes force a carriage return (\textit{if it is legal}).
+%
+%If you need to scale your image file, the best way is to use an image editor (just like the web). However, you can pass a parameter to \textbf{includegraphics} to scale. %\includegraphics[scale=0.10]{superprof}
+%
+%Use your favorite search engine if you get stuck. I suggest using the search term ``latex'' and your desired topic. For example, ``latex center text'' to find out how to center text.
+
+\end{document}

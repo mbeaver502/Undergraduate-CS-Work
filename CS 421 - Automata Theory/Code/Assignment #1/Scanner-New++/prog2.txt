@@ -1,0 +1,23 @@
+  (* program to   average 100 integers *)     
+(* multiline
+comment
+test
+*)
+program average
+var
+	sum, value, average, i, _hello : integer
+begin
+	sum := 0;
+	average := 0;
+	(* surprise 
+	comment! *)
+	for i := 1 to 100 do
+		begin
+			read(value);
+			sum := sum + value;
+		end;
+	(* `~!@#$%^&[]{}|/\<> *)
+	average := sum div 100;
+	write(average);
+	(* abcdefghijklmnopq *)
+end.abc

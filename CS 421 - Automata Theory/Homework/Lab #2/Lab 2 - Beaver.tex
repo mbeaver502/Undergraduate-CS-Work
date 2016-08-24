@@ -1,0 +1,125 @@
+\documentclass[12pt,letter]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{parskip}
+\usepackage{xcolor}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+
+\newcommand{\QED}{
+	\begin{flushright}
+		\textit{\textbf{\#QED}}
+	\end{flushright}
+}
+
+\begin{document}
+
+Michael Beaver\\
+CS 421, SP15\\
+9 February 2015 \\
+Lab \#2 
+\hrule
+
+\textbf{\S 2.2 8.} Construct an NFA with three states that accepts the language $\lbrace ab, abc \rbrace ^*$.
+
+\begin{center}
+	\includegraphics{"images/Lab 2 - 8"}
+\end{center}
+
+
+\textbf{\S 2.2 13.} What is the complement of the language accepted by the NFA in Figure 2.10?
+
+Assuming $\Sigma = \lbrace a \rbrace$, we can easily convert this NFA to a DFA. We then can see that it accepts all strings of the form $aa^*$. Hence, $L = \lbrace a^n : n \geq 1 \rbrace$. The complement is $\overline{L} = \Sigma ^* - L$. So, we have $\overline{L} = \Sigma ^* - \lbrace a^n : n \geq 1 \rbrace$. It is clear to see, then, that $\overline{L} = \lbrace a^0 \rbrace$, or $\overline{L} = \lbrace \lambda \rbrace$. \\
+
+
+\textbf{\S 2.3 2.} Convert the NFA in Exercise 12, Section 2.2, into an equivalent DFA.
+
+\begin{center}
+	\includegraphics{"images/Lab 2 - 2"}
+\end{center}
+
+
+\textbf{\S 2.3 3.} Convert the NFA into an equivalent DFA.
+
+\begin{center}
+	\includegraphics{"images/Lab 2 - 3"}
+\end{center}
+
+
+\pagebreak
+
+
+\textbf{\S 2.3 12.} Show that if $L$ is regular, so is $L^R$. \\
+
+Since $L$ is regular, we know that a finite accepter $M$ exists that accepts $L$. We know we can construct a transition graph $G$ with a finite number of vertices (states) and edges (transitions) from $M$. For the sake of argument, we may reasonably assume there is only one final state in $M$ and $G$. We may say this machine and graph accept all strings $w \in L$. We now need to show that $L^R$ is regular. By definition, the reverse of $L$ is $L^R = \lbrace w^R : w \in L \rbrace$, where $w^R$ is the reverse of $w$. To show $L^R$ is regular, we need to find a finite accepter that accepts all strings in $L^R$. Since we already have a graph $G$ that represents the machine $M$ that accepts $L$, we can start here. Because $G$ is a digraph (and by definition of a finite accepter), states can only transition in certain directions. Specifically, $G$ is set up to accept only $w \in L$. Let us clone this graph and call it $G_R$. In the graph $G_R$, let us reverse the direction of all non-loop edges. This may create inaccessible states, but these are negligible. Also, let us change the final state in $G_R$ to the initial state and vice versa. Now we have a graph that accepts strings in the reverse direction of $G$. That is, $G_R$ accepts $w^R$. Hence, this graph represents at least a nondeterministic finite accepter that accepts all strings in the language $L^R$, which is sufficient to show that $L^R$ is a regular language. \QED
+
+
+\textbf{\S 2.4 1.} Minimize the number of states in the DFA in Figure 2.16.
+
+\begin{center}
+	\includegraphics{"images/Lab 2 - 1"}
+\end{center}
+
+\pagebreak
+
+\textbf{\S 2.4 2a.} Find the minimal DFA for $L = \lbrace a^n b^m : n \geq 2, m \geq 1 \rbrace$. Prove that the result is minimal.
+
+\begin{center}
+	\includegraphics{"images/Lab 2 - 2a"}
+\end{center}
+
+We can use the mark and reduce algorithms to minimize our DFA. We know that the reduce algorithm will produce a DFA $\widehat{M}$ such that $L(M) = L(\widehat{M})$ and $\widehat{M}$ has the smallest number of states possible. We claim that our DFA is $\widehat{M}$. Assume that our DFA is not minimal. If we apply the mark and reduce algorithms on $\widehat{M}$, then we will produce another DFA $\widehat{M_1}$ such that $L(\widehat{M}) = L(\widehat{M_1})$ and $\widehat{M_1}$ has fewer states than $\widehat{M}$. Following the mark algorithm, we eliminate any inaccessible states, of which there are none. Next, we mark all distinguishable pairs of states $(p, q)$ such that $p \in F$ and $q \not \in F$ or vice versa. For our DFA $\widehat{M}$, these are the pairs $(0, 3), (1, 3), (2, 3),$ and $(3, 4)$. Next, we determine whether any other pairs are distinguishable based on the computations $\delta (p, a) = p_a$ and $\delta (q, a) = q_a$ for all pairs $(p, q)$ and all $a \in \Sigma$. If $(p_a, q_a)$ is distinguishable, then so is $(p, q)$. Repeating this step, we see all pairs $(p, q)$ are distinguishable, thus ending the mark algorithm. The first step of the reduce algorithm asks us to create equivalence classes, which gives us five distinct sets, each containing a different state in $\widehat{M}$. The next step asks us to create a new state for each equivalence class that contains indistinguishable states. Since we have no such states, there is no need to create these new states. The rest of the steps in the reduce algorithm thus become superfluous. We see, then, that the DFA $\widehat{M_1}$ produced by mark and reduce is actually $\widehat{M}$. This contradicts our assumption that $\widehat{M}$ is not the minimal DFA. Thus, we have  that $\widehat{M}$ is the minimal DFA. \QED
+
+
+\pagebreak
+
+
+\textbf{\S 2.4 2c.} Find the minimal DFA for $L = \lbrace a^n : n \geq 0, n \neq 3 \rbrace$. Prove that the result is minimal. Assume $\Sigma = \lbrace a \rbrace$.
+
+\begin{center}
+	\includegraphics{"images/Lab 2 - 2c"}
+\end{center}
+
+We can use the mark and reduce algorithms to minimize our DFA. We know that the reduce algorithm will produce a DFA $\widehat{M}$ such that $L(M) = L(\widehat{M})$ and $\widehat{M}$ has the smallest number of states possible. We claim that our DFA is $\widehat{M}$. Assume that our DFA is not minimal. If we apply the mark and reduce algorithms on $\widehat{M}$, then we will produce another DFA $\widehat{M_1}$ such that $L(\widehat{M}) = L(\widehat{M_1})$ and $\widehat{M_1}$ has fewer states than $\widehat{M}$. Following the mark algorithm, we eliminate any inaccessible states, of which there are none. Next, we mark all distinguishable pairs of states $(p, q)$ such that $p \in F$ and $q \not \in F$ or vice versa. For our DFA $\widehat{M}$, these are the pairs $(0, 3), (1, 3), (2, 3),$ and $(3, 4)$. Next, we determine whether any other pairs are distinguishable based on the computations $\delta (p, a) = p_a$ and $\delta (q, a) = q_a$ for all pairs $(p, q)$ and all $a \in \Sigma$. If $(p_a, q_a)$ is distinguishable, then so is $(p, q)$. Repeating this step, we see all pairs $(p, q)$ are distinguishable, thus ending the mark algorithm. The first step of the reduce algorithm asks us to create equivalence classes, which gives us five distinct sets, each containing a different state in $\widehat{M}$. The next step asks us to create a new state for each equivalence class that contains indistinguishable states. Since we have no such states, there is no need to create these new states. The rest of the steps in the reduce algorithm thus become superfluous. We see, then, that the DFA $\widehat{M_1}$ produced by mark and reduce is actually $\widehat{M}$. This contradicts our assumption that $\widehat{M}$ is not the minimal DFA. Thus, we have  that $\widehat{M}$ is the minimal DFA. \QED
+
+
+\pagebreak
+
+
+\textbf{\S 2.4 2d.} Find the minimal DFA for $L = \lbrace a^n : n \neq 2$ and $n \neq 4 \rbrace$. Prove that the result is minimal. Assume $\Sigma = \lbrace a \rbrace$.
+
+\begin{center}
+	\includegraphics{"images/Lab 2 - 2d"}
+\end{center}
+
+We can use the mark and reduce algorithms to minimize our DFA. We know that the reduce algorithm will produce a DFA $\widehat{M}$ such that $L(M) = L(\widehat{M})$ and $\widehat{M}$ has the smallest number of states possible. We claim that our DFA is $\widehat{M}$. Assume that our DFA is not minimal. If we apply the mark and reduce algorithms on $\widehat{M}$, then we will produce another DFA $\widehat{M_1}$ such that $L(\widehat{M}) = L(\widehat{M_1})$ and $\widehat{M_1}$ has fewer states than $\widehat{M}$. Following the mark algorithm, we eliminate any inaccessible states, of which there are none. Next, we mark all distinguishable pairs of states $(p, q)$ such that $p \in F$ and $q \not \in F$ or vice versa. For our DFA $\widehat{M}$, these are the pairs $(0, 2), (0, 4), (1, 2), (1, 4), (2, 3), (2, 5), (3, 4),$ and $(4, 5)$. Next, we determine whether any other pairs are distinguishable based on the computations $\delta (p, a) = p_a$ and $\delta (q, a) = q_a$ for all pairs $(p, q)$ and all $a \in \Sigma$. If $(p_a, q_a)$ is distinguishable, then so is $(p, q)$. Repeating this step, we see all pairs $(p, q)$ are distinguishable, thus ending the mark algorithm. The first step of the reduce algorithm asks us to create equivalence classes, which gives us six distinct sets, each containing a different state in $\widehat{M}$. The next step asks us to create a new state for each equivalence class that contains indistinguishable states. Since we have no such states, there is no need to create these new states. The rest of the steps in the reduce algorithm thus become superfluous. We see, then, that the DFA $\widehat{M_1}$ produced by mark and reduce is actually $\widehat{M}$. This contradicts our assumption that $\widehat{M}$ is not the minimal DFA. Thus, we have  that $\widehat{M}$ is the minimal DFA. \QED
+
+
+%\pagebreak
+
+
+\textbf{\S 2.4 4.} Minimize the states in the depicted DFA.
+
+\begin{center}
+	\includegraphics{"images/Lab 2 - 4"}
+\end{center}
+
+
+%Use math mode to typeset symbols. Math mode is started with a dollar sign and ended with another dollar sign. If you need to typeset a dollar sign, use an escape like this \$.
+%
+%Math mode example: a DFA is $M = (Q, \Sigma, q_0, \delta^*, F)$.
+%
+%Save your JFLAP graphs as either PNG or JPG files and compile with PDFLatex.
+%
+%If your image file is named superprof.jpg, include it like this\\
+%%\includegraphics{superprof}
+%
+%\LaTeX{} will do all your document formatting for you. This frees you up to concentrate on the content of the document. You may need a couple of tricks though. For example, the double backslashes force a carriage return (\textit{if it is legal}).
+%
+%If you need to scale your image file, the best way is to use an image editor (just like the web). However, you can pass a parameter to \textbf{includegraphics} to scale. %\includegraphics[scale=0.10]{superprof}
+%
+%Use your favorite search engine if you get stuck. I suggest using the search term ``latex'' and your desired topic. For example, ``latex center text'' to find out how to center text.
+
+\end{document}
