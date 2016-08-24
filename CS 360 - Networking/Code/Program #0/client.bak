@@ -1,0 +1,101 @@
+// Add linker: -lws2_32
+
+// For C
+#include <stdio.h>
+#include <sys/types.h>
+//#include <netinet/in.h>
+//#include <netdb>
+#include <winsock2.h> // Windows
+
+// For C++
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+
+// use global constants in C++
+#define SERVER_PORT 5432
+#define MAX_LINE 256
+
+
+// Set up a connection to some server on port 5432
+// Go into a loop and read from keyboard to send to other end
+// Like a one-way chat program... "SimplexTalk"
+int main(int argc, char * argv[]) {
+
+    //FILE * fp;
+    struct hostent * hp;
+    struct sockaddr_in sin;
+    char * host;
+    char buffer[MAX_LINE];
+    int s;
+    int len;
+
+
+    // Must have two input parameters from command line
+    // First parameter is the hostname
+    if (argc == 2) 
+        host = argv[1];
+
+    else {
+
+        fprintf(stderr, "Usage: SimplexTalk hostname\n");
+        exit(1);
+
+    }
+
+    
+    // Translates host name to peer's IP address
+    hp = gethostbyname(host);
+
+    // Null pointer => error
+    if (!hp) { 
+
+        fprintf(stderr, "SimplexTalk: unknown host %s\n", host);
+        exit(1);
+
+    }
+
+    
+    // Build address data structure
+    //bzero((char *) &sin, sizeof(sin)); 
+    memset((char *) &sin, 0, sizeof(sin));
+    sin.sin_family = AF_INET;
+    //bcopy(hp->h_addr, (char *) &sin.sin_addr, hp->h_length);
+    memcpy((char *) &sin.sin_addr, hp->h_addr, hp->h_length);
+    sin.sin_port = htons(SERVER_PORT); // Correct formatting (Endianness) for the network
+    
+
+    // Active open
+    if ((s = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+
+        perror("SimplexTalk: socket failure");
+        exit(1);
+
+    }
+
+    if (connect(s, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
+
+        perror("SimplexTalk: connection failure");
+        close(s);
+        exit(1);
+
+    }
+
+    
+    // Main loop: Get and send lines of text
+    while (fgets(buffer, sizeof(buffer), stdin)) {
+
+        buffer[MAX_LINE - 1] = '\0';
+        len = strnlen(buffer, sizeof(buffer));
+
+		// Send the message
+		send(s, buffer, len, 0);
+
+    }
+    
+    close(s);
+    
+    return 0;
+    
+}

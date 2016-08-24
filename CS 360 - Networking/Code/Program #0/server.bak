@@ -1,0 +1,144 @@
+// Add linker: -lws2_32
+
+// For C
+#include <stdio.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <sys/socket.h>
+//#include <winsock2.h> // Windows
+
+// For C++
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+
+#include <time.h>
+#include <signal.h>
+
+// use global constants in C++
+//#define SERVER_PORT 1113
+//#define MAX_PENDING 5
+//#define MAX_MSG 1004
+
+const int SERVER_PORT = 1113;
+const int MAX_PENDING = 5;
+const int MAX_MSG = 1004;
+
+
+//volatile sig_atomic_t done = 0;
+
+
+void signalHandler(int signal);
+
+
+int main() {
+
+	struct sockaddr_in sin;
+//	char buffer[MAX_MSG];
+	int len;
+	int s, new_s;
+	time_t currentTime;
+//	struct sigaction sa;
+
+	
+	// https://gist.github.com/aspyct/3462238
+	// https://airtower.wordpress.com/2010/06/16/catch-sigterm-exit-gracefully/
+//	sa.sa_handler = signalHandler;
+//	memset(&sa, 0, sizeof(struct sigaction));
+//	sa.sa_handler = signalHandler;
+//	sa.sa_flags = SA_SIGINFO;
+//	sigemptyset(&sa.sa_mask);
+
+//	time(&currentTime);
+//	fputs(ctime(&currentTime), stdout);
+	
+	
+	// Build address data structure
+	//bzero((char *) &sin, sizeof(sin)); 
+   	memset((char *) &sin, 0, sizeof(sin));
+    	sin.sin_family = AF_INET;
+    	sin.sin_addr.s_addr = INADDR_ANY;
+    	sin.sin_port = htons(SERVER_PORT); // Endianness Formatting
+    
+	
+   	// Passive open
+   	if ((s = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+    
+    		perror("SimplexTalk: socket failure");
+        	exit(1);
+    
+    	}	
+    
+	if (bind(s, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
+	
+		perror("SimplexTalk: bind failure");
+        	exit(1);
+	
+	}
+    
+   	listen(s, MAX_PENDING);
+   
+
+	signal(SIGINT, signalHandler);
+	signal(SIGTERM, signalHandler);
+ 
+    
+    	// Main loop: Accept and receive messages
+    	while (true) {
+    
+    		len = sizeof(sin); // ?
+    	
+    		//if ((new_s = accept(s, (struct sockaddr *) &sin, &len)) < 0) {
+    		if ((new_s = accept(s, (struct sockaddr*)&sin, (socklen_t*)&len)) < 0) {
+    			
+		    	perror("SimplexTalk: accept failure");
+			exit(1);
+    	
+    		}
+		
+//		signal(SIGINT, signalHandler);
+//		signal(SIGTERM, signalHandler);
+/*
+		if (sigaction(SIGTERM, &sa, &sa) == -1) 
+			perror("Failed on SIGTERM");
+
+		if (sigaction(SIGINT, &sa, &sa) == -1)
+			perror("Failed on SIGINT");
+*/    
+//		if (done){
+//			printf("done\n");
+//			break;
+//		}
+
+		/*
+    		while (len = recv(new_s, buffer, sizeof(buffer), 0)) 
+    			fputs(buffer, stdout);
+		*/
+		
+		time(&currentTime);
+		fputs(ctime(&currentTime), stdout);
+
+    		close(new_s);
+    
+    	}
+    
+    	close(s);
+
+	printf("Outside\n");
+    
+    	return 0;
+
+}
+
+
+// http://www.yolinux.com/TUTORIALS/C++Signals.html
+void signalHandler(int signal) {
+
+	printf("Caught signal %d\n", signal);
+
+	exit(signal);
+
+}
